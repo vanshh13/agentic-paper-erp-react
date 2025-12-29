@@ -1,15 +1,22 @@
-import { INQUIRY_STATUS } from '../types/inquiry'
+import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../types/inquiry'
 
 const DUMMY_INQUIRIES = [
   {
     id: '1',
-    inquiryNumber: 'INQ-2024-001',
+    inquiryNumber: 'INQ-241229-AB12',
     companyName: 'ABC Paper Trading Co.',
+    customerName: 'ABC Paper Trading Co.',
     contactPerson: 'Rajesh Kumar',
     email: 'rajesh@abc-paper.com',
+    customerEmail: 'rajesh@abc-paper.com',
     phone: '+91-9876543210',
+    customerPhone: '+91-9876543210',
     productCategory: 'Newsprint',
-    status: INQUIRY_STATUS.APPROVED,
+    source: INQUIRY_SOURCE.WHATSAPP,
+    status: INQUIRY_STATUS.CONVERTED,
+    slaStatus: SLA_STATUS.ON_TRACK,
+    assignedSalesPerson: 'John Doe',
+    inquiryDateTime: '2024-12-20T10:30:00',
     items: [
       {
         id: '1-1',
@@ -35,13 +42,20 @@ const DUMMY_INQUIRIES = [
   },
   {
     id: '2',
-    inquiryNumber: 'INQ-2024-002',
+    inquiryNumber: 'INQ-241225-CD34',
     companyName: 'Global Papers Ltd.',
+    customerName: 'Global Papers Ltd.',
     contactPerson: 'Priya Singh',
     email: 'priya@globalpapers.com',
+    customerEmail: 'priya@globalpapers.com',
     phone: '+91-9123456789',
+    customerPhone: '+91-9123456789',
     productCategory: 'Coated Paper',
-    status: INQUIRY_STATUS.PENDING,
+    source: INQUIRY_SOURCE.EMAIL,
+    status: INQUIRY_STATUS.NEW,
+    slaStatus: SLA_STATUS.ON_TRACK,
+    assignedSalesPerson: 'Jane Smith',
+    inquiryDateTime: '2024-12-25T14:15:00',
     items: [
       {
         id: '2-1',
@@ -59,13 +73,20 @@ const DUMMY_INQUIRIES = [
   },
   {
     id: '3',
-    inquiryNumber: 'INQ-2024-003',
+    inquiryNumber: 'INQ-241228-EF56',
     companyName: 'Metro Print Solutions',
+    customerName: 'Metro Print Solutions',
     contactPerson: 'Amit Patel',
     email: 'amit@metroprint.com',
+    customerEmail: 'amit@metroprint.com',
     phone: '+91-9988776655',
+    customerPhone: '+91-9988776655',
     productCategory: 'Kraft Paper',
-    status: INQUIRY_STATUS.DRAFT,
+    source: INQUIRY_SOURCE.PHONE,
+    status: INQUIRY_STATUS.PARSED,
+    slaStatus: SLA_STATUS.AT_RISK,
+    assignedSalesPerson: 'Mike Johnson',
+    inquiryDateTime: '2024-12-28T09:00:00',
     items: [
       {
         id: '3-1',
@@ -83,13 +104,20 @@ const DUMMY_INQUIRIES = [
   },
   {
     id: '4',
-    inquiryNumber: 'INQ-2024-004',
+    inquiryNumber: 'INQ-241215-GH78',
     companyName: 'PrintTech Industries',
+    customerName: 'PrintTech Industries',
     contactPerson: 'Vikram Sharma',
     email: 'vikram@printtech.com',
+    customerEmail: 'vikram@printtech.com',
     phone: '+91-9876654321',
+    customerPhone: '+91-9876654321',
     productCategory: 'Coated Paper',
-    status: INQUIRY_STATUS.APPROVED,
+    source: INQUIRY_SOURCE.PORTAL,
+    status: INQUIRY_STATUS.PI_SENT,
+    slaStatus: SLA_STATUS.ON_TRACK,
+    assignedSalesPerson: 'Sarah Williams',
+    inquiryDateTime: '2024-12-15T11:20:00',
     items: [
       {
         id: '4-1',
@@ -115,13 +143,20 @@ const DUMMY_INQUIRIES = [
   },
   {
     id: '5',
-    inquiryNumber: 'INQ-2024-005',
+    inquiryNumber: 'INQ-241210-IJ90',
     companyName: 'EcoWrap Packaging',
+    customerName: 'EcoWrap Packaging',
     contactPerson: 'Neha Gupta',
     email: 'neha@ecowrap.com',
+    customerEmail: 'neha@ecowrap.com',
     phone: '+91-9765432109',
+    customerPhone: '+91-9765432109',
     productCategory: 'Kraft Paper',
+    source: INQUIRY_SOURCE.WALK_IN,
     status: INQUIRY_STATUS.REJECTED,
+    slaStatus: SLA_STATUS.BREACHED,
+    assignedSalesPerson: 'Tom Brown',
+    inquiryDateTime: '2024-12-10T16:45:00',
     items: [
       {
         id: '5-1',
@@ -136,6 +171,37 @@ const DUMMY_INQUIRIES = [
     notes: 'Out of stock - cannot fulfill',
     createdAt: '2024-12-10',
     updatedAt: '2024-12-12'
+  },
+  {
+    id: '6',
+    inquiryNumber: 'INQ-241227-KL12',
+    companyName: 'Premium Print House',
+    customerName: 'Premium Print House',
+    contactPerson: 'Rahul Mehta',
+    email: 'rahul@premiumprint.com',
+    customerEmail: 'rahul@premiumprint.com',
+    phone: '+91-9456789012',
+    customerPhone: '+91-9456789012',
+    productCategory: 'Specialty Paper',
+    source: INQUIRY_SOURCE.EMAIL,
+    status: INQUIRY_STATUS.FOLLOW_UP,
+    slaStatus: SLA_STATUS.AT_RISK,
+    assignedSalesPerson: 'Lisa Anderson',
+    inquiryDateTime: '2024-12-27T13:30:00',
+    items: [
+      {
+        id: '6-1',
+        productName: 'Specialty Paper 150 GSM',
+        quantity: 1200,
+        unitPrice: 85,
+        totalAmount: 102000,
+        specifications: 'Premium specialty paper'
+      }
+    ],
+    totalAmount: 102000,
+    notes: 'Follow up required - waiting for customer response',
+    createdAt: '2024-12-27',
+    updatedAt: '2024-12-28'
   }
 ]
 
@@ -175,11 +241,25 @@ export const inquiryService = {
   create: async (inquiry) => {
     return new Promise((resolve) => {
       setTimeout(() => {
+        // Generate inquiry number
+        const date = new Date()
+        const prefix = 'INQ'
+        const dateStr = date.toISOString().slice(2, 10).replace(/-/g, '')
+        const random = Math.random().toString(36).substring(2, 6).toUpperCase()
+        const inquiryNumber = `${prefix}-${dateStr}-${random}`
+
         const newInquiry = {
           ...inquiry,
           id: Math.random().toString(36).substr(2, 9),
+          inquiryNumber,
+          inquiryDateTime: inquiry.inquiryDateTime || new Date().toISOString(),
           createdAt: new Date().toISOString().split('T')[0],
-          updatedAt: new Date().toISOString().split('T')[0]
+          updatedAt: new Date().toISOString().split('T')[0],
+          // Legacy compatibility
+          companyName: inquiry.customerName || inquiry.companyName || '',
+          contactPerson: inquiry.contactPerson || '',
+          email: inquiry.customerEmail || inquiry.email || '',
+          phone: inquiry.customerPhone || inquiry.phone || '',
         }
         DUMMY_INQUIRIES.push(newInquiry)
         resolve(newInquiry)
