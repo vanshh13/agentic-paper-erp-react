@@ -1,13 +1,29 @@
-import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, TruckIcon, FileCheck, ClipboardList, CheckSquare, Settings, LogOut } from 'lucide-react'
-import { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, TruckIcon, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAccountOpen, setIsAccountOpen] = useState(false)
+  const [isHighlighted, setIsHighlighted] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate();
+  const footerRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (footerRef.current && !footerRef.current.contains(event.target)) {
+        setIsHighlighted(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
   const menuItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/', badge: null },
+    { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
     { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
     { label: 'Rules', icon: FileCheck, path: '/rules', badge: null },
     { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
@@ -25,9 +41,6 @@ export default function Sidebar() {
   ]
 
   const isActive = (path) => {
-    if (path === '/') {
-      return location.pathname === '/'
-    }
     return location.pathname.startsWith(path)
   }
 
@@ -105,41 +118,51 @@ export default function Sidebar() {
           })}
         </nav>
 
+
         {/* My Account Section */}
-        <div className="flex-shrink-0 border-t border-[oklch(0.25_0_0)] pt-3 px-3">
-          <p className="text-xs font-semibold text-[oklch(0.55_0_0)] uppercase tracking-wider px-3 mb-2">My Account</p>
-          <div className="space-y-1 mb-3">
-            <Link
-              to="/settings"
-              onClick={() => setIsOpen(false)}
-              className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm
-                ${location.pathname === '/settings'
-                  ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
-                  : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
-                }
-              `}
-            >
-              <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
-              <span className="flex-1 truncate">Settings</span>
-            </Link>
-            <button
-              onClick={() => {
-                // Handle logout logic here
-                console.log('Logout clicked')
-                setIsOpen(false)
-              }}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
-            >
-              <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
-              <span className="flex-1 truncate text-left">Logout</span>
-            </button>
-          </div>
-        </div>
+       {isAccountOpen && (
+         <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2">
+           <p className="text-xs font-semibold text-white-600 uppercase tracking-wider px-3 mb-2">My Account</p>
+           <div className="space-y-1 mb-3">
+             <Link
+               to="/settings"
+               onClick={() => setIsOpen(false)}
+               className={`
+                 flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm
+                 ${location.pathname === '/settings'
+                   ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
+                   : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
+                 }
+               `}
+             >
+               <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
+               <span className="flex-1 truncate">Settings</span>
+             </Link>
+             <button
+               onClick={() => {
+                 // Handle logout logic here
+                 navigate('/auth/login');
+                 setIsOpen(false)
+               }}
+               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
+             >
+               <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
+               <span className="flex-1 truncate text-left">Logout</span>
+             </button>
+           </div>
+         </div>
+       )}
 
         {/* Sidebar Footer */}
-        <div className="flex-shrink-0 p-3 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)]">
-          <div className="flex items-center gap-3 px-3 py-2">
+        <div ref={footerRef} className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)] cursor-pointer hover:bg-[oklch(0.15_0_0)] transition-colors rounded-t-lg ${isHighlighted ? 'ring-2 ring-white' : ''}`} onClick={() => {
+          setIsAccountOpen(!isAccountOpen);
+          if (isAccountOpen) {
+            setIsHighlighted(true);
+          } else {
+            setIsHighlighted(false);
+          }
+        }}>
+          <div className="flex items-center gap-2 px-2 py-1">
             <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
               AM
             </div>
@@ -147,6 +170,11 @@ export default function Sidebar() {
               <p className="text-xs font-medium text-[oklch(0.90_0_0)] truncate">Admin User</p>
               <p className="text-xs text-[oklch(0.60_0_0)] truncate">admin@paperco.com</p>
             </div>
+            {isAccountOpen ? (
+              <ChevronUp size={16} className="text-[oklch(0.75_0_0)]" />
+            ) : (
+              <ChevronDown size={16} className="text-[oklch(0.75_0_0)]" />
+            )}
           </div>
         </div>
       </aside>

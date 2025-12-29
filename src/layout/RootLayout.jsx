@@ -1,7 +1,8 @@
 import Sidebar from './Sidebar'
 import { Bell } from 'lucide-react'
+import { Outlet } from 'react-router-dom'
 
-export default function RootLayout({ children }) {
+export default function RootLayout() {
   return (
     <div className="flex min-h-screen bg-[oklch(0.18_0_0)]">
       {/* Sidebar */}
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
 
         {/* Page Content */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>
