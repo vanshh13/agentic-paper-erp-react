@@ -7,7 +7,7 @@ import Products from './pages/Products'
 import SalesOrders from './pages/SalesOrders'
 import PurchaseOrders from './pages/PurchaseOrders'
 import Quotations from './pages/Quotations'
-import Inquiry from './pages/Inquiry'
+import Inquiry from './pages/Inquiry/Inquiry'
 
 function App() {
   return (

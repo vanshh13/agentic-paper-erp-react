@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, TruckIcon, FileCheck, ClipboardList, CheckSquare } from 'lucide-react'
+import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, TruckIcon, FileCheck, ClipboardList, CheckSquare, Settings, LogOut } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Sidebar() {
@@ -104,6 +104,38 @@ export default function Sidebar() {
             )
           })}
         </nav>
+
+        {/* My Account Section */}
+        <div className="flex-shrink-0 border-t border-[oklch(0.25_0_0)] pt-3 px-3">
+          <p className="text-xs font-semibold text-[oklch(0.55_0_0)] uppercase tracking-wider px-3 mb-2">My Account</p>
+          <div className="space-y-1 mb-3">
+            <Link
+              to="/settings"
+              onClick={() => setIsOpen(false)}
+              className={`
+                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm
+                ${location.pathname === '/settings'
+                  ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
+                  : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
+                }
+              `}
+            >
+              <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
+              <span className="flex-1 truncate">Settings</span>
+            </Link>
+            <button
+              onClick={() => {
+                // Handle logout logic here
+                console.log('Logout clicked')
+                setIsOpen(false)
+              }}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
+            >
+              <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
+              <span className="flex-1 truncate text-left">Logout</span>
+            </button>
+          </div>
+        </div>
 
         {/* Sidebar Footer */}
         <div className="flex-shrink-0 p-3 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)]">
