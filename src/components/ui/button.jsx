@@ -1,14 +1,10 @@
 const Button = ({ children, loading, ...props }) => (
-    <button
-      {...props}
-      disabled={loading || props.disabled}
-      className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
-        loading || props.disabled
-          ? 'bg-gray-700 cursor-not-allowed text-gray-400'
-          : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-      }`}
-    >
-      {loading ? 'Processing...' : children}
-    </button>
-  );
+  <button
+    className="px-8 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+    disabled={loading}
+    {...props}
+  >
+    {loading ? 'Processing...' : children}
+  </button>
+);
   export default Button;

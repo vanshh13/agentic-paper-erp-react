@@ -3,7 +3,7 @@ import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, Message
 import { useState, useEffect, useRef } from 'react'
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const [isHighlighted, setIsHighlighted] = useState(false)
   const location = useLocation()
@@ -11,16 +11,17 @@ export default function Sidebar() {
   const footerRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (footerRef.current && !footerRef.current.contains(event.target)) {
-        setIsHighlighted(false);
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    handleResize(); // Set initial state
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
@@ -47,19 +48,21 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Toggle Button */}
-      <button
+      {!isOpen &&
+      (<button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-3 left-3 z-[60] bg-indigo-600 text-white p-2 rounded-lg shadow-xl hover:bg-indigo-700 transition-colors active:scale-95"
+        className="fixed top-3 left-3 z-[60] bg-indigo-600 text-white p-2 rounded-lg shadow-xl hover:bg-indigo-700 transition-colors active:scale-95"
         aria-label="Toggle menu"
         title="Toggle sidebar menu"
       >
-        {isOpen ? <X size={20} className="w-5 h-5" /> : <Menu size={20} className="w-5 h-5" />}
+        { <Menu size={20} className="w-5 h-5" />}
       </button>
-
+      )
+      }
       {/* Mobile Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm lg:hidden z-30"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
@@ -67,13 +70,13 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed lg:static top-0 left-0 
+          ${isOpen ? 'lg:static' : 'fixed'} top-0 left-0 
           h-screen w-60 
           bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)]
           transform transition-transform duration-300 ease-in-out
-          z-50 lg:z-auto
+          z-50
           flex flex-col
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Sidebar Header */}
@@ -84,6 +87,13 @@ export default function Sidebar() {
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-semibold text-[oklch(0.92_0_0)] truncate">Rahul Papers</h2>
           </div>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="hidden lg:flex p-1 hover:bg-[oklch(0.20_0_0)] rounded text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)]"
+            aria-label="Close sidebar"
+          >
+            <X size={16} />
+          </button>
         </div>
 
         {/* Navigation Menu */}
