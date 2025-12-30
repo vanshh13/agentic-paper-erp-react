@@ -1,28 +1,27 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, TruckIcon, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown } from 'lucide-react'
+import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
+import { useSidebar } from '../contexts/SidebarContext'
 
 export default function Sidebar() {
-  const [isOpen, setIsOpen] = useState(true)
+  const { isOpen, setIsOpen } = useSidebar()
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const [isHighlighted, setIsHighlighted] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate();
-  const footerRef = useRef(null);
+  const navigate = useNavigate()
+  const footerRef = useRef(null)
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setIsOpen(true);
-      } else {
-        setIsOpen(false);
-      }
+      setIsMobile(window.innerWidth < 1024);
     };
 
-    handleResize(); // Set initial state
+    handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
     { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
@@ -34,7 +33,7 @@ export default function Sidebar() {
     { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
     { label: 'Customers', icon: Users, path: '/customers', badge: null },
     { label: 'Vendors', icon: Users, path: '/vendors', badge: null },
-    { label: 'Transporters', icon: TruckIcon, path: '/transporters', badge: null },
+    { label: 'Transporters', icon: Truck, path: '/transporters', badge: null },
     { label: 'Quotations', icon: FileText, path: '/quotations', badge: null },
     { label: 'Dispatch', icon: Truck, path: '/dispatch', badge: null },
     { label: 'GRN', icon: ClipboardList, path: '/grn', badge: '2' },
@@ -45,22 +44,21 @@ export default function Sidebar() {
     return location.pathname.startsWith(path)
   }
 
+  const handleLinkClick = () => {
+    // Only close sidebar on mobile devices
+    if (isMobile) {
+      setIsOpen(false)
+    }
+  }
+
+  const handleToggleSidebar = () => {
+    setIsOpen(!isOpen)
+  }
+
   return (
     <>
-      {/* Mobile Toggle Button */}
-      {!isOpen &&
-      (<button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-3 left-3 z-[60] bg-indigo-600 text-white p-2 rounded-lg shadow-xl hover:bg-indigo-700 transition-colors active:scale-95"
-        aria-label="Toggle menu"
-        title="Toggle sidebar menu"
-      >
-        { <Menu size={20} className="w-5 h-5" />}
-      </button>
-      )
-      }
       {/* Mobile Overlay */}
-      {isOpen && (
+      {isOpen && isMobile && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden"
           onClick={() => setIsOpen(false)}
@@ -70,13 +68,13 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside 
         className={`
-          ${isOpen ? 'lg:static' : 'fixed'} top-0 left-0 
+          fixed top-0 left-0 
           h-screen w-60 
           bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)]
           transform transition-transform duration-300 ease-in-out
           z-50
           flex flex-col
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
         `}
       >
         {/* Sidebar Header */}
@@ -89,7 +87,7 @@ export default function Sidebar() {
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="hidden lg:flex p-1 hover:bg-[oklch(0.20_0_0)] rounded text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)]"
+            className="lg:hidden p-1 hover:bg-[oklch(0.20_0_0)] rounded text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)]"
             aria-label="Close sidebar"
           >
             <X size={16} />
@@ -105,7 +103,7 @@ export default function Sidebar() {
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={() => setIsOpen(false)}
+                onClick={handleLinkClick}
                 className={`
                   flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm relative group
                   ${active
@@ -128,50 +126,48 @@ export default function Sidebar() {
           })}
         </nav>
 
-
         {/* My Account Section */}
-       {isAccountOpen && (
-         <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2">
-           <p className="text-xs font-semibold text-white-600 uppercase tracking-wider px-3 mb-2">My Account</p>
-           <div className="space-y-1 mb-3">
-             <Link
-               to="/settings"
-               onClick={() => setIsOpen(false)}
-               className={`
-                 flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm
-                 ${location.pathname === '/settings'
-                   ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
-                   : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
-                 }
-               `}
-             >
-               <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
-               <span className="flex-1 truncate">Settings</span>
-             </Link>
-             <button
-               onClick={() => {
-                 // Handle logout logic here
-                 navigate('/auth/login');
-                 setIsOpen(false)
-               }}
-               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
-             >
-               <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
-               <span className="flex-1 truncate text-left">Logout</span>
-             </button>
-           </div>
-         </div>
-       )}
+        {isAccountOpen && (
+          <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2">
+            <p className="text-xs font-semibold text-white-600 uppercase tracking-wider px-3 mb-2">My Account</p>
+            <div className="space-y-1 mb-3">
+              <Link
+                to="/settings"
+                onClick={handleLinkClick}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm
+                  ${location.pathname === '/settings'
+                    ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
+                    : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
+                  }
+                `}
+              >
+                <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
+                <span className="flex-1 truncate">Settings</span>
+              </Link>
+              <button
+                onClick={() => {
+                  navigate('/auth/login')
+                  handleLinkClick()
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300"
+              >
+                <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
+                <span className="flex-1 truncate text-left">Logout</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Sidebar Footer */}
-        <div ref={footerRef} className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)] cursor-pointer hover:bg-[oklch(0.15_0_0)] transition-colors rounded-t-lg ${isHighlighted ? 'ring-2 ring-white' : ''}`} onClick={() => {
-          setIsAccountOpen(!isAccountOpen);
-          if (isAccountOpen) {
-            setIsHighlighted(true);
-          } else {
-            setIsHighlighted(false);
-          }
-        }}>
+        <div 
+          ref={footerRef} 
+          className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)] cursor-pointer hover:bg-[oklch(0.15_0_0)] transition-colors rounded-t-lg ${isHighlighted ? 'ring-2 ring-white' : ''}`} 
+          onClick={() => {
+            setIsAccountOpen(!isAccountOpen)
+            setIsHighlighted(!isAccountOpen)
+          }}
+        >
           <div className="flex items-center gap-2 px-2 py-1">
             <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
               AM

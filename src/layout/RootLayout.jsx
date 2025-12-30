@@ -1,19 +1,30 @@
 import Sidebar from './Sidebar'
-import { Bell } from 'lucide-react'
+import { Bell, Menu } from 'lucide-react'
 import { Outlet } from 'react-router-dom'
+import { useSidebar } from '../contexts/SidebarContext'
 
 export default function RootLayout() {
+  const { isOpen, setIsOpen } = useSidebar()
+
   return (
     <div className="flex min-h-screen bg-[oklch(0.18_0_0)]">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col lg:ml-60">
         {/* Top Bar */}
-        <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] relative z-20">
+        <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] sticky top-0 z-20">
           <div className="px-4 md:px-6 py-3 flex justify-between items-center">
-            <h1 className="text-base md:text-lg font-semibold text-[oklch(0.70_0_0)] truncate">{document.title || 'Dashboard'}</h1>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="lg:hidden p-2 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.70_0_0)] truncate">{document.title || 'Dashboard'}</h1>
+            </div>
             
             <div className="flex items-center gap-2 md:gap-4">
               <button className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm">
@@ -29,7 +40,7 @@ export default function RootLayout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar">
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)]">
           <Outlet />
         </main>
       </div>

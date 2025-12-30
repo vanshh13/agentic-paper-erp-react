@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { SidebarProvider } from './contexts/SidebarContext'
 import RootLayout from './layout/RootLayout'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
@@ -22,7 +23,8 @@ import Register from './pages/auth/register'
 
 function App() {
   return (
-    <BrowserRouter>
+    <SidebarProvider>
+      <BrowserRouter>
       <Routes>
         {/* Default route */}
         <Route path="/" element={<Navigate to="/auth/login" replace />} />
@@ -53,6 +55,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </SidebarProvider>
   )
 }
 
