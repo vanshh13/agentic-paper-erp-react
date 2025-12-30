@@ -11,7 +11,7 @@ export default function RootLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
-        <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] sticky top-0 z-10">
+        <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] relative z-20">
           <div className="px-4 md:px-6 py-3 flex justify-between items-center">
             <h1 className="text-base md:text-lg font-semibold text-[oklch(0.70_0_0)] truncate">{document.title || 'Dashboard'}</h1>
             
