@@ -9,6 +9,11 @@ import {
   Plus,
   ArrowRight
 } from 'lucide-react'
+import ActiveCustomersChart from '../components/charts/ActiveCustomersChart'
+import SalesAnalyticsChart from '../components/charts/SalesAnalyticsChart'
+import TopInventoryChart from '../components/charts/TopInventoryChart'
+import CriticalInventoryChart from '../components/charts/CriticalInventoryChart'
+import PriceHistoryChart from '../components/charts/PriceHistoryChart'
 
 export default function Dashboard() {
   const quickActions = [
@@ -178,6 +183,21 @@ export default function Dashboard() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Analytics Charts */}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <ActiveCustomersChart />
+          <SalesAnalyticsChart />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TopInventoryChart />
+          <CriticalInventoryChart />
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          <PriceHistoryChart />
         </div>
       </div>
     </div>
