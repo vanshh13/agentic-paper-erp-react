@@ -25,8 +25,8 @@ export default function Sidebar() {
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
     { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
-    { label: 'Rules', icon: FileCheck, path: '/rules', badge: null },
     { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
+    { label: 'Rules', icon: FileCheck, path: '/rules', badge: null }, 
     { label: 'Sales', icon: DollarSign, path: '/sales-orders', badge: '8' },
     { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
     { label: 'Products', icon: Package, path: '/products', badge: null },
@@ -69,12 +69,12 @@ export default function Sidebar() {
       <aside 
         className={`
           fixed top-0 left-0 
-          h-screen w-60 
+          h-screen w-60
           bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)]
-          transform transition-transform duration-300 ease-in-out
+          transform transition-all duration-300 ease-in-out
           z-50
           flex flex-col
-          ${isMobile ? (isOpen ? 'translate-x-0' : '-translate-x-full') : 'translate-x-0'}
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Sidebar Header */}
@@ -86,11 +86,12 @@ export default function Sidebar() {
             <h2 className="text-sm font-semibold text-[oklch(0.92_0_0)] truncate">Rahul Papers</h2>
           </div>
           <button
-            onClick={() => setIsOpen(false)}
-            className="lg:hidden p-1 hover:bg-[oklch(0.20_0_0)] rounded text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)]"
+            onClick={handleToggleSidebar}
+            className="p-1.5 hover:bg-[oklch(0.20_0_0)] rounded-md text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)] transition-colors flex-shrink-0"
             aria-label="Close sidebar"
+            title="Close sidebar"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 

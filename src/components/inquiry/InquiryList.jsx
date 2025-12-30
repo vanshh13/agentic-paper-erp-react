@@ -92,6 +92,8 @@ export default function InquiryList({
       </div>
 
       <div className="overflow-x-auto custom-scrollbar">
+        {/* Desktop Table View - Hidden on Mobile */}
+        <div className="hidden md:block overflow-x-auto custom-scrollbar max-h-[600px]">
         <table className="w-full min-w-full">
           {/* Header Row */}
           <thead className="bg-[oklch(0.20_0_0)] border-b border-[var(--border)] sticky top-0 z-20">
@@ -273,6 +275,91 @@ export default function InquiryList({
             )}
           </tbody>
         </table>
+        </div>
+
+        {/* Mobile Card View - Hidden on Desktop */}
+        <div className="md:hidden max-h-[600px] overflow-y-auto custom-scrollbar">
+          {loading ? (
+            <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
+              Loading...
+            </div>
+          ) : filteredInquiries.length === 0 ? (
+            <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
+              No inquiries found
+            </div>
+          ) : (
+            <div className="p-3 space-y-3">
+              {filteredInquiries.map((inq) => {
+                const status = statusConfig[inq.status] || statusConfig.new
+                const source = sourceConfig[inq.source] || sourceConfig.whatsapp
+                const sla = slaConfig[inq.slaStatus] || slaConfig.on_track
+                const initials = getInitials(inq.customerName)
+
+                return (
+                  <div
+                    key={inq.id}
+                    className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 space-y-3 hover:bg-[oklch(0.22_0_0)] transition-colors"
+                  >
+                    {/* Header Row */}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="font-mono text-sm font-bold text-[oklch(0.92_0_0)] truncate">
+                          {inq.inquiryNumber}
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          <div className="w-8 h-8 rounded-full bg-[oklch(0.28_0_0)] text-[oklch(0.98_0_0)] flex items-center justify-center text-xs font-bold flex-shrink-0">
+                            {initials}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-sm text-[oklch(0.95_0_0)] truncate">{inq.customerName || 'Unknown'}</div>
+                            <div className="text-xs text-[oklch(0.70_0_0)] truncate">
+                              {inq.customerPhone || inq.customerEmail || '-'}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => onViewDetails(inq)}
+                        disabled={loadingDetail}
+                        className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-2 rounded-lg transition-colors flex-shrink-0"
+                        title="View details"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Badges */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[oklch(0.26_0_0)] text-[oklch(0.90_0_0)] text-xs font-medium">
+                        {source.label}
+                      </span>
+                      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${status.color}`}>
+                        {status.label}
+                      </span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${sla.color}`}>
+                        {sla.label}
+                      </span>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-[var(--border)]">
+                      <div>
+                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Assigned To</div>
+                        <div className="text-[oklch(0.88_0_0)] truncate">{inq.assignedSalesPerson || '-'}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Date</div>
+                        <div className="text-[oklch(0.88_0_0)]">
+                          {new Date(inq.inquiryDateTime || inq.createdAt).toLocaleDateString('en-IN')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

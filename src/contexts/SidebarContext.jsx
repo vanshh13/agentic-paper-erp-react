@@ -21,19 +21,16 @@ export const SidebarProvider = ({ children }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      const shouldBeOpen = window.innerWidth >= 1024;
-      setIsOpen(prev => {
-        if (prev !== shouldBeOpen) {
-          localStorage.setItem('sidebarOpen', JSON.stringify(shouldBeOpen));
-        }
-        return shouldBeOpen;
-      });
+      // Only auto-close on mobile, don't force open on desktop
+      if (window.innerWidth < 1024 && isOpen) {
+        setIsOpen(false);
+        localStorage.setItem('sidebarOpen', JSON.stringify(false));
+      }
     };
 
-    handleResize(); // Set initial state
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, [isOpen]);
 
   const handleSetIsOpen = (value) => {
     setIsOpen(value);

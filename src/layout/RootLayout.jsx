@@ -12,17 +12,23 @@ export default function RootLayout() {
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:ml-60">
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${
+        isOpen ? 'lg:ml-60' : 'lg:ml-0'
+      }`}>
         {/* Top Bar */}
         <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] sticky top-0 z-20">
           <div className="px-4 md:px-6 py-3 flex justify-between items-center">
             <div className="flex items-center gap-2">
-              <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="lg:hidden p-2 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+              {!isOpen && (
+                <button 
+                  onClick={() => setIsOpen(true)}
+                  className="p-2 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+                  aria-label="Open sidebar"
+                  title="Open sidebar"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              )}
               <h1 className="text-base md:text-lg font-semibold text-[oklch(0.70_0_0)] truncate">{document.title || 'Dashboard'}</h1>
             </div>
             
