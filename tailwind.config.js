@@ -10,8 +10,7 @@ export default {
         // Custom color palette for ERP System
         primary: '#00d9ff',      // Cyan/primary brand color
         secondary: '#00b8d4',    // Secondary brand color
-        dark: '#1a1a2e',         // Dark background color
-        darkalt: '#16213e',      // Alternative dark background
+        dark: '#213547',         // Dark text color (for text-dark)
       },
     },
   },
