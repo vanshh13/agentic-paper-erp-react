@@ -67,11 +67,11 @@ export default function Sidebar() {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed lg:sticky top-0 left-0 
+          fixed lg:static top-0 left-0 
           h-screen w-60 
           bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)]
           transform transition-transform duration-300 ease-in-out
-          z-50 lg:z-0
+          z-50 lg:z-auto
           flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
