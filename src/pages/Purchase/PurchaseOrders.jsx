@@ -42,7 +42,7 @@ const dummyPurchaseOrders = [
   {
     id: 4,
     poNumber: 'PO-20251215-1234',
-    type: 'domestic',
+    type: 'others',
     status: 'approved',
     delivery: 'warehouse',
     amount: 2500,
@@ -53,7 +53,7 @@ const dummyPurchaseOrders = [
   {
     id: 5,
     poNumber: 'PO-20251210-5678',
-    type: 'domestic',
+    type: 'others',
     status: 'in_transit',
     delivery: 'direct_to_customer',
     amount: 1800,
@@ -64,7 +64,7 @@ const dummyPurchaseOrders = [
   {
     id: 6,
     poNumber: 'PO-20251205-9012',
-    type: 'import',
+    type: 'imports',
     status: 'pending',
     delivery: 'warehouse',
     amount: 5000,
@@ -75,7 +75,7 @@ const dummyPurchaseOrders = [
   {
     id: 7,
     poNumber: 'PO-20251201-3456',
-    type: 'import',
+    type: 'imports',
     status: 'in_transit',
     delivery: 'warehouse',
     amount: 7500,
@@ -87,8 +87,8 @@ const dummyPurchaseOrders = [
 
 const typeConfig = {
   jk_company: { label: 'JK Company', color: 'bg-indigo-500/15 text-indigo-200' },
-  domestic: { label: 'Domestic', color: 'bg-emerald-500/15 text-emerald-200' },
-  import: { label: 'Import', color: 'bg-purple-500/15 text-purple-200' },
+  others: { label: 'Others', color: 'bg-emerald-500/15 text-emerald-200' },
+  imports: { label: 'Imports', color: 'bg-purple-500/15 text-purple-200' },
 }
 
 const statusConfig = {
@@ -111,12 +111,13 @@ export default function PurchaseOrders() {
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
-    poType: 'jk_company',
+    vendorType: 'others',
+    poType: 'others',
     status: 'new',
     supplier: '',
     deliveryType: '',
     deliveryDate: '',
-    lineItems: [{ product: '', quantity: 0, unitPrice: 0 }],
+    lineItems: [],
     paymentTerms: '',
     incoterms: '',
     deliveryAddress: '',
@@ -141,8 +142,8 @@ export default function PurchaseOrders() {
   // Calculate counts
   const counts = {
     jk_company: purchaseOrders.filter(po => po.type === 'jk_company').length,
-    domestic: purchaseOrders.filter(po => po.type === 'domestic').length,
-    import: purchaseOrders.filter(po => po.type === 'import').length,
+    others: purchaseOrders.filter(po => po.type === 'others').length,
+    imports: purchaseOrders.filter(po => po.type === 'imports').length,
     total: purchaseOrders.length,
   }
 
@@ -154,13 +155,13 @@ export default function PurchaseOrders() {
       const newPO = {
         id: purchaseOrders.length + 1,
         poNumber: `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
-        type: formData.poType,
-        status: formData.status,
-        delivery: formData.deliveryType,
-        amount: formData.lineItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice || 0), 0),
-        deliveryDate: formData.deliveryDate,
-        vendor: formData.supplier,
-        items: formData.lineItems.length,
+        type: formData.vendorType || formData.poType || 'others',
+        status: 'new',
+        delivery: formData.deliveryType || 'warehouse',
+        amount: formData.lineItems?.reduce((sum, item) => sum + (parseFloat(item.quantity || 0) * parseFloat(item.unitPrice || 0)), 0) || 0,
+        deliveryDate: formData.deliveryDate || formData.documentDate || new Date().toISOString().split('T')[0],
+        vendor: formData.supplierName || formData.supplier || 'Unknown Vendor',
+        items: formData.lineItems?.length || 0,
       }
       
       // Add to list
@@ -168,12 +169,13 @@ export default function PurchaseOrders() {
       
       // Reset form
       setFormData({
-        poType: 'jk_company',
+        vendorType: 'others',
+        poType: 'others',
         status: 'new',
         supplier: '',
         deliveryType: '',
         deliveryDate: '',
-        lineItems: [{ product: '', quantity: 0, unitPrice: 0 }],
+        lineItems: [],
         paymentTerms: '',
         incoterms: '',
         deliveryAddress: '',
@@ -271,12 +273,12 @@ export default function PurchaseOrders() {
           <div className="text-xl md:text-2xl font-bold text-sky-300">{counts.jk_company}</div>
         </div>
         <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Domestic Orders</div>
-          <div className="text-xl md:text-2xl font-bold text-emerald-300">{counts.domestic}</div>
+          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Others Orders</div>
+          <div className="text-xl md:text-2xl font-bold text-emerald-300">{counts.others}</div>
         </div>
         <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Import Orders</div>
-          <div className="text-xl md:text-2xl font-bold text-purple-300">{counts.import}</div>
+          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Imports Orders</div>
+          <div className="text-xl md:text-2xl font-bold text-purple-300">{counts.imports}</div>
         </div>
       </div>
 
@@ -301,8 +303,8 @@ export default function PurchaseOrders() {
           >
             <option value="">All Types</option>
             <option value="jk_company">JK Company</option>
-            <option value="domestic">Domestic</option>
-            <option value="import">Import</option>
+            <option value="others">Others</option>
+            <option value="imports">Imports</option>
           </select>
           <select
             value={filterStatus}
@@ -353,7 +355,7 @@ export default function PurchaseOrders() {
                 </tr>
               ) : (
                 filteredPOs.map((po) => {
-                  const type = typeConfig[po.type] || typeConfig.domestic
+                  const type = typeConfig[po.type] || typeConfig.others
                   const status = statusConfig[po.status] || statusConfig.pending
 
                   return (
@@ -421,7 +423,7 @@ export default function PurchaseOrders() {
           ) : (
             <div className="p-3 space-y-3">
               {filteredPOs.map((po) => {
-                const type = typeConfig[po.type] || typeConfig.domestic
+                const type = typeConfig[po.type] || typeConfig.others
                 const status = statusConfig[po.status] || statusConfig.pending
 
                 return (
