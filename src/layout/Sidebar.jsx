@@ -25,8 +25,8 @@ export default function Sidebar() {
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
     { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
-    { label: 'Rules', icon: FileCheck, path: '/rules', badge: null },
     { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
+    { label: 'Rules', icon: FileCheck, path: '/rules', badge: null },
     { label: 'Sales', icon: DollarSign, path: '/sales-orders', badge: '8' },
     { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
     { label: 'Products', icon: Package, path: '/products', badge: null },
