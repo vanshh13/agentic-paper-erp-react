@@ -15,7 +15,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.WHATSAPP,
     status: INQUIRY_STATUS.CONVERTED,
     slaStatus: SLA_STATUS.ON_TRACK,
-    assignedSalesPerson: 'John Doe',
+    assignedSalesPerson: 'Amit Sharma',
     inquiryDateTime: '2024-12-20T10:30:00',
     items: [
       {
@@ -54,7 +54,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.EMAIL,
     status: INQUIRY_STATUS.NEW,
     slaStatus: SLA_STATUS.ON_TRACK,
-    assignedSalesPerson: 'Jane Smith',
+    assignedSalesPerson: 'Priya Verma',
     inquiryDateTime: '2024-12-25T14:15:00',
     items: [
       {
@@ -85,7 +85,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.PHONE,
     status: INQUIRY_STATUS.PARSED,
     slaStatus: SLA_STATUS.AT_RISK,
-    assignedSalesPerson: 'Mike Johnson',
+    assignedSalesPerson: 'Rohit Mehta',
     inquiryDateTime: '2024-12-28T09:00:00',
     items: [
       {
@@ -116,7 +116,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.PORTAL,
     status: INQUIRY_STATUS.PI_SENT,
     slaStatus: SLA_STATUS.ON_TRACK,
-    assignedSalesPerson: 'Sarah Williams',
+    assignedSalesPerson: 'Neha Patel',
     inquiryDateTime: '2024-12-15T11:20:00',
     items: [
       {
@@ -155,7 +155,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.WALK_IN,
     status: INQUIRY_STATUS.REJECTED,
     slaStatus: SLA_STATUS.BREACHED,
-    assignedSalesPerson: 'Tom Brown',
+    assignedSalesPerson: 'Suresh Iyer',
     inquiryDateTime: '2024-12-10T16:45:00',
     items: [
       {
@@ -186,7 +186,7 @@ const DUMMY_INQUIRIES = [
     source: INQUIRY_SOURCE.EMAIL,
     status: INQUIRY_STATUS.FOLLOW_UP,
     slaStatus: SLA_STATUS.AT_RISK,
-    assignedSalesPerson: 'Lisa Anderson',
+    assignedSalesPerson: 'Kavita Nair',
     inquiryDateTime: '2024-12-27T13:30:00',
     items: [
       {
