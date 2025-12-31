@@ -6,17 +6,23 @@ export default function InquiryForm({
   setFormData,
   showDialog,
   setShowDialog,
-  onCreate,
+  onSubmit,
+  mode = 'create', // 'create' or 'edit'
   loading = false
 }) {
   if (!showDialog) return null
+
+  const isEditMode = mode === 'edit'
+  const title = isEditMode ? 'Edit Inquiry' : 'Create New Inquiry'
+  const subtitle = isEditMode ? 'Update inquiry details' : 'Log a new customer inquiry'
+  const submitButtonText = isEditMode ? 'Update Inquiry' : 'Create Inquiry'
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
       <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
         <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10">
-          <h3 className="text-xl md:text-2xl font-bold">Create New Inquiry</h3>
-          <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">Log a new customer inquiry</p>
+          <h3 className="text-xl md:text-2xl font-bold">{title}</h3>
+          <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">{subtitle}</p>
         </div>
         <div className="p-4 md:p-6 space-y-6">
           {/* Inquiry Section */}
@@ -196,6 +202,32 @@ export default function InquiryForm({
                   <p className="text-xs text-[oklch(0.65_0_0)] mt-1">According to price list</p>
                 </div>
               </div>
+              <div className="grid gap-3 md:gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Quantity</label>
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={formData.quantity}
+                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">UOM (Unit of Measure)</label>
+                  <select
+                    value={formData.uom}
+                    onChange={(e) => setFormData({ ...formData, uom: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  >
+                    <option value="">Select UOM</option>
+                    <option value="kg">kg</option>
+                    <option value="g">g</option>
+                    <option value="mg">mg</option>
+                    <option value="ton">ton</option>
+                  </select>
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Expected Delivery Date</label>
                 <input
@@ -288,11 +320,11 @@ export default function InquiryForm({
               Cancel
             </button>
             <button
-              onClick={onCreate}
+              onClick={onSubmit}
               disabled={loading}
               className="px-4 py-2 gradient-primary text-[oklch(0.98_0_0)] rounded-lg font-semibold shadow-glow hover:opacity-90 transition-colors disabled:opacity-50"
             >
-              Create Inquiry
+              {submitButtonText}
             </button>
           </div>
         </div>

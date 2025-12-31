@@ -374,5 +374,57 @@ export const inquiryService = {
         resolve(stats)
       }, 300)
     })
+  },
+
+  /**
+   * Get all interactions for a specific inquiry
+   * @param {string} inquiryId 
+   */
+  getInteractions: async (inquiryId) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const filtered = DUMMY_INQUIRIES.filter(int => int.inquiryId === inquiryId);
+        resolve([...filtered]);
+      }, 300);
+    });
+  },
+
+  /**
+   * Add a new interaction
+   */
+  addInteraction: async (inquiryId, interactionData) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newInteraction = {
+          ...interactionData,
+          id: Math.random().toString(36).substr(2, 9),
+          inquiryId,
+          dateTime: interactionData.dateTime || new Date().toISOString(),
+        };
+        DUMMY_INQUIRIES.push(newInteraction);
+        resolve(newInteraction);
+      }, 500);
+    });
+  },
+
+  /**
+   * Delete an interaction
+   * @param {string} interactionId - The unique ID of the interaction to remove
+   * @returns {Promise<boolean>}
+   */
+  deleteInteraction: async (interactionId) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = DUMMY_INQUIRIES.findIndex((int) => int.id === interactionId);
+        if (index !== -1) {
+          // Remove the interaction from the array
+          DUMMY_INQUIRIES.splice(index, 1);
+          resolve(true);
+        } else {
+          // If not found, we resolve true anyway or throw error based on your preference
+          resolve(false);
+        }
+      }, 500);
+    });
   }
 }

@@ -1,4 +1,4 @@
-import { X, FileText, User, MapPin, Phone, Mail, MessageSquare, Package, UserCircle, Plus } from 'lucide-react'
+import { X, FileText, User, MapPin, Phone, Mail, MessageSquare, Package, UserCircle, Plus, Trash2 } from 'lucide-react'
 
 const statusConfig = {
   new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
@@ -33,6 +33,9 @@ export default function InquiryView({
   interactionForm,
   setInteractionForm,
   onAddInteraction,
+  onEdit,
+  onDelete,
+  onDeleteInteraction,
   loadingDetail = false
 }) {
   if (!showDetailDialog || !selectedInquiry) return null
@@ -46,15 +49,39 @@ export default function InquiryView({
             <h3 className="text-xl md:text-2xl font-bold truncate">Inquiry Details</h3>
             <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1 font-mono truncate">{selectedInquiry.inquiryNumber}</p>
           </div>
-          <button
-            onClick={() => {
-              setShowDetailDialog(false)
-              setShowInteractionForm(false)
-            }}
-            className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors flex-shrink-0"
-          >
-            <X className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Edit Button */}
+            <button
+              onClick={() => onEdit && onEdit(selectedInquiry)}
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-indigo-500/20 transition-all"
+            >
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Edit</span>
+            </button>
+
+            {/* Delete Button */}
+            <button
+              onClick={() => onDelete && onDelete(selectedInquiry.id)}
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-rose-500 hover:text-white transition-all duration-200 group"
+            >
+              <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
+            {/* Vertical Divider */}
+            <div className="w-[1px] h-8 bg-[var(--border)] mx-1" />
+
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowDetailDialog(false)
+                setShowInteractionForm(false)
+              }}
+              className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1.5 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors"
+            >
+              <X className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+          </div>
         </div>
 
         <div className="p-4 md:p-6 space-y-6 max-h-[calc(90vh-120px)] overflow-y-auto custom-scrollbar">
@@ -164,6 +191,22 @@ export default function InquiryView({
                 <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Expected Delivery</label>
                 <p className="text-sm">{selectedInquiry.expectedDeliveryDate ? new Date(selectedInquiry.expectedDeliveryDate).toLocaleDateString('en-IN') : '-'}</p>
               </div>
+              <div>
+                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">
+                  Quantity
+                </label>
+                <p className="text-sm">
+                  {selectedInquiry?.quantity
+                    ? selectedInquiry.quantity.toLocaleString('en-IN')
+                    : '-'}
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">UOM</label>
+                <p className="text-sm">{selectedInquiry?.uom || '-'}</p>
+              </div>
+
               <div className="md:col-span-3">
                 <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Special Instructions</label>
                 <p className="text-sm whitespace-pre-wrap">{selectedInquiry.specialInstructions || '-'}</p>
@@ -341,6 +384,7 @@ export default function InquiryView({
                       <th className="px-4 py-3 text-center text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up?</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Date</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Status</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Remove</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)]">
@@ -398,6 +442,15 @@ export default function InquiryView({
                             ) : (
                               <span className="text-[oklch(0.60_0_0)]">-</span>
                             )}
+                          </td>
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => onDeleteInteraction(interaction.id)}
+                              className="p-1.5 text-rose-400 hover:text-rose-100 hover:bg-rose-500/20 rounded-lg transition-all"
+                              title="Delete Interaction"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))
