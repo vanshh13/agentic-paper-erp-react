@@ -126,45 +126,17 @@ export default function Inquiry() {
   const fetchInquiries = async () => {
     try {
       setLoading(true)
-      
-      // TODO: Uncomment when API is ready
-      // const data = await inquiryService.getAll()
-      
-      const response = await inquiryServiceApi.getAll()
-      // console.log(response);
-      const data = response.data.data;
+      const data = await inquiryService.getAll()
       const transformedData = data.map(inq => ({
-        // Keep original for reference
         ...inq,
-        
-        // Mapping Backend (snake_case) to Frontend (camelCase)
-        id: inq.id,
-        inquiryNumber: inq.inquiry_code, // Mapped from inquiry_code
-        customerName: inq.customer_name || '',
-        productRequested: inq.product_requested || '',
-        inquiryDateTime: inq.inquiry_datetime || inq.created_at,
-        
-        // Handle Nested Contact Info
-        customerPhone: inq.contact_info?.type === 'phone' ? inq.contact_info.value : (inq.customer_phone || ''),
-        customerWhatsapp: inq.contact_info?.type === 'whatsapp' ? inq.contact_info.value : (inq.customer_whatsapp || ''),
-        customerEmail: inq.customer_email || inq.email || '',
-        
-        // Assignment Info
-        assignedSalesPerson: inq.assigned_user_name || inq.assigned_sales_person || '',
-        
-        // Enums and Fallbacks
         source: inq.source || INQUIRY_SOURCE.WHATSAPP,
-        status: (inq.status || INQUIRY_STATUS.NEW).toLowerCase(), // Ensure lowercase for statusConfig keys
-        slaStatus: (inq.sla_status || SLA_STATUS.ON_TRACK).toLowerCase(),
-        
-        // Financials/Dates
-        expectedPrice: inq.expected_price || null,
-        expectedDeliveryDate: inq.expected_delivery_date || null,
-        
-        // Ensure consistency for components
-        createdAt: inq.created_at
-      }));
-
+        customerName: inq.customerName || inq.companyName || '',
+        customerPhone: inq.customerPhone || inq.phone || '',
+        customerEmail: inq.customerEmail || inq.email || '',
+        inquiryDateTime: inq.inquiryDateTime || inq.createdAt,
+        slaStatus: inq.slaStatus || SLA_STATUS.ON_TRACK,
+        status: inq.status || INQUIRY_STATUS.NEW,
+      }))
       setInquiries(transformedData)
     } catch (error) {
       console.error('Failed to fetch inquiries:', error)
@@ -172,74 +144,29 @@ export default function Inquiry() {
       setLoading(false)
     }
   }
-
   const handleViewDetails = async (inquiry) => {
     try {
       setLoadingDetail(true)
-      
-      // TODO: Uncomment when API is ready
-      // const data = await inquiryService.getById(inquiry.id)
-      
-      // Using dummy data for now
-      const response = await inquiryServiceApi.getById(inquiry.id)
-      const data = response.data;
-      console.log(data)
+      const data = await inquiryService.getById(inquiry.id)
       if (data) {
         const transformed = {
           ...data,
-        
-          // 1. Core Header Information
-          inquiryNumber: data.inquiry_code,
-          // Fallback to created_at if inquiry_datetime is missing
-          inquiryDateTime: data.inquiry_datetime || data.created_at,
-        
-          // 2. Map Nested Customer Details
-          customerId: data.customer_details?.id || null,
-          customerName: data.customer_details?.name || '',
-          customerPOC: data.customer_details?.poc_name || '',
-          customerPhone: data.customer_details?.phone_number || '',
-          // Logic: Use whatsapp_number if present, otherwise fall back to phone_number
-          customerWhatsapp: data.customer_details?.whatsapp_number || data.customer_details?.phone_number || '',
-          customerEmail: data.customer_details?.email || '',
-          customerAddress: data.customer_details?.address || '',
-          preferredContactMethod: data.customer_details?.preferred_contact_method || 'whatsapp',
-        
-          // 3. Status & Source Mapping
-          // Ensures strings are lowercase to match your statusConfig/slaConfig/sourceConfig keys
-          status: (data.status || 'new').toLowerCase(),
-          source: (data.source || 'whatsapp').toLowerCase(),
-          // Mapping 'PENDING' or 'OPEN' from backend to 'on_track' if it doesn't match your config keys
-          slaStatus: data.sla_status === 'PENDING' ? 'on_track' : (data.sla_status || 'on_track').toLowerCase(),
-        
-          // 4. Product & Order Details
-          productRequested: data.product_requested || null,
-          quantity: data.quantity || null,
-          uom: data.uom || null,
-          expectedPrice: data.expected_price || null,
-          expectedDeliveryDate: data.expected_delivery_date || null,
-          specialInstructions: data.special_instructions || null,
-          rawMessage: data.transcript || null, 
-          linkedOrderId: data.linked_order_id || null,
-        
-          // 5. Assignment & Working Hours
-          assignedSalesPerson: data.assigned_sales_person?.full_name || '',
-          // Checks strictly for null to allow false values
-          isWithinWorkingHours: data.is_within_working_hours !== null ? data.is_within_working_hours : true,
-          interactionDueTime: data.interaction_due_time || null,
-        
-          // 6. Interactions Table Data
-          interactions: (data.interactions || []).map(int => ({
-            id: int.id,
-            type: int.type,
-            // Maps backend dates to camelCase used in InquiryView table
-            dateTime: int.interaction_date || int.created_at,
-            outcome: int.outcome || '',
-            summary: int.summary || '',
-            followUpRequired: Boolean(int.follow_up_required),
-            followUpDateTime: int.follow_up_date || null,
-            followUpStatus: (int.follow_up_status || 'pending').toLowerCase()
-          }))
-        };
+          source: data.source || INQUIRY_SOURCE.WHATSAPP,
+          customerName: data.customerName || data.companyName || '',
+          customerPhone: data.customerPhone || data.phone || '',
+          customerEmail: data.customerEmail || data.email || '',
+          inquiryDateTime: data.inquiryDateTime || data.createdAt,
+          slaStatus: data.slaStatus || SLA_STATUS.ON_TRACK,
+          linkedOrderId: data.linkedOrderId || null,
+          customerId: data.customerId || null,
+          customerPOC: data.customerPOC || null,
+          customerWhatsapp: data.customerWhatsapp || data.customerPhone || null,
+          customerAddress: data.customerAddress || null,
+          preferredContactMethod: data.preferredContactMethod || 'whatsapp',
+          productRequested: data.productRequested || null,
+          isWithinWorkingHours: data.isWithinWorkingHours !== undefined ? data.isWithinWorkingHours : true,
+          interactionDueTime: data.interactionDueTime || null,
+        }
         setSelectedInquiry(transformed)
         setInteractions(data.interactions || [
           {
