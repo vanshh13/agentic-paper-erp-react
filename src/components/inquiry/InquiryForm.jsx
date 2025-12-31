@@ -20,7 +20,13 @@ export default function InquiryForm({
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
       <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
-        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10">
+        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 relative">
+          <button
+            onClick={() => setShowDialog(false)}
+            className="absolute top-4 right-4 text-[oklch(0.75_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+          >
+            <X size={20} />
+          </button>
           <h3 className="text-xl md:text-2xl font-bold">{title}</h3>
           <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">{subtitle}</p>
         </div>

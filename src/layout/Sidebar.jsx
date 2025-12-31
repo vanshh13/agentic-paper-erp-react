@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown } from 'lucide-react'
+import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown, IndianRupee } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
 
@@ -43,7 +43,7 @@ export default function Sidebar() {
     { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
     { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
     { label: 'Rules', icon: FileCheck, path: '/rules', badge: null }, 
-    { label: 'Sales', icon: DollarSign, path: '/sales-orders', badge: '8' },
+    { label: 'Sales', icon: IndianRupee, path: '/sales-orders', badge: '8' },
     { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
     { label: 'Products', icon: Package, path: '/products', badge: null },
     { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
