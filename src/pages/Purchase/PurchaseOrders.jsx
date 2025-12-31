@@ -1,89 +1,11 @@
-import { useState } from 'react'
-import { Plus, Eye, Search, FileText, Download } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Plus, Eye, Search, FileText } from 'lucide-react'
+import ConfirmationModal from '../../components/ui/ConfirmationModal'
+import Toast from '../../components/ui/Toast'
 import PurchaseOrderForm from './PurchaseOrderForm'
 import JKCompanyPOForm from './JKCompanyPOForm'
 import PurchaseOrderView from './PurchaseOrderView'
-
-// Dummy data
-const dummyPurchaseOrders = [
-  {
-    id: 1,
-    poNumber: 'PO-20251218-2595',
-    type: 'jk_company',
-    status: 'new',
-    delivery: 'direct_to_customer',
-    amount: 1000,
-    deliveryDate: '2025-12-18',
-    vendor: 'ABC Suppliers Ltd.',
-    items: 5,
-  },
-  {
-    id: 2,
-    poNumber: 'PO/24-25/0001',
-    type: 'jk_company',
-    status: 'completed',
-    delivery: '-',
-    amount: 0,
-    deliveryDate: '-',
-    vendor: 'Global Trading Co.',
-    items: 3,
-  },
-  {
-    id: 3,
-    poNumber: 'PO/24-25/0002',
-    type: 'jk_company',
-    status: 'in_transit',
-    delivery: '-',
-    amount: 0,
-    deliveryDate: '-',
-    vendor: 'Metro Supplies',
-    items: 8,
-  },
-  {
-    id: 4,
-    poNumber: 'PO-20251215-1234',
-    type: 'others',
-    status: 'approved',
-    delivery: 'warehouse',
-    amount: 2500,
-    deliveryDate: '2025-12-20',
-    vendor: 'Local Vendors Inc.',
-    items: 12,
-  },
-  {
-    id: 5,
-    poNumber: 'PO-20251210-5678',
-    type: 'others',
-    status: 'in_transit',
-    delivery: 'direct_to_customer',
-    amount: 1800,
-    deliveryDate: '2025-12-22',
-    vendor: 'National Traders',
-    items: 6,
-  },
-  {
-    id: 6,
-    poNumber: 'PO-20251205-9012',
-    type: 'imports',
-    status: 'pending',
-    delivery: 'warehouse',
-    amount: 5000,
-    deliveryDate: '2026-01-15',
-    vendor: 'International Exports Ltd.',
-    items: 20,
-  },
-  {
-    id: 7,
-    poNumber: 'PO-20251201-3456',
-    type: 'imports',
-    status: 'in_transit',
-    delivery: 'warehouse',
-    amount: 7500,
-    deliveryDate: '2026-01-10',
-    vendor: 'Global Imports Co.',
-    items: 15,
-  },
-]
+import { purchaseOrderApi } from '../../services/api/purchase/purchase-order-api'
 
 const typeConfig = {
   jk_company: { label: 'JK Company', color: 'bg-indigo-500/15 text-indigo-200' },
@@ -100,8 +22,51 @@ const statusConfig = {
   cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
 }
 
+const baseFormData = {
+  vendorType: 'others',
+  poType: 'others',
+  status: 'new',
+  supplier: '',
+  supplierName: '',
+  deliveryType: '',
+  deliveryDate: '',
+  lineItems: [],
+  paymentTerms: '',
+  incoterms: '',
+  deliveryAddress: '',
+  notes: '',
+}
+
+const blankJKLineItem = {
+  itemName: '',
+  qualityGrade: '',
+  brand: '',
+  gsm: '',
+  size1: '',
+  size2: '',
+  quantity: '',
+  packagingMode: '',
+  fscType: '',
+}
+
+const baseJKFormData = {
+  unit: '',
+  division: '',
+  supplyFrom: '',
+  incoterms: '',
+  deliveryType: '',
+  deliveryDate: '',
+  routeCode: '',
+  paymentTerms: '',
+  policyNumber: '',
+  insurerName: '',
+  policyExpiry: '',
+  lineItems: [blankJKLineItem],
+  specialRemarks: '',
+}
+
 export default function PurchaseOrders() {
-  const [purchaseOrders, setPurchaseOrders] = useState(dummyPurchaseOrders)
+  const [purchaseOrders, setPurchaseOrders] = useState([])
   const [searchPO, setSearchPO] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
@@ -110,34 +75,15 @@ export default function PurchaseOrders() {
   const [showViewDialog, setShowViewDialog] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState(null)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    vendorType: 'others',
-    poType: 'others',
-    status: 'new',
-    supplier: '',
-    deliveryType: '',
-    deliveryDate: '',
-    lineItems: [],
-    paymentTerms: '',
-    incoterms: '',
-    deliveryAddress: '',
-    notes: '',
-  })
-  const [jkFormData, setJKFormData] = useState({
-    unit: '',
-    division: '',
-    supplyFrom: '',
-    incoterms: '',
-    deliveryType: '',
-    deliveryDate: '',
-    routeCode: '',
-    paymentTerms: '',
-    policyNumber: '',
-    insurerName: '',
-    policyExpiry: '',
-    lineItems: [{ itemName: '', qualityGrade: '', brand: '', gsm: '', size1: '', size2: '', quantity: '', packagingMode: '', fscType: '' }],
-    specialRemarks: '',
-  })
+  const [formData, setFormData] = useState(baseFormData)
+  const [jkFormData, setJKFormData] = useState(baseJKFormData)
+  const [formMode, setFormMode] = useState('create')
+  const [jkFormMode, setJKFormMode] = useState('create')
+  const [editingPO, setEditingPO] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [toastState, setToastState] = useState({ isVisible: false, message: '', type: 'success' })
+  const [loadingList, setLoadingList] = useState(false)
 
   // Calculate counts
   const counts = {
@@ -147,84 +93,203 @@ export default function PurchaseOrders() {
     total: purchaseOrders.length,
   }
 
-  // Handle create PO
-  const handleCreatePO = () => {
-    setLoading(true)
-    setTimeout(() => {
-      // Create new PO object
-      const newPO = {
-        id: purchaseOrders.length + 1,
-        poNumber: `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
-        type: formData.vendorType || formData.poType || 'others',
-        status: 'new',
-        delivery: formData.deliveryType || 'warehouse',
-        amount: formData.lineItems?.reduce((sum, item) => sum + (parseFloat(item.quantity || 0) * parseFloat(item.unitPrice || 0)), 0) || 0,
-        deliveryDate: formData.deliveryDate || formData.documentDate || new Date().toISOString().split('T')[0],
-        vendor: formData.supplierName || formData.supplier || 'Unknown Vendor',
-        items: formData.lineItems?.length || 0,
-      }
-      
-      // Add to list
-      setPurchaseOrders([...purchaseOrders, newPO])
-      
-      // Reset form
-      setFormData({
-        vendorType: 'others',
-        poType: 'others',
-        status: 'new',
-        supplier: '',
-        deliveryType: '',
-        deliveryDate: '',
-        lineItems: [],
-        paymentTerms: '',
-        incoterms: '',
-        deliveryAddress: '',
-        notes: '',
-      })
-      setShowDialog(false)
-      setLoading(false)
-    }, 500)
+  const showToastMessage = (message, type = 'success') => {
+    setToastState({ isVisible: true, message, type })
   }
 
-  // Handle JK Company PO submission
-  const handleJKCompanyPOSubmit = () => {
-    setLoading(true)
-    setTimeout(() => {
-      // Create new JK Company PO
-      const newPO = {
-        id: purchaseOrders.length + 1,
-        poNumber: `JK-PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
-        type: 'jk_company',
-        status: 'new',
-        delivery: jkFormData.deliveryType,
-        amount: 0,
-        deliveryDate: jkFormData.deliveryDate,
-        vendor: jkFormData.supplyFrom,
-        items: jkFormData.lineItems.length,
+  const closeToast = () => setToastState((prev) => ({ ...prev, isVisible: false }))
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoadingList(true)
+      try {
+        const data = await purchaseOrderApi.getAll()
+        setPurchaseOrders(data)
+      } catch (error) {
+        showToastMessage('Failed to load purchase orders', 'error')
+      } finally {
+        setLoadingList(false)
       }
-      
-      // Add to list
-      setPurchaseOrders([...purchaseOrders, newPO])
-      
-      // Reset form
-      setJKFormData({
-        unit: '',
-        division: '',
-        supplyFrom: '',
-        incoterms: '',
-        deliveryType: '',
-        deliveryDate: '',
-        routeCode: '',
-        paymentTerms: '',
-        policyNumber: '',
-        insurerName: '',
-        policyExpiry: '',
-        lineItems: [{ itemName: '', qualityGrade: '', brand: '', gsm: '', size1: '', size2: '', quantity: '', packagingMode: '', fscType: '' }],
-        specialRemarks: '',
-      })
-      setShowJKDialog(false)
+    }
+
+    fetchOrders()
+  }, [])
+
+  const resetStandardForm = () => {
+    setFormData({ ...baseFormData })
+    setFormMode('create')
+  }
+
+  const resetJKForm = () => {
+    setJKFormData({
+      ...baseJKFormData,
+      lineItems: baseJKFormData.lineItems.map((item) => ({ ...item })),
+    })
+    setJKFormMode('create')
+  }
+
+  const handleSubmitStandardPO = async () => {
+    setLoading(true)
+    try {
+      const hasLineItems = formData.lineItems && formData.lineItems.length > 0
+      const amount = hasLineItems
+        ? formData.lineItems.reduce((sum, item) => sum + (parseFloat(item.quantity || 0) * parseFloat(item.unitPrice || 0)), 0)
+        : editingPO?.amount || 0
+      const itemsCount = hasLineItems ? formData.lineItems.length : editingPO?.items || 0
+      const payload = {
+        type: formData.vendorType === 'imports' ? 'imports' : 'others',
+        delivery: formData.deliveryType || 'warehouse',
+        amount: amount || 0,
+        deliveryDate: formData.deliveryDate || formData.documentDate || new Date().toISOString().split('T')[0],
+        vendor: formData.supplierName || formData.supplier || 'Unknown Vendor',
+        items: itemsCount,
+        lineItems: hasLineItems ? formData.lineItems : editingPO?.lineItems || [],
+        details: { ...formData },
+      }
+
+      if (formMode === 'edit' && editingPO) {
+        const updatedPO = await purchaseOrderApi.update(editingPO.id, payload)
+        setPurchaseOrders((prev) => prev.map((po) => (po.id === editingPO.id ? updatedPO : po)))
+        setSelectedOrder(updatedPO)
+        showToastMessage('Purchase order updated successfully', 'success')
+      } else {
+        const newPO = await purchaseOrderApi.create({
+          poNumber: `PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
+          ...payload,
+        })
+        setPurchaseOrders((prev) => [...prev, newPO])
+        showToastMessage('Purchase order created successfully', 'success')
+      }
+
+      resetStandardForm()
+      setEditingPO(null)
+      setShowDialog(false)
+      setShowViewDialog(false)
+    } catch (error) {
+      showToastMessage('Failed to save purchase order', 'error')
+    } finally {
       setLoading(false)
-    }, 500)
+    }
+  }
+
+  const handleSubmitJKCompanyPO = async () => {
+    setLoading(true)
+    try {
+      const hasLineItems = jkFormData.lineItems && jkFormData.lineItems.length > 0
+      const payload = {
+        type: 'jk_company',
+        delivery: jkFormData.deliveryType || 'warehouse',
+        amount: hasLineItems
+          ? jkFormData.lineItems.reduce((sum, item) => sum + (parseFloat(item.quantity || 0)), 0)
+          : editingPO?.amount || 0,
+        deliveryDate: jkFormData.deliveryDate || new Date().toISOString().split('T')[0],
+        vendor: jkFormData.supplyFrom || 'JK Paper Supplier',
+        items: hasLineItems ? jkFormData.lineItems.length : editingPO?.items || 0,
+        lineItems: hasLineItems ? jkFormData.lineItems : editingPO?.lineItems || [],
+        jkDetails: { ...jkFormData },
+      }
+
+      if (jkFormMode === 'edit' && editingPO) {
+        const updatedPO = await purchaseOrderApi.update(editingPO.id, payload)
+        setPurchaseOrders((prev) => prev.map((po) => (po.id === editingPO.id ? updatedPO : po)))
+        setSelectedOrder(updatedPO)
+        showToastMessage('Purchase order updated successfully', 'success')
+      } else {
+        const newPO = await purchaseOrderApi.create({
+          poNumber: `JK-PO-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`,
+          ...payload,
+        })
+        setPurchaseOrders((prev) => [...prev, newPO])
+        showToastMessage('Purchase order created successfully', 'success')
+      }
+
+      resetJKForm()
+      setEditingPO(null)
+      setShowJKDialog(false)
+      setShowViewDialog(false)
+    } catch (error) {
+      showToastMessage('Failed to save purchase order', 'error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditFromView = (order) => {
+    setEditingPO(order)
+    setSelectedOrder(order)
+
+    if (order.type === 'jk_company') {
+      setJKFormMode('edit')
+      const details = order.jkDetails || {}
+      setJKFormData({
+        ...baseJKFormData,
+        ...details,
+        supplyFrom: details.supplyFrom || order.vendor || '',
+        deliveryType: order.delivery || details.deliveryType || '',
+        deliveryDate: order.deliveryDate && order.deliveryDate !== '-' ? order.deliveryDate : details.deliveryDate || '',
+        lineItems: order.lineItems?.length
+          ? order.lineItems
+          : details.lineItems?.length
+            ? details.lineItems
+            : [{ ...blankJKLineItem }],
+      })
+      setShowJKDialog(true)
+    } else {
+      const vendorType = order.type === 'imports' ? 'imports' : 'others'
+      setFormMode('edit')
+      const details = order.details || {}
+      setFormData({
+        ...baseFormData,
+        ...details,
+        vendorType,
+        poType: vendorType,
+        status: order.status || details.status || 'new',
+        supplier: details.supplier || order.vendor || '',
+        supplierName: details.supplierName || order.vendor || '',
+        deliveryType: order.delivery || details.deliveryType || '',
+        deliveryDate: order.deliveryDate && order.deliveryDate !== '-' ? order.deliveryDate : details.deliveryDate || '',
+        lineItems: order.lineItems?.length
+          ? order.lineItems
+          : details.lineItems?.length
+            ? details.lineItems
+            : [],
+        paymentTerms: details.paymentTerms || '',
+        incoterms: details.incoterms || '',
+      })
+      setShowDialog(true)
+    }
+
+    setShowViewDialog(false)
+  }
+
+  const handleRequestDelete = (order) => {
+    setDeleteTarget(order)
+    setShowDeleteConfirm(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return
+
+    purchaseOrderApi.remove(deleteTarget.id)
+      .then(() => {
+        setPurchaseOrders((prev) => prev.filter((po) => po.id !== deleteTarget.id))
+        setSelectedOrder(null)
+        setEditingPO(null)
+        setShowViewDialog(false)
+        showToastMessage('Purchase order deleted successfully', 'success')
+      })
+      .catch(() => {
+        showToastMessage('Failed to delete purchase order', 'error')
+      })
+      .finally(() => {
+        setShowDeleteConfirm(false)
+        setDeleteTarget(null)
+      })
+  }
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false)
+    setDeleteTarget(null)
   }
 
   // Filter purchase orders
@@ -252,13 +317,21 @@ export default function PurchaseOrders() {
         </div>
         <div className="flex gap-2">
           <button 
-            onClick={() => setShowJKDialog(true)}
+            onClick={() => {
+              resetJKForm()
+              setEditingPO(null)
+              setShowJKDialog(true)
+            }}
             className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm">
             <FileText className="w-4 h-4" />
             JK Company PO
           </button>
           <button 
-            onClick={() => setShowDialog(true)}
+            onClick={() => {
+              resetStandardForm()
+              setEditingPO(null)
+              setShowDialog(true)
+            }}
             className="flex items-center gap-2 gradient-primary text-[oklch(0.98_0_0)] px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap">
             <Plus className="w-4 h-4" />
             Create PO
@@ -347,7 +420,13 @@ export default function PurchaseOrders() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
-              {filteredPOs.length === 0 ? (
+              {loadingList ? (
+                <tr>
+                  <td colSpan={9} className="px-6 py-6 text-center text-[oklch(0.70_0_0)]">
+                    Loading purchase orders...
+                  </td>
+                </tr>
+              ) : filteredPOs.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="px-6 py-12 text-center text-[oklch(0.70_0_0)]">
                     No purchase orders found
@@ -416,7 +495,11 @@ export default function PurchaseOrders() {
 
         {/* Mobile Card View - Hidden on Desktop */}
         <div className="md:hidden max-h-[600px] overflow-y-auto custom-scrollbar">
-          {filteredPOs.length === 0 ? (
+          {loadingList ? (
+            <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
+              Loading purchase orders...
+            </div>
+          ) : filteredPOs.length === 0 ? (
             <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
               No purchase orders found
             </div>
@@ -503,7 +586,10 @@ export default function PurchaseOrders() {
         setFormData={setFormData}
         showDialog={showDialog}
         setShowDialog={setShowDialog}
-        onCreate={handleCreatePO}
+        onSubmit={handleSubmitStandardPO}
+        mode={formMode}
+        submitLabel={formMode === 'edit' ? 'Update Purchase Order' : undefined}
+        title={formMode === 'edit' ? 'Update Details' : undefined}
         loading={loading}
       />
 
@@ -513,7 +599,10 @@ export default function PurchaseOrders() {
         setFormData={setJKFormData}
         showDialog={showJKDialog}
         setShowDialog={setShowJKDialog}
-        onSubmit={handleJKCompanyPOSubmit}
+        onSubmit={handleSubmitJKCompanyPO}
+        mode={jkFormMode}
+        submitLabel={jkFormMode === 'edit' ? 'Update Purchase Order' : undefined}
+        title={jkFormMode === 'edit' ? 'Update Details' : undefined}
         loading={loading}
       />
 
@@ -523,6 +612,26 @@ export default function PurchaseOrders() {
         showDetailDialog={showViewDialog}
         setShowDetailDialog={setShowViewDialog}
         loadingDetail={loading}
+        onEdit={handleEditFromView}
+        onDelete={handleRequestDelete}
+      />
+
+      <ConfirmationModal
+        isOpen={showDeleteConfirm}
+        onClose={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        title="Delete purchase order?"
+        message={`Are you sure you want to delete ${deleteTarget?.poNumber || 'this purchase order'}?`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
+      />
+
+      <Toast
+        message={toastState.message}
+        type={toastState.type}
+        isVisible={toastState.isVisible}
+        onClose={closeToast}
       />
     </div>
   )

@@ -19,7 +19,9 @@ export default function PurchaseOrderView({
   selectedOrder,
   showDetailDialog,
   setShowDetailDialog,
-  loadingDetail = false
+  loadingDetail = false,
+  onEdit = () => {},
+  onDelete = () => {},
 }) {
   if (!showDetailDialog || !selectedOrder) return null
 
@@ -35,20 +37,16 @@ export default function PurchaseOrderView({
                     <div className="flex items-center gap-2 flex-shrink-0">
             {/* Edit Button */}
             <button
-              onClick={() => {/* Add your Edit logic here */}}
+              onClick={() => onEdit(selectedOrder)}
               className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-indigo-500/20 transition-all"
             >
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Edit</span>
+              <span className="hidden sm:inline">Update</span>
             </button>
 
             {/* Delete Button */}
             <button
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this inquiry?')) {
-                  // Add your delete logic here
-                }
-              }}
+              onClick={() => onDelete(selectedOrder)}
               className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-rose-500 hover:text-white transition-all duration-200 group"
             >
               <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
@@ -61,7 +59,6 @@ export default function PurchaseOrderView({
             <button
               onClick={() => {
                 setShowDetailDialog(false)
-                setShowInteractionForm(false)
               }}
               className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1.5 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors"
             >

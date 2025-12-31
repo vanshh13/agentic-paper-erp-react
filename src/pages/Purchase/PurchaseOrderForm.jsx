@@ -6,9 +6,17 @@ export default function PurchaseOrderForm({
   showDialog,
   setShowDialog,
   onCreate,
-  loading = false
+  onSubmit,
+  loading = false,
+  mode = 'create',
+  submitLabel,
+  title,
 }) {
   if (!showDialog) return null
+
+  const isEdit = mode === 'edit'
+  const formTitle = title || (isEdit ? 'Update Purchase Order' : 'Create Purchase Order')
+  const primaryLabel = submitLabel || (isEdit ? 'Update Purchase Order' : 'Create Purchase Order')
 
   const vendorType = formData.vendorType || 'others'
 
@@ -57,7 +65,7 @@ export default function PurchaseOrderForm({
         {/* Header */}
         <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 flex justify-between items-start">
           <div>
-            <h3 className="text-xl md:text-2xl font-bold">Create Purchase Order</h3>
+            <h3 className="text-xl md:text-2xl font-bold">{formTitle}</h3>
             <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">Complete all mandatory fields marked with <span className="text-rose-300">*</span></p>
           </div>
           <button
@@ -1089,11 +1097,11 @@ export default function PurchaseOrderForm({
               Cancel
             </button>
             <button
-              onClick={onCreate}
+              onClick={onSubmit || onCreate}
               disabled={loading}
               className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create Purchase Order'}
+              {loading ? (isEdit ? 'Updating...' : 'Creating...') : primaryLabel}
             </button>
           </div>
         </div>
