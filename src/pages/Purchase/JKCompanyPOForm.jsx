@@ -6,9 +6,16 @@ export default function JKCompanyPOForm({
   showDialog,
   setShowDialog,
   onSubmit,
-  loading = false
+  loading = false,
+  mode = 'create',
+  submitLabel,
+  title,
 }) {
   if (!showDialog) return null
+
+  const isEdit = mode === 'edit'
+  const formTitle = title || (isEdit ? 'Update JK Company PO' : 'JK Company Purchase Order')
+  const primaryLabel = submitLabel || (isEdit ? 'Update Purchase Order' : 'Submit Purchase Order')
 
   const handleAddItem = () => {
     const newItems = [...(formData.lineItems || []), {
@@ -41,7 +48,7 @@ export default function JKCompanyPOForm({
       <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
         <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 flex justify-between items-start">
           <div>
-            <h3 className="text-xl md:text-2xl font-bold">JK Company Purchase Order</h3>
+            <h3 className="text-xl md:text-2xl font-bold">{formTitle}</h3>
             <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">Create specialized purchase order for JK Paper Mills Ltd</p>
           </div>
           <button
@@ -378,14 +385,14 @@ export default function JKCompanyPOForm({
               onClick={() => setShowDialog(false)}
               className="px-6 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors font-medium"
             >
-              Save as Draft
+              Cancel
             </button>
             <button
               onClick={onSubmit}
               disabled={loading}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
             >
-              {loading ? 'Submitting...' : 'Submit Purchase Order'}
+              {loading ? (isEdit ? 'Updating...' : 'Submitting...') : primaryLabel}
             </button>
           </div>
         </div>

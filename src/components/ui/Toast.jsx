@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
 
 const toastTypes = {
@@ -32,13 +32,22 @@ const toastTypes = {
   },
 }
 
-export default function Toast({ message, type = 'info', isVisible, onClose, duration = 3000 }) {
+export default function Toast({ message, type = 'info', isVisible, onClose, duration = 2000 }) {
+  const timerRef = useRef(null)
+
   useEffect(() => {
     if (isVisible && duration > 0) {
-      const timer = setTimeout(() => {
+      timerRef.current = setTimeout(() => {
         onClose()
       }, duration)
-      return () => clearTimeout(timer)
+
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current)
+      }
+    }
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [isVisible, duration, onClose])
 
@@ -48,22 +57,21 @@ export default function Toast({ message, type = 'info', isVisible, onClose, dura
   const Icon = config.icon
 
   return (
-    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-2 fade-in duration-300">
+    <div className="fixed top-4 right-4 z-[100] animate-in slide-in-from-right-4 fade-in duration-300">
       <div
-        className={`
-          flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border backdrop-blur-sm
-          ${config.bgColor} ${config.borderColor} min-w-[300px] max-w-[500px]
-        `}
+        className={`flex flex-col gap-2 px-4 py-3 rounded-lg shadow-lg border backdrop-blur-sm ${config.bgColor} ${config.borderColor} min-w-[300px] max-w-[500px]`}
       >
-        <Icon className={`w-5 h-5 flex-shrink-0 ${config.iconColor}`} />
-        <p className={`flex-1 text-sm font-medium ${config.textColor}`}>{message}</p>
-        <button
-          onClick={onClose}
-          className={`p-1 rounded hover:bg-black/10 transition-colors ${config.iconColor}`}
-          aria-label="Close"
-        >
-          <X className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-3">
+          <Icon className={`w-5 h-5 flex-shrink-0 ${config.iconColor}`} />
+          <p className={`flex-1 text-sm font-medium ${config.textColor}`}>{message}</p>
+          <button
+            onClick={onClose}
+            className={`p-1 rounded hover:bg-black/10 transition-colors ${config.iconColor}`}
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   )
