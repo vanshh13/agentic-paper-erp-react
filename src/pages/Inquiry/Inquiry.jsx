@@ -131,7 +131,7 @@ export default function Inquiry() {
       // const data = await inquiryService.getAll()
       
       const response = await inquiryServiceApi.getAll()
-      // console.log(response);
+      console.log(response);
       const data = response.data.data;
       const transformedData = data.map(inq => ({
         // Keep original for reference
