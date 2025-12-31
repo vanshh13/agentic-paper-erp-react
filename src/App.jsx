@@ -1,23 +1,23 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { SidebarProvider } from './contexts/SidebarContext'
 import RootLayout from './layout/RootLayout'
-import Home from './pages/Home'
-import Dashboard from './pages/Dashboard'
-import Customers from './pages/Customers'
-import Products from './pages/Products'
-import SalesOrders from './pages/SalesOrders'
+import Home from './pages/Home/Home'
+import Dashboard from './pages/Dashboard/Dashboard'
+import Customers from './pages/Customers/Customers'
+import SalesOrders from './pages/SalesOrders/SalesOrders'
 import PurchaseOrders from './pages/Purchase/PurchaseOrders'
-import Quotations from './pages/Quotations'
+import Quotations from './pages/Quotations/Quotations'
 import Inquiry from './pages/Inquiry/Inquiry'
-import Rules from './pages/Rules'
-import Stock from './pages/Stock'
-import PriceLists from './pages/PriceLists'
-import Vendors from './pages/Vendors'
-import Transporters from './pages/Transporters'
-import Dispatch from './pages/Dispatch'
-import GRN from './pages/GRN'
-import Approvals from './pages/Approvals'
-import Settings from './pages/Settings'
+import Rules from './pages/Rules/Rules'
+import Stock from './pages/Stock/Stock'
+import PriceLists from './pages/PriceLists/PriceLists'
+import Products from './pages/Products/Products'
+import Vendors from './pages/Vendors/Vendors'
+import Transporters from './pages/Transporters/Transporters'
+import Dispatch from './pages/Dispatch/Dispatch'
+import GRN from './pages/GRN/GRN'
+import Approvals from './pages/Approvals/Approvals'
+import Settings from './pages/Settings/Settings'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
 
@@ -38,9 +38,9 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/home" element={<Home />} />
           <Route path="/customers" element={<Customers />} />
-          <Route path="/products" element={<Products />} />
           <Route path="/sales-orders" element={<SalesOrders />} />
           <Route path="/purchase-orders" element={<PurchaseOrders />} />
+          <Route path="/products" element={<Products />} />
           <Route path="/inquiry" element={<Inquiry />} />
           <Route path="/quotations" element={<Quotations />} />
           <Route path="/rules" element={<Rules />} />

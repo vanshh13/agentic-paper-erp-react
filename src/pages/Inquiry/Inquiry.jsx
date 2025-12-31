@@ -337,6 +337,7 @@ export default function Inquiry() {
               <MessageSquare className="w-6 h-6" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-[oklch(0.98_0_0)]">Inquiries</h2>
+            
           </div>
           <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">
             Track and manage customer inquiries from all sources
