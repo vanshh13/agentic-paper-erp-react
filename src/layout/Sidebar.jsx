@@ -2,17 +2,37 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown, IndianRupee } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
+import { logoutUser, getCurrentUser } from '../services/api/auth'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const [isHighlighted, setIsHighlighted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   
   // 1. This ref will track the entire account section area
   const accountRef = useRef(null)
+
+  useEffect(() => {
+    // Get current user from localStorage
+    const user = getCurrentUser()
+    setCurrentUser(user)
+    
+    // Listen for storage changes (when user logs in or registers in another tab)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user') {
+        const updatedUser = e.newValue ? JSON.parse(e.newValue) : null
+        setCurrentUser(updatedUser)
+      }
+    }
+    
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
 
   useEffect(() => {
     const handleResize = () => {
@@ -64,6 +84,20 @@ export default function Sidebar() {
 
   const handleToggleSidebar = () => setIsOpen(!isOpen)
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logoutUser()
+      navigate('/auth/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+      // Still navigate to login even if logout fails
+      navigate('/auth/login')
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
+
   return (
     <>
       {/* Mobile Overlay */}
@@ -111,9 +145,13 @@ export default function Sidebar() {
                   <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
                   <span className="flex-1 truncate">Settings</span>
                 </Link>
-                <button onClick={() => { navigate('/auth/login'); handleLinkClick(); setIsAccountOpen(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300">
+                <button 
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
-                  <span className="flex-1 truncate text-left">Logout</span>
+                  <span className="flex-1 truncate text-left">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
                 </button>
               </div>
             </div>
@@ -128,10 +166,16 @@ export default function Sidebar() {
             }}
           >
             <div className="flex items-center gap-2 px-2 py-1">
-              <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">AM</div>
+              <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                {currentUser?.first_name ? currentUser.first_name.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || 'U')}
+              </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-[oklch(0.90_0_0)] truncate">Admin User</p>
-                <p className="text-xs text-[oklch(0.60_0_0)] truncate">admin@paperco.com</p>
+                <p className="text-xs font-medium text-[oklch(0.90_0_0)] truncate">
+                  {currentUser?.first_name && currentUser?.last_name 
+                    ? `${currentUser.first_name} ${currentUser.middle_name ? currentUser.middle_name + ' ' : ''}${currentUser.last_name}` 
+                    : currentUser?.username || 'User'}
+                </p>
+                <p className="text-xs text-[oklch(0.60_0_0)] truncate">{currentUser?.email || 'user@company.com'}</p>
               </div>
               {isAccountOpen ? <ChevronUp size={16} className="text-[oklch(0.75_0_0)]" /> : <ChevronDown size={16} className="text-[oklch(0.75_0_0)]" />}
             </div>
