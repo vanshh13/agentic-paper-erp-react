@@ -1,4 +1,4 @@
-import { X, FileText, Package, MapPin, Calendar, DollarSign, Truck } from 'lucide-react'
+import { X, FileText, Package, MapPin, Calendar, DollarSign, Truck, Edit, Trash2 } from 'lucide-react'
 
 const typeConfig = {
   jk_company: { label: 'JK Company', color: 'bg-indigo-500/15 text-indigo-200' },
@@ -19,7 +19,9 @@ export default function PurchaseOrderView({
   selectedOrder,
   showDetailDialog,
   setShowDetailDialog,
-  loadingDetail = false
+  loadingDetail = false,
+  onEdit = () => {},
+  onDelete = () => {},
 }) {
   if (!showDetailDialog || !selectedOrder) return null
 
@@ -32,12 +34,37 @@ export default function PurchaseOrderView({
             <h3 className="text-xl md:text-2xl font-bold">Purchase Order Details</h3>
             <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1 font-mono">{selectedOrder.poNumber}</p>
           </div>
-          <button
-            onClick={() => setShowDetailDialog(false)}
-            className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors flex-shrink-0"
-          >
-            <X className="w-5 h-5 md:w-6 md:h-6" />
-          </button>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+            {/* Edit Button */}
+            <button
+              onClick={() => onEdit(selectedOrder)}
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-indigo-500/20 transition-all"
+            >
+              <FileText className="w-4 h-4" />
+              <span className="hidden sm:inline">Update</span>
+            </button>
+
+            {/* Delete Button */}
+            <button
+              onClick={() => onDelete(selectedOrder)}
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-rose-500 hover:text-white transition-all duration-200 group"
+            >
+              <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
+              <span className="hidden sm:inline">Delete</span>
+            </button>
+            {/* Vertical Divider */}
+            <div className="w-[1px] h-8 bg-[var(--border)] mx-1" />
+
+            {/* Close Button */}
+            <button
+              onClick={() => {
+                setShowDetailDialog(false)
+              }}
+              className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1.5 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors"
+            >
+              <X className="w-5 h-5 md:w-6 md:h-6" />
+            </button>
+          </div>
         </div>
 
         <div className="p-4 md:p-6 space-y-6 max-h-[calc(90vh-120px)] overflow-y-auto custom-scrollbar">
@@ -155,16 +182,6 @@ export default function PurchaseOrderView({
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="p-4 md:p-6 border-t border-[var(--border)] flex justify-end gap-3 bg-[oklch(0.18_0_0)] rounded-b-xl">
-          <button
-            onClick={() => setShowDetailDialog(false)}
-            className="px-4 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm font-medium"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

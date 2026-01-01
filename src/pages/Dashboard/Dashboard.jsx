@@ -7,13 +7,18 @@ import {
   ClipboardList,
   MessageSquare,
   Plus,
-  ArrowRight
+  ArrowRight,
+  LayoutDashboard
 } from 'lucide-react'
-import ActiveCustomersChart from '../components/charts/ActiveCustomersChart'
-import SalesAnalyticsChart from '../components/charts/SalesAnalyticsChart'
-import TopInventoryChart from '../components/charts/TopInventoryChart'
-import CriticalInventoryChart from '../components/charts/CriticalInventoryChart'
-import PriceHistoryChart from '../components/charts/PriceHistoryChart'
+import ActiveCustomersChart from '../../components/charts/ActiveCustomersChart'
+import SalesAnalyticsChart from '../../components/charts/SalesAnalyticsChart'
+import TopInventoryChart from '../../components/charts/TopInventoryChart'
+import CriticalInventoryChart from '../../components/charts/CriticalInventoryChart'
+import PriceHistoryChart from '../../components/charts/PriceHistoryChart'
+import OrderWorkflowStatus from '../../components/dashboard/OrderWorkflowStatus'
+import TopSellingProducts from '../../components/dashboard/TopSellingProducts'
+import TopCustomers from '../../components/dashboard/TopCustomers'
+import AdditionalStatsSection from '../../components/dashboard/AdditionalStatsSection'
 
 export default function Dashboard() {
   const quickActions = [
@@ -61,23 +66,30 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] max-w-[1600px]">
+    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Welcome back!</h1>
-            <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">
-              Here's an overview across all companies
-            </p>
+        <div className="flex flex-wrap items-center gap-3 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-lg bg-indigo-500/20 text-indigo-400">
+              <LayoutDashboard className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Dashboard</h1>
+                <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">Company-wide overview and quick actions</p>
+
+            </div>
           </div>
-          <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium">
-            <Plus className="w-4 h-4" />
-            New
-          </button>
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 animate-pulse"></span>
+            </span>
+            <span className="text-sm font-medium text-emerald-400">Live</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
-          <span className="inline-flex items-center gap-1">
+
+        <div className="flex flex-wrap items-center gap-3 text-[oklch(0.65_0_0)]">
+          <span className="inline-flex items-center gap-1 text-xs md:text-sm">
             <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
             Showing data from all companies
           </span>
@@ -145,45 +157,16 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Additional Info Cards - Optional */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="card-surface p-5 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)] mb-3">Recent Activity</h3>
-          <div className="space-y-3">
-            {[
-              { action: 'New inquiry received', time: '5 min ago', color: 'text-blue-400' },
-              { action: 'Order #SO-2025-001 approved', time: '1 hour ago', color: 'text-emerald-400' },
-              { action: 'Stock updated for Product A', time: '2 hours ago', color: 'text-cyan-400' },
-            ].map((activity, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${activity.color.replace('text-', 'bg-')}`}></div>
-                  <span className="text-sm text-[oklch(0.85_0_0)]">{activity.action}</span>
-                </div>
-                <span className="text-xs text-[oklch(0.65_0_0)]">{activity.time}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Additional Stats Section */}
+      <AdditionalStatsSection />
 
-        <div className="card-surface p-5 md:p-6">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)] mb-3">Quick Stats</h3>
-          <div className="space-y-3">
-            {[
-              { label: 'Total Customers', value: '234', change: '+12%' },
-              { label: 'Active Products', value: '156', change: '+5%' },
-              { label: 'Monthly Revenue', value: '₹12.5L', change: '+18%' },
-            ].map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between py-2">
-                <span className="text-sm text-[oklch(0.75_0_0)]">{item.label}</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-semibold text-[oklch(0.95_0_0)]">{item.value}</span>
-                  <span className="text-xs text-emerald-400">{item.change}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Order Workflow Status - Full Width */}
+      <OrderWorkflowStatus />
+
+      {/* Top Selling Products and Top Customers - Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <TopSellingProducts />
+        <TopCustomers />
       </div>
 
       {/* Analytics Charts */}

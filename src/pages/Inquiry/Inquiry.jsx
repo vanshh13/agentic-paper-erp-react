@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react'
 import { inquiryService } from '../../services/inquiryService'
 import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../../types/inquiry'
 import { Plus, MessageSquare } from 'lucide-react'
-
+import { inquiryServiceApi } from '../../services/api/inquiry/inquiry-api'
 // Import components
 import InquiryForm from '../../components/inquiry/InquiryForm'
 import InquiryList from '../../components/inquiry/InquiryList'
 import InquiryView from '../../components/inquiry/InquiryView'
+import Toast from '../../components/ui/Toast'
+import ConfirmationModal from '../../components/ui/ConfirmationModal'
 
 export default function Inquiry() {
   // Main state
@@ -27,7 +29,9 @@ export default function Inquiry() {
   })
 
   // Dialog states
-  const [showNewDialog, setShowNewDialog] = useState(false)
+  const [showFormDialog, setShowFormDialog] = useState(false)
+  const [formMode, setFormMode] = useState('create') // 'create' or 'edit'
+  const [editingInquiryId, setEditingInquiryId] = useState(null)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [showInteractionForm, setShowInteractionForm] = useState(false)
@@ -35,6 +39,50 @@ export default function Inquiry() {
   // Data states
   const [selectedInquiry, setSelectedInquiry] = useState(null)
   const [interactions, setInteractions] = useState([])
+
+  // Toast state
+  const [toast, setToast] = useState({
+    isVisible: false,
+    message: '',
+    type: 'info', // 'success', 'error', 'warning', 'info'
+  })
+
+  // Confirmation modal state
+  const [confirmationModal, setConfirmationModal] = useState({
+    isOpen: false,
+    message: '',
+    onConfirm: null,
+  })
+
+  // Helper function to show toast
+  const showToast = (message, type = 'info') => {
+    setToast({
+      isVisible: true,
+      message,
+      type,
+    })
+  }
+
+  const hideToast = () => {
+    setToast(prev => ({ ...prev, isVisible: false }))
+  }
+
+  // Helper function to show confirmation modal
+  const showConfirmation = (message, onConfirm) => {
+    setConfirmationModal({
+      isOpen: true,
+      message,
+      onConfirm,
+    })
+  }
+
+  const hideConfirmation = () => {
+    setConfirmationModal({
+      isOpen: false,
+      message: '',
+      onConfirm: null,
+    })
+  }
 
   // Form states
   const [formData, setFormData] = useState({
@@ -51,6 +99,8 @@ export default function Inquiry() {
     preferredContactMethod: 'whatsapp',
     productRequested: '',
     expectedPrice: '',
+    quantity: '',
+    uom: '',
     expectedDeliveryDate: '',
     specialInstructions: '',
     rawMessage: '',
@@ -94,7 +144,6 @@ export default function Inquiry() {
       setLoading(false)
     }
   }
-
   const handleViewDetails = async (inquiry) => {
     try {
       setLoadingDetail(true)
@@ -169,67 +218,203 @@ export default function Inquiry() {
     setShowInteractionForm(false)
   }
 
-  const handleCreate = async () => {
+  const resetForm = () => {
+    setFormData({
+      source: INQUIRY_SOURCE.WHATSAPP,
+      linkedOrderId: '',
+      status: INQUIRY_STATUS.NEW,
+      customerId: '',
+      customerName: '',
+      customerPOC: '',
+      customerPhone: '',
+      customerWhatsapp: '',
+      customerEmail: '',
+      customerAddress: '',
+      preferredContactMethod: 'whatsapp',
+      productRequested: '',
+      expectedPrice: '',
+      quantity: '',
+      uom: '',
+      expectedDeliveryDate: '',
+      specialInstructions: '',
+      rawMessage: '',
+      assignedSalesPerson: '',
+      isWithinWorkingHours: true,
+      interactionDueTime: '',
+      slaStatus: SLA_STATUS.ON_TRACK,
+    })
+  }
+
+  const handleOpenCreateForm = () => {
+    resetForm()
+    setFormMode('create')
+    setEditingInquiryId(null)
+    setShowFormDialog(true)
+  }
+
+  const handleOpenEditForm = (inquiry) => {
+    // Prefill form with inquiry data
+    setFormData({
+      source: inquiry.source || INQUIRY_SOURCE.WHATSAPP,
+      linkedOrderId: inquiry.linkedOrderId || '',
+      status: inquiry.status || INQUIRY_STATUS.NEW,
+      customerId: inquiry.customerId || '',
+      customerName: inquiry.customerName || '',
+      customerPOC: inquiry.customerPOC || '',
+      customerPhone: inquiry.customerPhone || '',
+      customerWhatsapp: inquiry.customerWhatsapp || '',
+      customerEmail: inquiry.customerEmail || '',
+      customerAddress: inquiry.customerAddress || '',
+      preferredContactMethod: inquiry.preferredContactMethod || 'whatsapp',
+      productRequested: inquiry.productRequested || '',
+      expectedPrice: inquiry.expectedPrice || '',
+      quantity: inquiry.quantity || '',
+      uom: inquiry.uom || '',
+      expectedDeliveryDate: inquiry.expectedDeliveryDate || '',
+      specialInstructions: inquiry.specialInstructions || '',
+      rawMessage: inquiry.rawMessage || '',
+      assignedSalesPerson: inquiry.assignedSalesPerson || '',
+      isWithinWorkingHours: inquiry.isWithinWorkingHours !== undefined ? inquiry.isWithinWorkingHours : true,
+      interactionDueTime: inquiry.interactionDueTime || '',
+      slaStatus: inquiry.slaStatus || SLA_STATUS.ON_TRACK,
+    })
+    setFormMode('edit')
+    setEditingInquiryId(inquiry.id)
+    setShowFormDialog(true)
+    setShowDetailDialog(false) // Close detail view when opening edit form
+  }
+
+  const handleFormSubmit = async () => {
     if (!formData.customerName && !formData.customerPhone && !formData.customerEmail) {
       alert('At least one customer contact is required')
       return
     }
 
     try {
-      const newInquiry = {
-        source: formData.source,
-        linkedOrderId: formData.linkedOrderId || null,
-        status: formData.status,
-        customerId: formData.customerId || null,
-        customerName: formData.customerName || null,
-        customerPOC: formData.customerPOC || null,
-        customerPhone: formData.customerPhone || null,
-        customerWhatsapp: formData.customerWhatsapp || null,
-        customerEmail: formData.customerEmail || null,
-        customerAddress: formData.customerAddress || null,
-        preferredContactMethod: formData.preferredContactMethod,
-        productRequested: formData.productRequested || null,
-        expectedPrice: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
-        expectedDeliveryDate: formData.expectedDeliveryDate || null,
-        specialInstructions: formData.specialInstructions || null,
-        rawMessage: formData.rawMessage || null,
-        assignedSalesPerson: formData.assignedSalesPerson || null,
-        isWithinWorkingHours: formData.isWithinWorkingHours,
-        interactionDueTime: formData.interactionDueTime || null,
-        slaStatus: formData.slaStatus,
-        inquiryDateTime: new Date().toISOString(),
-      }
+      if (formMode === 'edit' && editingInquiryId) {
+        // Update existing inquiry
+        const updatedInquiry = {
+          source: formData.source,
+          linkedOrderId: formData.linkedOrderId || null,
+          status: formData.status,
+          customerId: formData.customerId || null,
+          customerName: formData.customerName || null,
+          customerPOC: formData.customerPOC || null,
+          customerPhone: formData.customerPhone || null,
+          customerWhatsapp: formData.customerWhatsapp || null,
+          customerEmail: formData.customerEmail || null,
+          customerAddress: formData.customerAddress || null,
+          preferredContactMethod: formData.preferredContactMethod,
+          productRequested: formData.productRequested || null,
+          expectedPrice: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
+          quantity: formData.quantity ? parseFloat(formData.quantity) : null,
+          uom: formData.uom || null,
+          expectedDeliveryDate: formData.expectedDeliveryDate || null,
+          specialInstructions: formData.specialInstructions || null,
+          rawMessage: formData.rawMessage || null,
+          assignedSalesPerson: formData.assignedSalesPerson || null,
+          isWithinWorkingHours: formData.isWithinWorkingHours,
+          interactionDueTime: formData.interactionDueTime || null,
+          slaStatus: formData.slaStatus,
+        }
 
-      await inquiryService.create(newInquiry)
-      setShowNewDialog(false)
-      setFormData({
-        source: INQUIRY_SOURCE.WHATSAPP,
-        linkedOrderId: '',
-        status: INQUIRY_STATUS.NEW,
-        customerId: '',
-        customerName: '',
-        customerPOC: '',
-        customerPhone: '',
-        customerWhatsapp: '',
-        customerEmail: '',
-        customerAddress: '',
-        preferredContactMethod: 'whatsapp',
-        productRequested: '',
-        expectedPrice: '',
-        expectedDeliveryDate: '',
-        specialInstructions: '',
-        rawMessage: '',
-        assignedSalesPerson: '',
-        isWithinWorkingHours: true,
-        interactionDueTime: '',
-        slaStatus: SLA_STATUS.ON_TRACK,
-      })
-      fetchInquiries()
+        // TODO: Uncomment when API is ready
+        // await inquiryService.update(editingInquiryId, updatedInquiry)
+        
+        // Using dummy data for now
+        await inquiryService.update(editingInquiryId, updatedInquiry)
+        
+        setShowFormDialog(false)
+        resetForm()
+        fetchInquiries()
+        showToast('Inquiry updated successfully', 'success')
+      } else {
+        // Create new inquiry
+        const newInquiry = {
+          source: formData.source,
+          linkedOrderId: formData.linkedOrderId || null,
+          status: formData.status,
+          customerId: formData.customerId || null,
+          customerName: formData.customerName || null,
+          customerPOC: formData.customerPOC || null,
+          customerPhone: formData.customerPhone || null,
+          customerWhatsapp: formData.customerWhatsapp || null,
+          customerEmail: formData.customerEmail || null,
+          customerAddress: formData.customerAddress || null,
+          preferredContactMethod: formData.preferredContactMethod,
+          productRequested: formData.productRequested || null,
+          expectedPrice: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
+          quantity: formData.quantity ? parseFloat(formData.quantity) : null,
+          uom: formData.uom || null,
+          expectedDeliveryDate: formData.expectedDeliveryDate || null,
+          specialInstructions: formData.specialInstructions || null,
+          rawMessage: formData.rawMessage || null,
+          assignedSalesPerson: formData.assignedSalesPerson || null,
+          isWithinWorkingHours: formData.isWithinWorkingHours,
+          interactionDueTime: formData.interactionDueTime || null,
+          slaStatus: formData.slaStatus,
+          inquiryDateTime: new Date().toISOString(),
+        }
+
+        // TODO: Uncomment when API is ready
+        // await inquiryService.create(newInquiry)
+        
+        // Using dummy data for now
+        await inquiryService.create(newInquiry)
+        
+        setShowFormDialog(false)
+        resetForm()
+        fetchInquiries()
+        showToast('Inquiry created successfully', 'success')
+      }
     } catch (error) {
-      console.error('Error creating inquiry:', error)
-      alert('Failed to create inquiry')
+      console.error(`Error ${formMode === 'edit' ? 'updating' : 'creating'} inquiry:`, error)
+      alert(`Failed to ${formMode === 'edit' ? 'update' : 'create'} inquiry`)
     }
   }
+
+  const handleDeleteInquiry = (inquiryId) => {
+    showConfirmation(
+      'Are you sure you want to delete this inquiry?',
+      async () => {
+        try {
+          // TODO: Uncomment when API is ready
+          // await inquiryService.delete(inquiryId)
+          
+          // Using dummy data for now
+          await inquiryService.delete(inquiryId)
+          
+          setShowDetailDialog(false)
+          setSelectedInquiry(null)
+          fetchInquiries()
+          showToast('Inquiry deleted successfully', 'success')
+        } catch (error) {
+          console.error('Error deleting inquiry:', error)
+          showToast('Failed to delete inquiry', 'error')
+        }
+      }
+    )
+  }
+
+  const handleDeleteInteraction = (interactionId) => {
+    showConfirmation(
+      'Are you sure you want to delete this interaction?',
+      async () => {
+        try {
+          await inquiryService.deleteInteraction(interactionId);
+          
+          // Refresh the interactions list for the currently selected inquiry
+          const updatedInteractions = await inquiryService.getInteractions(selectedInquiry.id);
+          setInteractions(updatedInteractions);
+          
+          showToast('Interaction removed successfully', 'success');
+        } catch (error) {
+          console.error('Error deleting interaction:', error);
+          showToast('Failed to delete interaction', 'error');
+        }
+      }
+    );
+  };
 
   const getFilteredInquiries = () => {
     let filtered = inquiries
@@ -337,6 +522,7 @@ export default function Inquiry() {
               <MessageSquare className="w-6 h-6" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-[oklch(0.98_0_0)]">Inquiries</h2>
+            
           </div>
           <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">
             Track and manage customer inquiries from all sources
@@ -349,7 +535,7 @@ export default function Inquiry() {
           </div>
         </div>
         <button
-          onClick={() => setShowNewDialog(true)}
+          onClick={handleOpenCreateForm}
           className="flex items-center gap-2 gradient-primary text-[oklch(0.98_0_0)] px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
@@ -394,13 +580,14 @@ export default function Inquiry() {
         loadingDetail={loadingDetail}
       />
 
-      {/* Form Component */}
+      {/* Form Component - Reusable for Create and Edit */}
       <InquiryForm
         formData={formData}
         setFormData={setFormData}
-        showDialog={showNewDialog}
-        setShowDialog={setShowNewDialog}
-        onCreate={handleCreate}
+        showDialog={showFormDialog}
+        setShowDialog={setShowFormDialog}
+        onSubmit={handleFormSubmit}
+        mode={formMode}
       />
 
       {/* View Component */}
@@ -414,7 +601,35 @@ export default function Inquiry() {
         interactionForm={interactionForm}
         setInteractionForm={setInteractionForm}
         onAddInteraction={handleAddInteraction}
+        onEdit={handleOpenEditForm}
+        onDelete={handleDeleteInquiry}
+        onDeleteInteraction={handleDeleteInteraction}
         loadingDetail={loadingDetail}
+      />
+
+      {/* Toast Notification */}
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        isVisible={toast.isVisible}
+        onClose={hideToast}
+        duration={3000}
+      />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModal.isOpen}
+        onClose={hideConfirmation}
+        onConfirm={() => {
+          if (confirmationModal.onConfirm) {
+            confirmationModal.onConfirm()
+          }
+        }}
+        title="Confirm Delete"
+        message={confirmationModal.message}
+        confirmText="Delete"
+        cancelText="Cancel"
+        type="danger"
       />
     </div>
   )
