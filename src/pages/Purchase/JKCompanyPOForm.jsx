@@ -20,26 +20,46 @@ export default function JKCompanyPOForm({
   const handleAddItem = () => {
     const newItems = [...(formData.lineItems || []), {
       itemName: '',
-      qualityGrade: '',
+      description: '',
       brand: '',
+      itemGroup: '',
+      hsnCode: '',
+      qualityGrade: '',
       gsm: '',
       size1: '',
       size2: '',
-      quantity: '',
+      sizeType: '',
       packagingMode: '',
-      fscType: ''
+      quantity: '',
+      numPackages: '',
+      sheetsReams: '',
+      reamsPerPackage: '',
+      unitOfWeight: 'kg',
+      reamWeight: '',
+      tareWeight: '',
+      netWeight: '',
+      fscType: '',
+      itemRemarks: '',
     }]
     setFormData({ ...formData, lineItems: newItems })
   }
 
   const handleRemoveItem = (index) => {
-    const newItems = formData.lineItems.filter((_, i) => i !== index)
+    const newItems = (formData.lineItems || []).filter((_, i) => i !== index)
     setFormData({ ...formData, lineItems: newItems })
   }
 
   const handleItemChange = (index, field, value) => {
-    const newItems = [...formData.lineItems]
+    const newItems = [...(formData.lineItems || [])]
     newItems[index] = { ...newItems[index], [field]: value }
+
+    // Auto-calc net weight when weight inputs change
+    if (['reamWeight', 'tareWeight'].includes(field)) {
+      const rw = parseFloat(newItems[index].reamWeight) || 0
+      const tw = parseFloat(newItems[index].tareWeight) || 0
+      newItems[index].netWeight = (rw - tw).toFixed(2)
+    }
+
     setFormData({ ...formData, lineItems: newItems })
   }
 
@@ -49,7 +69,6 @@ export default function JKCompanyPOForm({
         <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 flex justify-between items-start">
           <div>
             <h3 className="text-xl md:text-2xl font-bold">{formTitle}</h3>
-            <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">Create specialized purchase order for JK Paper Mills Ltd</p>
           </div>
           <button
             onClick={() => setShowDialog(false)}
@@ -183,6 +202,207 @@ export default function JKCompanyPOForm({
                   />
                 </div>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">PO Number</label>
+                  <input
+                    type="text"
+                    placeholder="Enter PO number"
+                    value={formData.poNumber || ''}
+                    onChange={(e) => setFormData({ ...formData, poNumber: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Document Date</label>
+                  <input
+                    type="date"
+                    value={formData.documentDate || ''}
+                    onChange={(e) => setFormData({ ...formData, documentDate: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Buyer Name</label>
+                  <input
+                    type="text"
+                    placeholder="Buyer name"
+                    value={formData.buyerName || ''}
+                    onChange={(e) => setFormData({ ...formData, buyerName: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Buyer Contact</label>
+                  <input
+                    type="text"
+                    placeholder="Contact / phone"
+                    value={formData.buyerContact || ''}
+                    onChange={(e) => setFormData({ ...formData, buyerContact: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tax Details</label>
+                  <input
+                    type="text"
+                    placeholder="GST / tax notes"
+                    value={formData.taxDetails || ''}
+                    onChange={(e) => setFormData({ ...formData, taxDetails: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Supplier Address</label>
+                  <textarea
+                    placeholder="Supplier address"
+                    value={formData.supplierAddress || ''}
+                    onChange={(e) => setFormData({ ...formData, supplierAddress: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Bill To</label>
+                  <textarea
+                    placeholder="Billing address"
+                    value={formData.billToAddress || ''}
+                    onChange={(e) => setFormData({ ...formData, billToAddress: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Ship To</label>
+                  <textarea
+                    placeholder="Shipping address"
+                    value={formData.shipToAddress || ''}
+                    onChange={(e) => setFormData({ ...formData, shipToAddress: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Deliver To</label>
+                  <textarea
+                    placeholder="Delivery location"
+                    value={formData.deliverToAddress || ''}
+                    onChange={(e) => setFormData({ ...formData, deliverToAddress: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Buyer Details</label>
+                  <textarea
+                    placeholder="Additional buyer details"
+                    value={formData.buyerDetails || ''}
+                    onChange={(e) => setFormData({ ...formData, buyerDetails: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Supplier Details</label>
+                  <textarea
+                    placeholder="Additional supplier details"
+                    value={formData.supplierDetails || ''}
+                    onChange={(e) => setFormData({ ...formData, supplierDetails: e.target.value })}
+                    rows={2}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Import / Customs (Optional) */}
+          <div>
+            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Import / Customs (Optional)</h4>
+            <div className="grid gap-4 md:grid-cols-3 bg-[oklch(0.18_0_0)] p-4 rounded-lg">
+              <div>
+                <label className="block text-sm font-medium mb-2">Country of Origin</label>
+                <input
+                  type="text"
+                  placeholder="e.g., India"
+                  value={formData.countryOfOrigin || ''}
+                  onChange={(e) => setFormData({ ...formData, countryOfOrigin: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Shipment Mode</label>
+                <select
+                  value={formData.shipmentMode || ''}
+                  onChange={(e) => setFormData({ ...formData, shipmentMode: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                >
+                  <option value="">Select mode</option>
+                  <option value="sea">Sea</option>
+                  <option value="air">Air</option>
+                  <option value="road">Road</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Port of Loading</label>
+                <input
+                  type="text"
+                  placeholder="Port of loading"
+                  value={formData.portOfLoading || ''}
+                  onChange={(e) => setFormData({ ...formData, portOfLoading: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Port of Discharge</label>
+                <input
+                  type="text"
+                  placeholder="Port of discharge"
+                  value={formData.portOfDischarge || ''}
+                  onChange={(e) => setFormData({ ...formData, portOfDischarge: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Final Destination</label>
+                <input
+                  type="text"
+                  placeholder="Final destination"
+                  value={formData.finalDestination || ''}
+                  onChange={(e) => setFormData({ ...formData, finalDestination: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">BL Number</label>
+                <input
+                  type="text"
+                  placeholder="BL number"
+                  value={formData.blNumber || ''}
+                  onChange={(e) => setFormData({ ...formData, blNumber: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">AWB Number</label>
+                <input
+                  type="text"
+                  placeholder="AWB number"
+                  value={formData.awbNumber || ''}
+                  onChange={(e) => setFormData({ ...formData, awbNumber: e.target.value })}
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                />
+              </div>
             </div>
           </div>
 
@@ -191,6 +411,16 @@ export default function JKCompanyPOForm({
             <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Insurance Information</h4>
             <div className="bg-[oklch(0.18_0_0)] p-4 rounded-lg space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Insurance Terms</label>
+                  <input
+                    type="text"
+                    placeholder="Insurance terms"
+                    value={formData.insuranceTerms || ''}
+                    onChange={(e) => setFormData({ ...formData, insuranceTerms: e.target.value })}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                  />
+                </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Policy Number</label>
                   <input
@@ -255,6 +485,49 @@ export default function JKCompanyPOForm({
                         />
                       </div>
                       <div>
+                        <label className="block text-xs font-medium mb-1">Description</label>
+                        <textarea
+                          placeholder="Short description"
+                          value={item.description || ''}
+                          onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                          rows={2}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Brand</label>
+                        <input
+                          type="text"
+                          placeholder="Brand name"
+                          value={item.brand || ''}
+                          onChange={(e) => handleItemChange(index, 'brand', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Item Group</label>
+                        <input
+                          type="text"
+                          placeholder="Optional group"
+                          value={item.itemGroup || ''}
+                          onChange={(e) => handleItemChange(index, 'itemGroup', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">HSN Code</label>
+                        <input
+                          type="text"
+                          placeholder="HSN code"
+                          value={item.hsnCode || ''}
+                          onChange={(e) => handleItemChange(index, 'hsnCode', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
                         <label className="block text-xs font-medium mb-1">Quality Grade</label>
                         <select
                           value={item.qualityGrade || ''}
@@ -266,16 +539,6 @@ export default function JKCompanyPOForm({
                           <option value="B">Grade B</option>
                           <option value="C">Grade C</option>
                         </select>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium mb-1">Brand</label>
-                        <input
-                          type="text"
-                          placeholder="Brand name"
-                          value={item.brand || ''}
-                          onChange={(e) => handleItemChange(index, 'brand', e.target.value)}
-                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
-                        />
                       </div>
                     </div>
 
@@ -294,7 +557,7 @@ export default function JKCompanyPOForm({
                         <label className="block text-xs font-medium mb-1">Size 1 (mm)</label>
                         <input
                           type="text"
-                          placeholder="e.g., 210"
+                          placeholder="e.g., 21"
                           value={item.size1 || ''}
                           onChange={(e) => handleItemChange(index, 'size1', e.target.value)}
                           className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
@@ -304,11 +567,37 @@ export default function JKCompanyPOForm({
                         <label className="block text-xs font-medium mb-1">Size 2 (mm)</label>
                         <input
                           type="text"
-                          placeholder="e.g., 297"
+                          placeholder="e.g., 29.7"
                           value={item.size2 || ''}
                           onChange={(e) => handleItemChange(index, 'size2', e.target.value)}
                           className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
                         />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Size Type (FOL)</label>
+                        <input
+                          type="text"
+                          placeholder="Optional size type"
+                          value={item.sizeType || ''}
+                          onChange={(e) => handleItemChange(index, 'sizeType', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Mode of Packaging</label>
+                        <select
+                          value={item.packagingMode || ''}
+                          onChange={(e) => handleItemChange(index, 'packagingMode', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        >
+                          <option value="">Select packaging</option>
+                          <option value="carton">Carton</option>
+                          <option value="pallet">Pallet</option>
+                          <option value="bulk">Bulk</option>
+                        </select>
                       </div>
                       <div>
                         <label className="block text-xs font-medium mb-1">Quantity</label>
@@ -320,21 +609,82 @@ export default function JKCompanyPOForm({
                           className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
                         />
                       </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">No. of Packages</label>
+                        <input
+                          type="number"
+                          placeholder="Packages"
+                          value={item.numPackages || ''}
+                          onChange={(e) => handleItemChange(index, 'numPackages', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
                     </div>
 
-                    <div className="grid gap-3 md:grid-cols-2">
+                    <div className="grid gap-3 md:grid-cols-3">
                       <div>
-                        <label className="block text-xs font-medium mb-1">Packaging Mode</label>
+                        <label className="block text-xs font-medium mb-1">Sheets / Reams</label>
+                        <input
+                          type="number"
+                          placeholder="Sheets or reams"
+                          value={item.sheetsReams || ''}
+                          onChange={(e) => handleItemChange(index, 'sheetsReams', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">No. of Reams / Packages</label>
+                        <input
+                          type="number"
+                          placeholder="Reams per package"
+                          value={item.reamsPerPackage || ''}
+                          onChange={(e) => handleItemChange(index, 'reamsPerPackage', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Unit of Weight</label>
                         <select
-                          value={item.packagingMode || ''}
-                          onChange={(e) => handleItemChange(index, 'packagingMode', e.target.value)}
+                          value={item.unitOfWeight || 'kg'}
+                          onChange={(e) => handleItemChange(index, 'unitOfWeight', e.target.value)}
                           className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
                         >
-                          <option value="">Select packaging</option>
-                          <option value="carton">Carton</option>
-                          <option value="pallet">Pallet</option>
-                          <option value="bulk">Bulk</option>
+                          <option value="kg">KG</option>
+                          <option value="mt">MT</option>
+                          <option value="lb">LB</option>
                         </select>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-3 md:grid-cols-4">
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Ream Weight ({item.unitOfWeight || 'kg'})</label>
+                        <input
+                          type="number"
+                          placeholder="Ream weight"
+                          value={item.reamWeight || ''}
+                          onChange={(e) => handleItemChange(index, 'reamWeight', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Tare Weight ({item.unitOfWeight || 'kg'})</label>
+                        <input
+                          type="number"
+                          placeholder="Tare weight"
+                          value={item.tareWeight || ''}
+                          onChange={(e) => handleItemChange(index, 'tareWeight', e.target.value)}
+                          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">Net Weight ({item.unitOfWeight || 'kg'})</label>
+                        <input
+                          type="number"
+                          value={item.netWeight || ''}
+                          readOnly
+                          className="w-full px-3 py-2 input-surface focus:outline-none rounded text-sm opacity-80"
+                        />
                       </div>
                       <div>
                         <label className="block text-xs font-medium mb-1">FSC Type</label>
@@ -349,6 +699,17 @@ export default function JKCompanyPOForm({
                           <option value="non_fsc">Non FSC</option>
                         </select>
                       </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-medium mb-1">Item Remarks</label>
+                      <textarea
+                        placeholder="Item remarks"
+                        value={item.itemRemarks || ''}
+                        onChange={(e) => handleItemChange(index, 'itemRemarks', e.target.value)}
+                        rows={2}
+                        className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded text-sm"
+                      />
                     </div>
                   </div>
                 ))

@@ -17,6 +17,7 @@ export const inquiryServiceApi = {
    */
   getAll: async () => {
     const response = await apiClient.get('/inquiries');
+    console.log('Fetched Inquiries:', response.data);
     return response.data;
   },
 

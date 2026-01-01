@@ -4,6 +4,7 @@ import Button from "../../components/ui/button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/ui/passwordInput";
+import { registerUser } from "../../services/api/auth";
 const Register = () => {
   const navigate = useNavigate();
   const [ formData, setFormData] = useState({
@@ -20,6 +21,8 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const genderOptions = ['Male', 'Female', 'Other'];
 
@@ -77,6 +80,7 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
       e.preventDefault();
+      setApiError('');
       
       const newErrors = validate();
       if (Object.keys(newErrors).length > 0) {
@@ -86,28 +90,33 @@ const Register = () => {
 
       setLoading(true);
 
-    //   try {
-    //     const response = await fetch('/api/auth/register', {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify(formData),
-    //     });
-
-    //     if (response.ok) {
-    //       setSuccess(true);
-    //       navigate('/auth/login');
-    //     } else {
-    //       setSuccess(false);
-    //       setErrors({});
-    //       setLoading(false);
-    //     }
-    //   } catch (error) {
-    //     setSuccess(false);
-    //     setErrors({});
-    //     setLoading(false);
-    //   }
-    navigate('/auth/login');
-  };
+      try {
+        const response = await registerUser(formData);
+        
+        if (response.success) {
+          setSuccess(true);
+          setFormData({
+            username: '',
+            email: '',
+            password: '',
+            confirm_password: '',
+            first_name: '',
+            middle_name: '',
+            last_name: '',
+            gender: '',
+            date_of_birth: '',
+            mobile_number: '',
+          });
+          // Navigate to login after 2 seconds
+          setTimeout(() => {
+            navigate('/auth/login');
+          }, 1000);
+        }
+      } catch (error) {
+        setApiError(error.message || 'Registration failed. Please try again.');
+        setLoading(false);
+      }
+    };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -139,6 +148,18 @@ const Register = () => {
 
         <h2 className="text-xl sm:text-2xl font-bold text-white mb-1 text-center">Create Account</h2>
         <p className="text-gray-400 mb-3 sm:mb-4 text-center text-xs sm:text-sm">Register as a new employee</p>
+
+        {apiError && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg text-sm">
+            {apiError}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 p-3 bg-green-500/10 border border-green-500/50 text-green-400 rounded-lg text-sm">
+            Registration successful! Redirecting to login...
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
         {/* Name Fields */}

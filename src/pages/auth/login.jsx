@@ -3,6 +3,7 @@ import Input from "../../components/ui/input";
 import Button from "../../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/ui/passwordInput";
+import { loginUser } from "../../services/api/auth";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -32,39 +33,22 @@ const Login = () => {
       }
   
       setLoading(true);
-      try{
-        const username = formData.username;
-        const password = formData.password;
-        if(username === 'user' && password === 'user123'){
+      try {
+        const response = await loginUser({
+          username_or_email: formData.username,
+          password: formData.password,
+        });
+
+        if (response.success && response.data?.user) {
+          // User data is stored in localStorage by loginUser function
+          // Navigate to dashboard
           navigate('/dashboard');
-        }else{
-          setApiError('Invalid username or password');
         }
-      }catch(error){
-        setApiError(error.message);
-      }finally{
+      } catch (error) {
+        setApiError(error.message || 'Login failed. Please try again.');
+      } finally {
         setLoading(false);
       }
-    //   try {
-    //     const response = await fetch('/api/auth/login', {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify(formData),
-    //     });
-        
-    //     if (response.ok) {
-    //       const data = await response.json();
-    //       localStorage.setItem('authToken', data.token || 'mock-token');
-    //       navigate('/');
-    //     } else {
-    //       setApiError('Invalid username or password');
-    //     }
-    //   } catch (error) {
-    //     localStorage.setItem('authToken', 'mock-token');
-    //     navigate('/');
-    //   } finally {
-    //     setLoading(false);
-    //   }
     };
   
   const handleChange = (e) => {
