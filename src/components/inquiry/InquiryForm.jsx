@@ -1,5 +1,4 @@
 import { X } from 'lucide-react'
-import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../../types/inquiry'
 
 export default function InquiryForm({
   formData,
@@ -16,6 +15,29 @@ export default function InquiryForm({
   const title = isEditMode ? 'Edit Inquiry' : 'Create New Inquiry'
   const subtitle = isEditMode ? 'Update inquiry details' : 'Log a new customer inquiry'
   const submitButtonText = isEditMode ? 'Update Inquiry' : 'Create Inquiry'
+  const uomOptions = ['kg', 'g', 'mg', 'ton'];
+
+  // Helper function for handling changes
+  const handleChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  // Helper to format date for datetime-local input
+  const formatForDateTimeLocal = (dateString) => {
+    if (!dateString) return ''
+    try {
+      const date = new Date(dateString)
+      if (isNaN(date.getTime())) return ''
+      // Convert to YYYY-MM-DDTHH:mm format
+      const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+      return local.toISOString().slice(0, 16)
+    } catch {
+      return ''
+    }
+  }
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
@@ -42,23 +64,37 @@ export default function InquiryForm({
                   </label>
                   <select
                     value={formData.source}
-                    onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                    onChange={(e) => handleChange('source', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   >
-                    <option value={INQUIRY_SOURCE.WHATSAPP}>WhatsApp</option>
-                    <option value={INQUIRY_SOURCE.EMAIL}>Email</option>
-                    <option value={INQUIRY_SOURCE.PHONE}>Phone</option>
-                    <option value={INQUIRY_SOURCE.PORTAL}>Portal</option>
-                    <option value={INQUIRY_SOURCE.WALK_IN}>Walk-in</option>
+                    <option value="">Select Source</option>
+                    <option value="WHATSAPP">WhatsApp</option>
+                    <option value="EMAIL">Email</option>
+                    <option value="PHONE">Phone</option>
+                    <option value="PORTAL">Portal</option>
+                    <option value="WALK_IN">Walk-in</option>
                   </select>
                 </div>
+                
+                {/* ADD THIS FIELD - source_reference */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Source Reference</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., WhatsApp Group Name"
+                    value={formData.sourceReference || ''}
+                    onChange={(e) => handleChange('sourceReference', e.target.value)}
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  />
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium mb-1">Linked Order ID</label>
                   <input
                     type="text"
                     placeholder="SO-2025-001"
                     value={formData.linkedOrderId}
-                    onChange={(e) => setFormData({ ...formData, linkedOrderId: e.target.value })}
+                    onChange={(e) => handleChange('linkedOrderId', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -68,22 +104,24 @@ export default function InquiryForm({
                   </label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    onChange={(e) => handleChange('status', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   >
-                    <option value={INQUIRY_STATUS.NEW}>New</option>
-                    <option value={INQUIRY_STATUS.PARSED}>Parsed</option>
-                    <option value={INQUIRY_STATUS.PI_SENT}>PI Sent</option>
-                    <option value={INQUIRY_STATUS.FOLLOW_UP}>Follow Up</option>
-                    <option value={INQUIRY_STATUS.CONVERTED}>Converted</option>
-                    <option value={INQUIRY_STATUS.REJECTED}>Rejected</option>
+                    <option value="">Select Status</option>
+                    {/* <option value="NEW">New</option> */}
+                    <option value="OPEN">Open</option>
+                    {/* <option value="PARSED">Parsed</option> */}
+                    {/* <option value="PI_SENT">PI Sent</option> */}
+                    <option value="FOLLOW_UP">Follow Up</option>
+                    <option value="CLOSED">Closed</option>
+                    <option value="CANCELLED">Rejected</option>
                   </select>
                 </div>
               </div>
             </div>
           </div>
-
-          {/* Customer Details Section */}
+ 
+          {/* Customer Details Section - SAME AS BEFORE */}
           <div>
             <h4 className="text-lg font-bold mb-3 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Customer Details</h4>
             <div className="space-y-4">
@@ -94,7 +132,8 @@ export default function InquiryForm({
                     type="text"
                     placeholder="Will be assigned (leave empty for new customer)"
                     value={formData.customerId}
-                    onChange={(e) => setFormData({ ...formData, customerId: e.target.value })}
+                    onChange={(e) => handleChange('customerId', e.target.value)}
+                    readOnly
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                   <p className="text-xs text-[oklch(0.65_0_0)] mt-1">Will be assigned for new customers</p>
@@ -105,7 +144,7 @@ export default function InquiryForm({
                     type="text"
                     placeholder="Customer name"
                     value={formData.customerName}
-                    onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
+                    onChange={(e) => handleChange('customerName', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -117,7 +156,7 @@ export default function InquiryForm({
                     type="text"
                     placeholder="Contact person name"
                     value={formData.customerPOC}
-                    onChange={(e) => setFormData({ ...formData, customerPOC: e.target.value })}
+                    onChange={(e) => handleChange('customerPOC', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -127,7 +166,7 @@ export default function InquiryForm({
                     type="tel"
                     placeholder="+91 98765 43210"
                     value={formData.customerPhone}
-                    onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+                    onChange={(e) => handleChange('customerPhone', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -139,7 +178,7 @@ export default function InquiryForm({
                     type="tel"
                     placeholder="+91 98765 43210"
                     value={formData.customerWhatsapp}
-                    onChange={(e) => setFormData({ ...formData, customerWhatsapp: e.target.value })}
+                    onChange={(e) => handleChange('customerWhatsapp', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -149,7 +188,7 @@ export default function InquiryForm({
                     type="email"
                     placeholder="email@example.com"
                     value={formData.customerEmail}
-                    onChange={(e) => setFormData({ ...formData, customerEmail: e.target.value })}
+                    onChange={(e) => handleChange('customerEmail', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -160,7 +199,7 @@ export default function InquiryForm({
                   <textarea
                     placeholder="Customer address"
                     value={formData.customerAddress}
-                    onChange={(e) => setFormData({ ...formData, customerAddress: e.target.value })}
+                    onChange={(e) => handleChange('customerAddress', e.target.value)}
                     rows={2}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
@@ -169,7 +208,7 @@ export default function InquiryForm({
                   <label className="block text-sm font-medium mb-1">Preferred Contact Method</label>
                   <select
                     value={formData.preferredContactMethod}
-                    onChange={(e) => setFormData({ ...formData, preferredContactMethod: e.target.value })}
+                    onChange={(e) => handleChange('preferredContactMethod', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   >
                     <option value="whatsapp">WhatsApp</option>
@@ -192,7 +231,7 @@ export default function InquiryForm({
                     type="text"
                     placeholder="Product name or category"
                     value={formData.productRequested}
-                    onChange={(e) => setFormData({ ...formData, productRequested: e.target.value })}
+                    onChange={(e) => handleChange('productRequested', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
@@ -202,8 +241,9 @@ export default function InquiryForm({
                     type="number"
                     placeholder="0.00"
                     value={formData.expectedPrice}
-                    onChange={(e) => setFormData({ ...formData, expectedPrice: e.target.value })}
+                    onChange={(e) => handleChange('expectedPrice', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    step="0.01"
                   />
                   <p className="text-xs text-[oklch(0.65_0_0)] mt-1">According to price list</p>
                 </div>
@@ -215,23 +255,28 @@ export default function InquiryForm({
                     type="number"
                     placeholder="0"
                     value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    onChange={(e) => handleChange('quantity', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
                 <div>
+                  {/* CHANGE UOM to text input */}
                   <label className="block text-sm font-medium mb-1">UOM (Unit of Measure)</label>
                   <select
-                    value={formData.uom}
-                    onChange={(e) => setFormData({ ...formData, uom: e.target.value })}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
-                  >
-                    <option value="">Select UOM</option>
-                    <option value="kg">kg</option>
-                    <option value="g">g</option>
-                    <option value="mg">mg</option>
-                    <option value="ton">ton</option>
-                  </select>
+                      value={formData.uom || ''}
+                      onChange={(e) => handleChange('uom', e.target.value)}
+                      className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    >
+                      <option value="" disabled>
+                        Select unit
+                      </option>
+                      {uomOptions.map((uom) => (
+                        <option key={uom} value={uom}>
+                          {uom}
+                        </option>
+                      ))}
+                    </select>
+
                 </div>
               </div>
               <div>
@@ -239,7 +284,7 @@ export default function InquiryForm({
                 <input
                   type="date"
                   value={formData.expectedDeliveryDate}
-                  onChange={(e) => setFormData({ ...formData, expectedDeliveryDate: e.target.value })}
+                  onChange={(e) => handleChange('expectedDeliveryDate', e.target.value)}
                   className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                 />
               </div>
@@ -248,17 +293,18 @@ export default function InquiryForm({
                 <textarea
                   placeholder="Any special requirements or notes"
                   value={formData.specialInstructions}
-                  onChange={(e) => setFormData({ ...formData, specialInstructions: e.target.value })}
+                  onChange={(e) => handleChange('specialInstructions', e.target.value)}
                   rows={2}
                   className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                 />
               </div>
               <div>
+                {/* CHANGE rawMessage to transcript */}
                 <label className="block text-sm font-medium mb-1">Transcript of Interaction</label>
                 <textarea
                   placeholder="Paste the original inquiry message here..."
-                  value={formData.rawMessage}
-                  onChange={(e) => setFormData({ ...formData, rawMessage: e.target.value })}
+                  value={formData.transcript || formData.rawMessage || ''}
+                  onChange={(e) => handleChange('transcript', e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                 />
@@ -272,20 +318,21 @@ export default function InquiryForm({
             <div className="space-y-4">
               <div className="grid gap-3 md:gap-4 md:grid-cols-2">
                 <div>
+                  {/* Keep as text input since no API */}
                   <label className="block text-sm font-medium mb-1">Assigned Sales Person</label>
                   <input
                     type="text"
-                    placeholder="Sales person name"
+                    placeholder="Sales person name or ID"
                     value={formData.assignedSalesPerson}
-                    onChange={(e) => setFormData({ ...formData, assignedSalesPerson: e.target.value })}
+                    onChange={(e) => handleChange('assignedSalesPerson', e.target.value)}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Within Working Hours</label>
                   <select
-                    value={formData.isWithinWorkingHours}
-                    onChange={(e) => setFormData({ ...formData, isWithinWorkingHours: e.target.value === 'true' })}
+                    value={formData.isWithinWorkingHours?.toString() || 'true'}
+                    onChange={(e) => handleChange('isWithinWorkingHours', e.target.value === 'true')}
                     className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                   >
                     <option value="true">Yes</option>
@@ -293,29 +340,30 @@ export default function InquiryForm({
                   </select>
                 </div>
               </div>
-              <div className="grid gap-3 md:gap-4 md:grid-cols-2">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Interaction Due Time</label>
-                  <input
-                    type="datetime-local"
-                    value={formData.interactionDueTime}
-                    onChange={(e) => setFormData({ ...formData, interactionDueTime: e.target.value })}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">SLA Status</label>
-                  <select
-                    value={formData.slaStatus}
-                    onChange={(e) => setFormData({ ...formData, slaStatus: e.target.value })}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
-                  >
-                    <option value={SLA_STATUS.ON_TRACK}>On Track</option>
-                    <option value={SLA_STATUS.AT_RISK}>At Risk</option>
-                    <option value={SLA_STATUS.BREACHED}>Breached</option>
-                  </select>
-                </div>
-              </div>
+    <div className="grid gap-3 md:gap-4 md:grid-cols-2">
+      <div>
+        <label className="block text-sm font-medium mb-1">Interaction Due Time</label>
+        <input
+          type="datetime-local"
+          value={formatForDateTimeLocal(formData.interactionDueTime)}
+          onChange={(e) => handleChange('interactionDueTime', e.target.value)}
+          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium mb-1">SLA Status</label>
+        <select
+          value={formData.slaStatus || 'PENDING'}
+          onChange={(e) => handleChange('slaStatus', e.target.value)}
+          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+        >
+          <option value="PENDING">Pending</option>
+          <option value="ON_TRACK">On Track</option>
+          <option value="AT_RISK">At Risk</option>
+          <option value="BREACHED">Breached</option>
+        </select>
+      </div>
+    </div>
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">

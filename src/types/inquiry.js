@@ -6,6 +6,7 @@ export const INQUIRY_STATUS = {
   FOLLOW_UP: 'follow_up',
   CONVERTED: 'converted',
   REJECTED: 'rejected',
+  CANCELLED:'cancelled',
   // Legacy support
   DRAFT: 'draft',
   PENDING: 'pending',
@@ -24,6 +25,7 @@ export const INQUIRY_SOURCE = {
 
 // SLA Status Types
 export const SLA_STATUS = {
+  PENDING: 'pending',
   ON_TRACK: 'on_track',
   AT_RISK: 'at_risk',
   BREACHED: 'breached'
