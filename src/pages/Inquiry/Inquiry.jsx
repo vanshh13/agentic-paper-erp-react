@@ -86,10 +86,21 @@ export default function Inquiry() {
 
   // Form states
   const [formData, setFormData] = useState({
-    source: INQUIRY_SOURCE.WHATSAPP,
+    source: '',
+    sourceReference: '',
     linkedOrderId: '',
-    status: INQUIRY_STATUS.NEW,
-    customerId: '',
+    status: '',
+    productRequested: '',
+    expectedPrice: '',
+    expectedDeliveryDate: '',
+    quantity: '',
+    uom: '',
+    specialInstructions: '',
+    transcript: '',
+    assignedSalesPerson: '',
+    isWithinWorkingHours: true,
+    interactionDueTime: '',
+    slaStatus: 'PENDING',
     customerName: '',
     customerPOC: '',
     customerPhone: '',
@@ -97,17 +108,7 @@ export default function Inquiry() {
     customerEmail: '',
     customerAddress: '',
     preferredContactMethod: 'whatsapp',
-    productRequested: '',
-    expectedPrice: '',
-    quantity: '',
-    uom: '',
-    expectedDeliveryDate: '',
-    specialInstructions: '',
-    rawMessage: '',
-    assignedSalesPerson: '',
-    isWithinWorkingHours: true,
-    interactionDueTime: '',
-    slaStatus: SLA_STATUS.ON_TRACK,
+    customerId: ''  
   })
 
   const [interactionForm, setInteractionForm] = useState({
@@ -126,17 +127,48 @@ export default function Inquiry() {
   const fetchInquiries = async () => {
     try {
       setLoading(true)
-      const data = await inquiryService.getAll()
-      const transformedData = data.map(inq => ({
-        ...inq,
-        source: inq.source || INQUIRY_SOURCE.WHATSAPP,
-        customerName: inq.customerName || inq.companyName || '',
-        customerPhone: inq.customerPhone || inq.phone || '',
-        customerEmail: inq.customerEmail || inq.email || '',
-        inquiryDateTime: inq.inquiryDateTime || inq.createdAt,
-        slaStatus: inq.slaStatus || SLA_STATUS.ON_TRACK,
-        status: inq.status || INQUIRY_STATUS.NEW,
-      }))
+  
+      const response = await inquiryServiceApi.getAll()
+      const data = response?.data?.data ?? []
+      console.log(response);
+      const transformedData = data.map(inq => {
+        let customerPhone = ''
+        let customerEmail = ''
+      
+        if (inq.contact_info) {
+          if (inq.contact_info.type === 'email') {
+            customerEmail = inq.contact_info.value || ''
+          } else if (inq.contact_info.type === 'phone') {
+            customerPhone = inq.contact_info.value || ''
+          }
+          else if(inq.contact_info.type === 'whatsapp') {
+            customerPhone = inq.contact_info.value || ''
+          }
+        }
+      
+        return {
+          ...inq,
+          // Map backend fields to frontend naming convention
+          inquiryNumber: inq.inquiry_code || '',
+          source: inq.source ? inq.source.toLowerCase() : INQUIRY_SOURCE.WHATSAPP,
+          status: inq.status || INQUIRY_STATUS.NEW,
+          slaStatus: inq.sla_status || SLA_STATUS.PENDING,
+          customerName: inq.customer_name || '',
+          customerPhone,
+          customerEmail,
+          inquiryDateTime: inq.inquiry_datetime || '',
+          assignedSalesPerson: inq.assigned_user_name || '',
+          expectedPrice: inq.expected_price || '',
+          productRequested: inq.product_requested || '',
+          expectedDeliveryDate: inq.expected_delivery_date,
+          // You might also want to map the user code if needed
+          assignedSalesPersonCode: inq.assigned_user_code || '',
+          // Original contact info if needed
+          contactType: inq.contact_info?.type || '',
+          id: inq.id || inq.inquiry_code,
+        }
+      })
+      console.log(transformedData);
       setInquiries(transformedData)
     } catch (error) {
       console.error('Failed to fetch inquiries:', error)
@@ -144,46 +176,111 @@ export default function Inquiry() {
       setLoading(false)
     }
   }
+
   const handleViewDetails = async (inquiry) => {
     try {
       setLoadingDetail(true)
-      const data = await inquiryService.getById(inquiry.id)
-      if (data) {
-        const transformed = {
-          ...data,
-          source: data.source || INQUIRY_SOURCE.WHATSAPP,
-          customerName: data.customerName || data.companyName || '',
-          customerPhone: data.customerPhone || data.phone || '',
-          customerEmail: data.customerEmail || data.email || '',
-          inquiryDateTime: data.inquiryDateTime || data.createdAt,
-          slaStatus: data.slaStatus || SLA_STATUS.ON_TRACK,
-          linkedOrderId: data.linkedOrderId || null,
-          customerId: data.customerId || null,
-          customerPOC: data.customerPOC || null,
-          customerWhatsapp: data.customerWhatsapp || data.customerPhone || null,
-          customerAddress: data.customerAddress || null,
-          preferredContactMethod: data.preferredContactMethod || 'whatsapp',
-          productRequested: data.productRequested || null,
-          isWithinWorkingHours: data.isWithinWorkingHours !== undefined ? data.isWithinWorkingHours : true,
-          interactionDueTime: data.interactionDueTime || null,
-        }
-        setSelectedInquiry(transformed)
-        setInteractions(data.interactions || [
-          {
-            id: 1,
-            type: 'Call',
-            dateTime: new Date().toISOString(),
-            outcome: 'Customer Interested',
-            summary: 'Discussed product requirements and pricing',
-            followUpRequired: true,
-            followUpDateTime: new Date(Date.now() + 86400000).toISOString(),
-            followUpStatus: 'pending'
-          }
-        ])
-        setShowDetailDialog(true)
+      console.log('View details clicked for:', inquiry)
+      
+      // Make sure we have an ID to fetch
+      const inquiryId = inquiry?.id || inquiry?.inquiryId
+      if (!inquiryId) {
+        console.error('No inquiry ID provided')
+        return
       }
+  
+      const response = await inquiryServiceApi.getById(inquiryId)
+      const data = response?.data.data
+      
+      console.log('Backend response:', data)
+      
+      if (!data) {
+        console.error('No data received from backend')
+        return
+      }
+  
+      // Extract customer details if available
+      const customerDetails = data.customer_details || {}
+      
+      // Extract assigned sales person details
+      const assignedPerson = data.assigned_sales_person || {}
+      
+      // Extract interaction summary
+      const interactionSummary = data.interaction_summary || {}
+      
+      // Transform data to match frontend expectations
+      const transformed = {
+        // Basic fields
+        id: data.id,
+        inquiryNumber: data.inquiry_code || '',
+        inquiryDateTime: data.inquiry_datetime || data.created_at,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        
+        // Source - convert to lowercase for frontend config
+        source: (data.source || '').toLowerCase(),
+        sourceReference: data.source_reference || '',
+        
+        // Status - convert to lowercase for frontend config
+        status: (data.status || '').toLowerCase(),
+        
+        // SLA Status - convert to lowercase for frontend config
+        slaStatus: (data.sla_status || '').toLowerCase(),
+        
+        // Customer information
+        customerId: customerDetails.id || null,
+        customerName: customerDetails.name || '',
+        customerPOC: customerDetails.poc_name || '',
+        customerPhone: customerDetails.phone_number || '',
+        customerWhatsapp: customerDetails.whatsapp_number || customerDetails.phone_number || '',
+        customerEmail: customerDetails.email || '',
+        customerAddress: customerDetails.address || '',
+        preferredContactMethod: (customerDetails.preferred_contact_method || 'whatsapp').toLowerCase(),
+        
+        // Product information
+        productRequested: data.product_requested || '',
+        expectedPrice: data.expected_price ? parseFloat(data.expected_price) : null,
+        expectedDeliveryDate: data.expected_delivery_date,
+        quantity: data.quantity ? parseInt(data.quantity) : null,
+        uom: data.uom || '',
+        specialInstructions: data.special_instructions || '',
+        transcript: data.transcript || '-',
+        rawMessage: data.transcript || '', // For frontend display
+        
+        // Sales person assignment
+        assignedSalesPerson: assignedPerson.full_name || assignedPerson.username || '',
+        assignedSalesPersonCode: assignedPerson.employee_code || '',
+        
+        // Additional fields
+        linkedOrderId: data.linked_order_id || null,
+        isWithinWorkingHours: data.is_within_working_hours ?? true,
+        interactionDueTime: data.interaction_due_time || null,
+        
+        // Interaction summary (for display purposes)
+        totalInteractions: interactionSummary.total_interactions || 0,
+        lastInteractionType: interactionSummary.last_interaction_type || null,
+        lastInteractionDate: interactionSummary.last_interaction_date || null,
+        
+        // Keep original nested objects (optional)
+        customer_details: customerDetails,
+        assigned_sales_person: assignedPerson,
+        interaction_summary: interactionSummary,
+      }
+  
+      console.log('Transformed data for frontend:', transformed)
+      
+      // Set the transformed data
+      setSelectedInquiry(transformed)
+      
+      // Set interactions (if available from response)
+      setInteractions(data.interactions || [])
+      
+      // Show the detail dialog
+      setShowDetailDialog(true)
+  
     } catch (error) {
       console.error('Failed to fetch inquiry details:', error)
+      // Optional: Show error toast/message
     } finally {
       setLoadingDetail(false)
     }
@@ -220,10 +317,21 @@ export default function Inquiry() {
 
   const resetForm = () => {
     setFormData({
-      source: INQUIRY_SOURCE.WHATSAPP,
+      source: '',
+      sourceReference: '',
       linkedOrderId: '',
-      status: INQUIRY_STATUS.NEW,
-      customerId: '',
+      status: '',
+      productRequested: '',
+      expectedPrice: '',
+      expectedDeliveryDate: '',
+      quantity: '',
+      uom: '',
+      specialInstructions: '',
+      transcript: '',
+      assignedSalesPerson: '',
+      isWithinWorkingHours: true,
+      interactionDueTime: '',
+      slaStatus: 'PENDING',
       customerName: '',
       customerPOC: '',
       customerPhone: '',
@@ -231,17 +339,7 @@ export default function Inquiry() {
       customerEmail: '',
       customerAddress: '',
       preferredContactMethod: 'whatsapp',
-      productRequested: '',
-      expectedPrice: '',
-      quantity: '',
-      uom: '',
-      expectedDeliveryDate: '',
-      specialInstructions: '',
-      rawMessage: '',
-      assignedSalesPerson: '',
-      isWithinWorkingHours: true,
-      interactionDueTime: '',
-      slaStatus: SLA_STATUS.ON_TRACK,
+      customerId: ''
     })
   }
 
@@ -253,31 +351,45 @@ export default function Inquiry() {
   }
 
   const handleOpenEditForm = (inquiry) => {
-    // Prefill form with inquiry data
-    setFormData({
-      source: inquiry.source || INQUIRY_SOURCE.WHATSAPP,
-      linkedOrderId: inquiry.linkedOrderId || '',
-      status: inquiry.status || INQUIRY_STATUS.NEW,
-      customerId: inquiry.customerId || '',
-      customerName: inquiry.customerName || '',
-      customerPOC: inquiry.customerPOC || '',
-      customerPhone: inquiry.customerPhone || '',
-      customerWhatsapp: inquiry.customerWhatsapp || '',
-      customerEmail: inquiry.customerEmail || '',
-      customerAddress: inquiry.customerAddress || '',
-      preferredContactMethod: inquiry.preferredContactMethod || 'whatsapp',
-      productRequested: inquiry.productRequested || '',
-      expectedPrice: inquiry.expectedPrice || '',
+    console.log('Opening edit form for inquiry:', inquiry)
+    
+    // Transform the inquiry data to match form structure
+    const transformedData = {
+      source: inquiry.source?.toUpperCase() || 'WHATSAPP',
+      sourceReference: inquiry.sourceReference || inquiry.source_reference || '',
+      linkedOrderId: inquiry.linkedOrderId || inquiry.linked_order_id || '',
+      status: inquiry.status?.toUpperCase() || 'OPEN',
+      productRequested: inquiry.productRequested || inquiry.product_requested || '',
+      expectedPrice: inquiry.expectedPrice || inquiry.expected_price || '',
+      expectedDeliveryDate: inquiry.expectedDeliveryDate || inquiry.expected_delivery_date || '',
       quantity: inquiry.quantity || '',
       uom: inquiry.uom || '',
-      expectedDeliveryDate: inquiry.expectedDeliveryDate || '',
-      specialInstructions: inquiry.specialInstructions || '',
-      rawMessage: inquiry.rawMessage || '',
-      assignedSalesPerson: inquiry.assignedSalesPerson || '',
-      isWithinWorkingHours: inquiry.isWithinWorkingHours !== undefined ? inquiry.isWithinWorkingHours : true,
-      interactionDueTime: inquiry.interactionDueTime || '',
-      slaStatus: inquiry.slaStatus || SLA_STATUS.ON_TRACK,
-    })
+      specialInstructions: inquiry.specialInstructions || inquiry.special_instructions || '',
+      transcript: inquiry.transcript || inquiry.rawMessage || '',
+      assignedSalesPerson: inquiry.assignedSalesPersonId || 
+                         inquiry.assigned_sales_person?.user_id || 
+                         inquiry.assigned_sales_person || 
+                         '',
+      isWithinWorkingHours: inquiry.isWithinWorkingHours ?? 
+                          inquiry.is_within_working_hours ?? 
+                          true,
+      interactionDueTime: inquiry.interactionDueTime || inquiry.interaction_due_time || '',
+      slaStatus: inquiry.slaStatus?.toUpperCase() || inquiry.sla_status?.toUpperCase() || 'PENDING',
+      customerName: inquiry.customerName || inquiry.customer_details?.name || '',
+      customerPOC: inquiry.customerPOC || inquiry.customer_details?.poc_name || '',
+      customerPhone: inquiry.customerPhone || inquiry.customer_details?.phone_number || '',
+      customerWhatsapp: inquiry.customerWhatsapp || inquiry.customer_details?.whatsapp_number || '',
+      customerEmail: inquiry.customerEmail || inquiry.customer_details?.email || '',
+      customerAddress: inquiry.customerAddress || inquiry.customer_details?.address || '',
+      preferredContactMethod: inquiry.preferredContactMethod || 
+                            inquiry.customer_details?.preferred_contact_method || 
+                            'whatsapp',
+      customerId: inquiry.customerId || inquiry.customer_details?.id || ''
+    }
+  
+    console.log('Transformed data for edit form:', transformedData)
+    
+    setFormData(transformedData)
     setFormMode('edit')
     setEditingInquiryId(inquiry.id)
     setShowFormDialog(true)
@@ -285,82 +397,121 @@ export default function Inquiry() {
   }
 
   const handleFormSubmit = async () => {
-    if (!formData.customerName && !formData.customerPhone && !formData.customerEmail) {
-      alert('At least one customer contact is required')
+    // Validation
+    if (!formData.source) {
+      alert('Source is required')
       return
     }
-
+    
+    if (!formData.status) {
+      alert('Status is required')
+      return
+    }
+    
+    if (!formData.productRequested) {
+      alert('Product requested is required')
+      return
+    }
+  
     try {
       if (formMode === 'edit' && editingInquiryId) {
-        // Update existing inquiry
-        const updatedInquiry = {
+        // Prepare update data for backend
+        const updateData = {
           source: formData.source,
-          linkedOrderId: formData.linkedOrderId || null,
+          source_reference: formData.sourceReference || null,
+          linked_order_id: formData.linkedOrderId || null,
           status: formData.status,
-          customerId: formData.customerId || null,
-          customerName: formData.customerName || null,
-          customerPOC: formData.customerPOC || null,
-          customerPhone: formData.customerPhone || null,
-          customerWhatsapp: formData.customerWhatsapp || null,
-          customerEmail: formData.customerEmail || null,
-          customerAddress: formData.customerAddress || null,
-          preferredContactMethod: formData.preferredContactMethod,
-          productRequested: formData.productRequested || null,
-          expectedPrice: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
-          quantity: formData.quantity ? parseFloat(formData.quantity) : null,
+          product_requested: formData.productRequested,
+          expected_price: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
+          expected_delivery_date: formData.expectedDeliveryDate || null,
+          quantity: formData.quantity ? parseInt(formData.quantity) : null,
           uom: formData.uom || null,
-          expectedDeliveryDate: formData.expectedDeliveryDate || null,
-          specialInstructions: formData.specialInstructions || null,
-          rawMessage: formData.rawMessage || null,
-          assignedSalesPerson: formData.assignedSalesPerson || null,
-          isWithinWorkingHours: formData.isWithinWorkingHours,
-          interactionDueTime: formData.interactionDueTime || null,
-          slaStatus: formData.slaStatus,
+          special_instructions: formData.specialInstructions || null,
+          transcript: formData.transcript || null,
+          assigned_sales_person: formData.assignedSalesPerson || null,
+          is_within_working_hours: formData.isWithinWorkingHours,
+          interaction_due_time: formData.interactionDueTime || null,
+          sla_status: formData.slaStatus,
         }
-
-        // TODO: Uncomment when API is ready
-        // await inquiryService.update(editingInquiryId, updatedInquiry)
+  
+        // Add customer details if any customer field is filled
+        const hasCustomerData = 
+          formData.customerName ||
+          formData.customerPOC ||
+          formData.customerPhone ||
+          formData.customerWhatsapp ||
+          formData.customerEmail ||
+          formData.customerAddress
+  
+        if (hasCustomerData) {
+          updateData.customer_name = formData.customerName || null
+          updateData.customer_poc_name = formData.customerPOC || null
+          updateData.customer_phone_number = formData.customerPhone || null
+          updateData.customer_whatsapp_number = formData.customerWhatsapp || null
+          updateData.customer_email = formData.customerEmail || null
+          updateData.customer_address = formData.customerAddress || null
+          updateData.customer_preferred_contact_method = formData.preferredContactMethod
+        }
+  
+        console.log('Updating inquiry with data:', updateData)
         
-        // Using dummy data for now
-        await inquiryService.update(editingInquiryId, updatedInquiry)
+        // Call your API to update the inquiry
+        const response = await inquiryServiceApi.update(editingInquiryId, updateData)
         
-        setShowFormDialog(false)
-        resetForm()
-        fetchInquiries()
-        showToast('Inquiry updated successfully', 'success')
+        console.log('Update response:', response.data)
+        
+        if (response?.data) {
+          setShowFormDialog(false)
+          resetForm()
+          fetchInquiries()
+          
+          // If we're viewing this inquiry, refresh the details
+          if (selectedInquiry?.id === editingInquiryId) {
+            handleViewDetails({ id: editingInquiryId })
+          }
+          
+          showToast('Inquiry updated successfully', 'success')
+        } else {
+          showToast('Failed to update inquiry', 'error')
+        }
       } else {
         // Create new inquiry
         const newInquiry = {
           source: formData.source,
-          linkedOrderId: formData.linkedOrderId || null,
+          source_reference: formData.sourceReference || null,
+          linked_order_id: formData.linkedOrderId || null,
           status: formData.status,
-          customerId: formData.customerId || null,
-          customerName: formData.customerName || null,
-          customerPOC: formData.customerPOC || null,
-          customerPhone: formData.customerPhone || null,
-          customerWhatsapp: formData.customerWhatsapp || null,
-          customerEmail: formData.customerEmail || null,
-          customerAddress: formData.customerAddress || null,
-          preferredContactMethod: formData.preferredContactMethod,
-          productRequested: formData.productRequested || null,
-          expectedPrice: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
-          quantity: formData.quantity ? parseFloat(formData.quantity) : null,
+          product_requested: formData.productRequested,
+          expected_price: formData.expectedPrice ? parseFloat(formData.expectedPrice) : null,
+          expected_delivery_date: formData.expectedDeliveryDate || null,
+          quantity: formData.quantity ? parseInt(formData.quantity) : null,
           uom: formData.uom || null,
-          expectedDeliveryDate: formData.expectedDeliveryDate || null,
-          specialInstructions: formData.specialInstructions || null,
-          rawMessage: formData.rawMessage || null,
-          assignedSalesPerson: formData.assignedSalesPerson || null,
-          isWithinWorkingHours: formData.isWithinWorkingHours,
-          interactionDueTime: formData.interactionDueTime || null,
-          slaStatus: formData.slaStatus,
-          inquiryDateTime: new Date().toISOString(),
+          special_instructions: formData.specialInstructions || null,
+          transcript: formData.transcript || null,
+          assigned_sales_person: formData.assignedSalesPerson || null,
+          is_within_working_hours: formData.isWithinWorkingHours,
+          interaction_due_time: formData.interactionDueTime || null,
+          sla_status: formData.slaStatus,
         }
-
-        // TODO: Uncomment when API is ready
-        // await inquiryService.create(newInquiry)
+  
+        // Add customer details for create mode
+        if (formData.customerName || formData.customerPhone || formData.customerEmail) {
+          newInquiry.customer_name = formData.customerName || null
+          newInquiry.customer_poc_name = formData.customerPOC || null
+          newInquiry.customer_phone_number = formData.customerPhone || null
+          newInquiry.customer_whatsapp_number = formData.customerWhatsapp || null
+          newInquiry.customer_email = formData.customerEmail || null
+          newInquiry.customer_address = formData.customerAddress || null
+          newInquiry.customer_preferred_contact_method = formData.preferredContactMethod
+        }
+  
+        console.log('Creating new inquiry with data:', newInquiry)
         
-        // Using dummy data for now
-        await inquiryService.create(newInquiry)
+        // TODO: Uncomment when create API is ready
+        // const response = await inquiryServiceApi.create(newInquiry)
+        
+        // For now, using dummy data
+        const response = await inquiryServiceApi.create(newInquiry)
         
         setShowFormDialog(false)
         resetForm()
@@ -369,7 +520,7 @@ export default function Inquiry() {
       }
     } catch (error) {
       console.error(`Error ${formMode === 'edit' ? 'updating' : 'creating'} inquiry:`, error)
-      alert(`Failed to ${formMode === 'edit' ? 'update' : 'create'} inquiry`)
+      showToast(`Failed to ${formMode === 'edit' ? 'update' : 'create'} inquiry: ${error.response.data.error.message}`, 'error')
     }
   }
 
@@ -378,11 +529,11 @@ export default function Inquiry() {
       'Are you sure you want to delete this inquiry?',
       async () => {
         try {
-          // TODO: Uncomment when API is ready
-          // await inquiryService.delete(inquiryId)
+          // API is ready
+          await inquiryServiceApi.delete(inquiryId)
           
           // Using dummy data for now
-          await inquiryService.delete(inquiryId)
+          // await inquiryService.delete(inquiryId)
           
           setShowDetailDialog(false)
           setSelectedInquiry(null)
@@ -463,14 +614,14 @@ export default function Inquiry() {
 
     if (activeTab !== 'all') {
       if (activeTab === 'pending') {
-        filtered = filtered.filter(inq => ['new', 'parsed'].includes(inq.status))
+        filtered = filtered.filter(inq => inq.status === 'OPEN')
       } else if (activeTab === 'success') {
-        filtered = filtered.filter(inq => inq.status === 'converted')
+        filtered = filtered.filter(inq => inq.status === 'CONVERTED')
       } else if (activeTab === 'rejected') {
-        filtered = filtered.filter(inq => inq.status === 'rejected')
+        filtered = filtered.filter(inq => inq.status === 'CANCELLED')
       } else if (activeTab === 'follow_up') {
-        filtered = filtered.filter(inq => inq.status === 'follow_up')
-      }
+        filtered = filtered.filter(inq => inq.status === 'FOLLOW_UP')
+      } 
     }
 
     return filtered
@@ -506,10 +657,12 @@ export default function Inquiry() {
 
   const counts = {
     all: inquiries.length,
-    pending: inquiries.filter(inq => ['new', 'parsed'].includes(inq.status)).length,
-    success: inquiries.filter(inq => inq.status === 'converted').length,
-    rejected: inquiries.filter(inq => inq.status === 'rejected').length,
-    follow_up: inquiries.filter(inq => inq.status === 'follow_up').length,
+    pending: inquiries.filter(inq => inq.status === 'OPEN').length,
+    success: inquiries.filter(inq => inq.status === 'CONVERTED').length,
+    rejected: inquiries.filter(inq => inq.status === 'CANCELLED').length,
+    follow_up: inquiries.filter(inq => inq.status === 'FOLLOW_UP').length,
+    new: inquiries.filter(inq => inq.status === 'NEW').length,
+    converted: inquiries.filter(inq => inq.status === 'CONVERTED').length,
   }
 
   return (

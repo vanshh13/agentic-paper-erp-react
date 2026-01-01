@@ -2,12 +2,15 @@ import { Eye, X } from 'lucide-react'
 import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../../types/inquiry'
 
 const statusConfig = {
-  new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-  parsed: { label: 'Parsed', color: 'bg-indigo-500/15 text-indigo-200' },
-  pi_sent: { label: 'PI Sent', color: 'bg-cyan-500/15 text-cyan-200' },
-  follow_up: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
-  converted: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
-  rejected: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
+  // Update status keys to match backend values
+  NEW: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
+  OPEN: { label: 'Open', color: 'bg-emerald-500/15 text-emerald-200' },
+  PARSED: { label: 'Parsed', color: 'bg-indigo-500/15 text-indigo-200' },
+  PI_SENT: { label: 'PI Sent', color: 'bg-cyan-500/15 text-cyan-200' },
+  FOLLOW_UP: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
+  CONVERTED: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
+  REJECTED: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
+  CANCELLED: { label: 'cancelled', color: 'bg-rose-500/20 text-rose-100' },
 }
 
 const sourceConfig = {
@@ -19,9 +22,10 @@ const sourceConfig = {
 }
 
 const slaConfig = {
-  on_track: { label: 'On Track', color: 'bg-emerald-500/15 text-emerald-200' },
-  at_risk: { label: 'At Risk', color: 'bg-amber-500/20 text-amber-200' },
-  breached: { label: 'Breached', color: 'bg-rose-500/20 text-rose-100' },
+  PENDING: { label: 'Pending', color: 'bg-gray-500/15 text-gray-200' },
+  ON_TRACK: { label: 'On Track', color: 'bg-emerald-500/15 text-emerald-200' },
+  AT_RISK: { label: 'At Risk', color: 'bg-amber-500/20 text-amber-200' },
+  BREACHED: { label: 'Breached', color: 'bg-rose-500/20 text-rose-100' },
 }
 
 export default function InquiryList({
@@ -46,6 +50,46 @@ export default function InquiryList({
   const getInitials = (name) => {
     if (!name) return 'UN'
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
+  // Helper function to get status config
+  const getStatusConfig = (status) => {
+    // Handle both uppercase and lowercase status
+    const statusKey = status?.toUpperCase() || 'NEW'
+    return statusConfig[statusKey] || statusConfig.NEW
+  }
+
+  // Helper function to get SLA config
+  const getSlaConfig = (slaStatus) => {
+    // Handle both uppercase and lowercase sla status
+    const slaKey = slaStatus?.toUpperCase() || 'PENDING'
+    return slaConfig[slaKey] || slaConfig.PENDING
+  }
+
+  // Helper function to get source config
+  const getSourceConfig = (source) => {
+    // Your backend data will be lowercase due to transformation
+    const sourceKey = source?.toLowerCase() || 'whatsapp'
+    return sourceConfig[sourceKey] || sourceConfig.whatsapp
+  }
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A'
+    try {
+      return new Date(dateString).toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })
+    } catch {
+      return 'Invalid Date'
+    }
+  }
+
+  // Get appropriate date for display
+  const getDisplayDate = (inq) => {
+    return inq.inquiryDateTime || inq.created_at || inq.createdAt
   }
 
   return (
@@ -134,11 +178,11 @@ export default function InquiryList({
                   className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
                 >
                   <option value="">All</option>
-                  <option value={INQUIRY_SOURCE.WHATSAPP}>WhatsApp</option>
-                  <option value={INQUIRY_SOURCE.EMAIL}>Email</option>
-                  <option value={INQUIRY_SOURCE.PHONE}>Phone</option>
-                  <option value={INQUIRY_SOURCE.PORTAL}>Portal</option>
-                  <option value={INQUIRY_SOURCE.WALK_IN}>Walk-in</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="email">Email</option>
+                  <option value="phone">Phone</option>
+                  <option value="portal">Portal</option>
+                  <option value="walk_in">Walk-in</option>
                 </select>
               </td>
               <td className="px-3 md:px-4 py-2">
@@ -148,12 +192,13 @@ export default function InquiryList({
                   className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
                 >
                   <option value="">All</option>
-                  <option value={INQUIRY_STATUS.NEW}>New</option>
-                  <option value={INQUIRY_STATUS.PARSED}>Parsed</option>
-                  <option value={INQUIRY_STATUS.PI_SENT}>PI Sent</option>
-                  <option value={INQUIRY_STATUS.FOLLOW_UP}>Follow Up</option>
-                  <option value={INQUIRY_STATUS.CONVERTED}>Converted</option>
-                  <option value={INQUIRY_STATUS.REJECTED}>Rejected</option>
+                  {/* <option value="NEW">New</option> */}
+                  <option value="OPEN">Open</option>
+                  {/* <option value="PARSED">Parsed</option> */}
+                  {/* <option value="PI_SENT">PI Sent</option> */}
+                  <option value="FOLLOW_UP">Follow Up</option>
+                  <option value="CONVERTED">Converted</option>
+                  <option value="REJECTED">Rejected</option>
                 </select>
               </td>
               <td className="px-3 md:px-4 py-2">
@@ -163,9 +208,10 @@ export default function InquiryList({
                   className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
                 >
                   <option value="">All</option>
-                  <option value={SLA_STATUS.ON_TRACK}>On Track</option>
-                  <option value={SLA_STATUS.AT_RISK}>At Risk</option>
-                  <option value={SLA_STATUS.BREACHED}>Breached</option>
+                  <option value="PENDING">Pending</option>
+                  <option value="ON_TRACK">On Track</option>
+                  <option value="AT_RISK">At Risk</option>
+                  <option value="BREACHED">Breached</option>
                 </select>
               </td>
               <td className="px-3 md:px-4 py-2">
@@ -213,15 +259,19 @@ export default function InquiryList({
               </tr>
             ) : (
               filteredInquiries.map((inq) => {
-                const status = statusConfig[inq.status] || statusConfig.new
-                const source = sourceConfig[inq.source] || sourceConfig.whatsapp
-                const sla = slaConfig[inq.slaStatus] || slaConfig.on_track
+                // Use helper functions to get configs
+                const status = getStatusConfig(inq.status)
+                const source = getSourceConfig(inq.source)
+                const sla = getSlaConfig(inq.slaStatus)
                 const initials = getInitials(inq.customerName)
+                const displayDate = getDisplayDate(inq)
 
                 return (
                   <tr key={inq.id} className="hover:bg-[oklch(0.24_0_0)] transition-colors">
                     <td className="px-3 md:px-4 py-3 md:py-4">
-                      <div className="font-mono text-xs md:text-sm font-semibold text-[oklch(0.90_0_0)] whitespace-nowrap">{inq.inquiryNumber}</div>
+                      <div className="font-mono text-xs md:text-sm font-semibold text-[oklch(0.90_0_0)] whitespace-nowrap">
+                        {inq.inquiryNumber || inq.inquiry_code || '-'}
+                      </div>
                     </td>
                     <td className="px-3 md:px-4 py-3 md:py-4">
                       <div className="flex items-center gap-2">
@@ -229,10 +279,18 @@ export default function InquiryList({
                           {initials}
                         </div>
                         <div className="min-w-0">
-                          <div className="font-medium text-xs md:text-sm text-[oklch(0.95_0_0)] truncate">{inq.customerName || 'Unknown'}</div>
+                          <div className="font-medium text-xs md:text-sm text-[oklch(0.95_0_0)] truncate">
+                            {inq.customerName || inq.customer_name || 'Unknown'}
+                          </div>
                           <div className="text-xs text-[oklch(0.70_0_0)] truncate">
                             {inq.customerPhone || inq.customerEmail || '-'}
                           </div>
+                          {/* Show product if available */}
+                          {inq.productRequested && (
+                            <div className="text-xs text-[oklch(0.60_0_0)] truncate mt-0.5">
+                              {inq.productRequested}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -252,11 +310,13 @@ export default function InquiryList({
                       </span>
                     </td>
                     <td className="px-3 md:px-4 py-3 md:py-4">
-                      <span className="text-xs md:text-sm text-[oklch(0.78_0_0)] truncate block">{inq.assignedSalesPerson || '-'}</span>
+                      <span className="text-xs md:text-sm text-[oklch(0.78_0_0)] truncate block">
+                        {inq.assignedSalesPerson || inq.assigned_user_name || '-'}
+                      </span>
                     </td>
                     <td className="px-3 md:px-4 py-3 md:py-4">
                       <div className="text-xs md:text-sm text-[oklch(0.78_0_0)] whitespace-nowrap">
-                        {new Date(inq.inquiryDateTime || inq.createdAt).toLocaleDateString('en-IN')}
+                        {formatDate(displayDate)}
                       </div>
                     </td>
                     <td className="px-3 md:px-4 py-3 md:py-4 text-right">
@@ -290,10 +350,11 @@ export default function InquiryList({
           ) : (
             <div className="p-3 space-y-3">
               {filteredInquiries.map((inq) => {
-                const status = statusConfig[inq.status] || statusConfig.new
-                const source = sourceConfig[inq.source] || sourceConfig.whatsapp
-                const sla = slaConfig[inq.slaStatus] || slaConfig.on_track
+                const status = getStatusConfig(inq.status)
+                const source = getSourceConfig(inq.source)
+                const sla = getSlaConfig(inq.slaStatus)
                 const initials = getInitials(inq.customerName)
+                const displayDate = getDisplayDate(inq)
 
                 return (
                   <div
@@ -304,17 +365,24 @@ export default function InquiryList({
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="font-mono text-sm font-bold text-[oklch(0.92_0_0)] truncate">
-                          {inq.inquiryNumber}
+                          {inq.inquiryNumber || inq.inquiry_code || '-'}
                         </div>
                         <div className="flex items-center gap-2 mt-2">
                           <div className="w-8 h-8 rounded-full bg-[oklch(0.28_0_0)] text-[oklch(0.98_0_0)] flex items-center justify-center text-xs font-bold flex-shrink-0">
                             {initials}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="font-medium text-sm text-[oklch(0.95_0_0)] truncate">{inq.customerName || 'Unknown'}</div>
+                            <div className="font-medium text-sm text-[oklch(0.95_0_0)] truncate">
+                              {inq.customerName || inq.customer_name || 'Unknown'}
+                            </div>
                             <div className="text-xs text-[oklch(0.70_0_0)] truncate">
                               {inq.customerPhone || inq.customerEmail || '-'}
                             </div>
+                            {inq.productRequested && (
+                              <div className="text-xs text-[oklch(0.60_0_0)] truncate mt-0.5">
+                                {inq.productRequested}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -345,14 +413,25 @@ export default function InquiryList({
                     <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-[var(--border)]">
                       <div>
                         <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Assigned To</div>
-                        <div className="text-[oklch(0.88_0_0)] truncate">{inq.assignedSalesPerson || '-'}</div>
+                        <div className="text-[oklch(0.88_0_0)] truncate">
+                          {inq.assignedSalesPerson || inq.assigned_user_name || '-'}
+                        </div>
                       </div>
                       <div>
                         <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Date</div>
                         <div className="text-[oklch(0.88_0_0)]">
-                          {new Date(inq.inquiryDateTime || inq.createdAt).toLocaleDateString('en-IN')}
+                          {formatDate(displayDate)}
                         </div>
                       </div>
+                      {/* Show expected price if available */}
+                      {inq.expectedPrice && (
+                        <div className="col-span-2">
+                          <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Expected Price</div>
+                          <div className="text-[oklch(0.88_0_0)]">
+                            ₹{parseFloat(inq.expectedPrice).toLocaleString('en-IN')}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
