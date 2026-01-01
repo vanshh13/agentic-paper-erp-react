@@ -16,7 +16,7 @@ export const inquiryServiceApi = {
    * Get all inquiries
    */
   getAll: async () => {
-    const response = await apiClient.get('/inquiries');
+    const response = await apiClient.get('/inquiries-service/');
     console.log('Fetched Inquiries:', response.data);
     return response.data;
   },
@@ -25,7 +25,7 @@ export const inquiryServiceApi = {
    * Get inquiry by ID
    */
   getById: async (id) => {
-    const response = await apiClient.get(`/inquiries/${id}`);
+    const response = await apiClient.get(`/inquiries-service/${id}`);
     return response.data;
   },
 
@@ -33,7 +33,7 @@ export const inquiryServiceApi = {
    * Create new inquiry
    */
   create: async (inquiryData) => {
-    const response = await apiClient.post('/inquiries', inquiryData);
+    const response = await apiClient.post('/inquiries-service', inquiryData);
     return response.data;
   },
 
@@ -41,7 +41,7 @@ export const inquiryServiceApi = {
    * Update existing inquiry
    */
   update: async (id, updates) => {
-    const response = await apiClient.put(`/inquiries/${id}`, updates);
+    const response = await apiClient.put(`/inquiries-service/${id}`, updates);
     return response.data;
   },
 
@@ -49,7 +49,7 @@ export const inquiryServiceApi = {
    * Delete inquiry (Soft Delete)
    */
   delete: async (id) => {
-    const response = await apiClient.delete(`/inquiries/${id}`);
+    const response = await apiClient.delete(`/inquiries-service/${id}`);
     return response.data;
   },
 
@@ -62,7 +62,7 @@ export const inquiryServiceApi = {
    * API Route: GET /api/inquiries/:id/interactions
    */
   getInteractions: async (inquiryId) => {
-    const response = await apiClient.get(`/inquiries/${inquiryId}/interactions`);
+    const response = await apiClient.get(`/inquiry-interactions-service/${inquiryId}`);
     return response.data;
   },
 
@@ -71,7 +71,7 @@ export const inquiryServiceApi = {
    * API Route: POST /api/inquiries/:id/interactions
    */
   addInteraction: async (inquiryId, interactionData) => {
-    const response = await apiClient.post(`/inquiries/${inquiryId}/interactions`, interactionData);
+    const response = await apiClient.post(`/inquiry-interactions-service/${inquiryId}`, interactionData);
     return response.data;
   },
 
@@ -80,7 +80,7 @@ export const inquiryServiceApi = {
    * API Route: DELETE /api/interactions/:id
    */
   deleteInteraction: async (interactionId) => {
-    const response = await apiClient.delete(`/interactions/${interactionId}`);
+    const response = await apiClient.delete(`/inquiry-interactions-service/${interactionId}`);
     return response.data;
   }
 };
