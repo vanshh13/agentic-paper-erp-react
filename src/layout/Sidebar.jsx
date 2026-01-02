@@ -1,23 +1,18 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { X, Settings, LogOut, ChevronUp, ChevronDown, Search } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { X, Search, Settings, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
-import { logoutUser, getCurrentUser } from '../services/api/auth'
+import { getCurrentUser, logoutUser } from '../services/api/auth'
 import NavItems from './NavItems'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
-  const [isAccountOpen, setIsAccountOpen] = useState(false)
-  const [isHighlighted, setIsHighlighted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
-  
-  // 1. This ref will track the entire account section area
-  const accountRef = useRef(null)
 
   useEffect(() => {
     // Get current user from localStorage
@@ -41,22 +36,11 @@ export default function Sidebar() {
       setIsMobile(window.innerWidth < 1024);
     };
 
-    // 2. Click outside logic
-    const handleClickOutside = (event) => {
-      if (accountRef.current && !accountRef.current.contains(event.target)) {
-        setIsAccountOpen(false);
-        setIsHighlighted(false);
-      }
-    };
-
     handleResize();
     window.addEventListener('resize', handleResize);
-    // Add the click listener
-    document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -66,7 +50,9 @@ export default function Sidebar() {
 
   const handleToggleSidebar = () => setIsOpen(!isOpen)
 
-  const handleLogout = async () => {
+  const handleLogout = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
     setIsLoggingOut(true)
     try {
       await logoutUser()
@@ -90,7 +76,7 @@ export default function Sidebar() {
         />
       )}
 
-      <aside className={`fixed top-0 left-0 h-screen w-60 bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)] transform transition-all duration-300 ease-in-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`fixed top-0 left-0 h-screen w-78 bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)] transform transition-all duration-300 ease-in-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Sidebar Header */}
         <div className="flex-shrink-0 p-4 border-b border-[oklch(0.25_0_0)] flex items-center gap-3">
           <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">RP</div>
@@ -111,57 +97,65 @@ export default function Sidebar() {
               placeholder="Search navigation..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-[oklch(0.12_0_0)] border border-[oklch(0.25_0_0)] rounded-lg text-sm text-[oklch(0.92_0_0)] placeholder-[oklch(0.60_0_0)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full pl-9 pr-9 py-2 bg-[oklch(0.12_0_0)] border border-[oklch(0.25_0_0)] rounded-lg text-sm text-[oklch(0.92_0_0)] placeholder-[oklch(0.60_0_0)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-[oklch(0.20_0_0)] rounded transition-colors"
+                aria-label="Clear search"
+              >
+                <X size={14} className="text-[oklch(0.60_0_0)] hover:text-[oklch(0.90_0_0)]" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Navigation Menu */}
         <NavItems onLinkClick={handleLinkClick} searchQuery={searchQuery} />
 
-        {/* 3. Wrap Account Section and Footer in a div with the ref */}
-        <div ref={accountRef} className="flex flex-col relative z-10 flex-shrink-0 mt-auto">
-          {isAccountOpen && (
-            <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2 relative z-20 bg-[oklch(0.15_0_0)]">
-              <p className="text-xs font-semibold text-white/60 uppercase tracking-wider px-3 mb-2">My Account</p>
-              <div className="space-y-1 mb-3">
-                <Link to="/settings" onClick={() => { handleLinkClick(); setIsAccountOpen(false); }} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm ${location.pathname === '/settings' ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40' : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'}`}>
-                  <Settings size={18} className="flex-shrink-0 min-w-[18px]" />
-                  <span className="flex-1 truncate">Settings</span>
-                </Link>
-                <button 
-                  onClick={handleLogout}
-                  disabled={isLoggingOut}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <LogOut size={18} className="flex-shrink-0 min-w-[18px]" />
-                  <span className="flex-1 truncate text-left">{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Sidebar Footer */}
-          <div 
-            className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)] cursor-pointer hover:bg-[oklch(0.18_0_0)] transition-colors rounded-t-lg relative z-10 ${isHighlighted ? 'ring-2 ring-white/20' : ''}`} 
-            onClick={() => {
-              setIsAccountOpen(!isAccountOpen)
-              setIsHighlighted(!isAccountOpen)
-            }}
-          >
-            <div className="flex items-center gap-2 px-2 py-1">
-              <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+        {/* Sidebar Footer - Profile Section */}
+        <div className="flex-shrink-0 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)] rounded-t-lg relative z-10 mt-auto">
+          <div className="flex items-center gap-2 p-3">
+            <Link
+              to="/profile"
+              onClick={handleLinkClick}
+              className={`flex-1 flex items-center gap-3 cursor-pointer hover:bg-[oklch(0.18_0_0)] transition-colors rounded-lg p-2 -m-2 ${location.pathname === '/profile' ? 'bg-[oklch(0.20_0_0)]' : ''}`}
+            >
+              <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/30">
                 {currentUser?.first_name ? currentUser.first_name.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || 'U')}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-[oklch(0.90_0_0)] truncate">
+                <p className="text-sm font-semibold text-[oklch(0.95_0_0)] truncate">
                   {currentUser?.first_name && currentUser?.last_name 
-                    ? `${currentUser.first_name} ${currentUser.middle_name ? currentUser.middle_name + ' ' : ''}${currentUser.last_name}` 
+                    ? `${currentUser.first_name} ${currentUser.middle_name ? currentUser.middle_name + ' ' : ''}${currentUser.last_name}`.trim()
                     : currentUser?.username || 'User'}
                 </p>
-                <p className="text-xs text-[oklch(0.60_0_0)] truncate">{currentUser?.email || 'user@company.com'}</p>
+                <p className="text-xs text-[oklch(0.65_0_0)] truncate mt-0.5">{currentUser?.email || 'user@company.com'}</p>
+                {currentUser?.is_admin && (
+                  <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 rounded-md">
+                    Admin
+                  </span>
+                )}
               </div>
-              {isAccountOpen ? <ChevronUp size={16} className="text-[oklch(0.75_0_0)]" /> : <ChevronDown size={16} className="text-[oklch(0.75_0_0)]" />}
+            </Link>
+            <div className="flex items-center gap-1">
+              <Link
+                to="/settings"
+                onClick={handleLinkClick}
+                className={`p-2 rounded-lg transition-colors ${location.pathname === '/settings' ? 'bg-indigo-600 text-white' : 'text-[oklch(0.70_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.90_0_0)]'}`}
+                title="Settings"
+              >
+                <Settings size={18} />
+              </Link>
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="p-2 rounded-lg transition-colors text-red-400 hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Logout"
+              >
+                <LogOut size={18} />
+              </button>
             </div>
           </div>
         </div>
