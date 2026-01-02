@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Users as UsersIcon, RefreshCw } from 'lucide-react'
+import { Users as UsersIcon } from 'lucide-react'
 import { userApi } from '../../services/api/user/user-api'
 import { DynamicTable } from '../../components/table'
 import UserView from '../../components/user/UserView'
@@ -21,16 +21,6 @@ export default function UserList() {
   const [error, setError] = useState('')
   const [selectedUser, setSelectedUser] = useState(null)
   const [showDetailDialog, setShowDetailDialog] = useState(false)
-
-  const stats = useMemo(() => {
-    const activeCount = users.filter((u) => (u.employment_status || '').toLowerCase() === 'active').length
-    const adminCount = users.filter((u) => u.is_admin).length
-    return {
-      total: users.length,
-      active: activeCount,
-      admins: adminCount,
-    }
-  }, [users])
 
   const loadUsers = async () => {
     setLoading(true)
@@ -84,51 +74,18 @@ export default function UserList() {
   ], [])
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-3 justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-lg bg-indigo-500/20 text-indigo-400">
-              <UsersIcon className="w-6 h-6" />
+      <div className="pt-2 pb-1 flex-shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
+              <UsersIcon className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">Manage employees, access levels, and reporting lines</p>
+              <h1 className="text-xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
             </div>
           </div>
-          <button
-            onClick={loadUsers}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-sm font-medium"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
-          </button>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
-          <span className="inline-flex items-center gap-1">
-            <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
-            Shows live data when API is available, otherwise local sample data
-          </span>
-        </div>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="card-surface p-4 md:p-5 rounded-xl border border-[var(--border)]">
-          <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-1">Total Users</p>
-          <p className="text-2xl md:text-3xl font-bold text-[oklch(0.98_0_0)]">{stats.total}</p>
-          <p className="text-xs text-[oklch(0.65_0_0)] mt-0.5">Including active and inactive</p>
-        </div>
-        <div className="card-surface p-4 md:p-5 rounded-xl border border-[var(--border)]">
-          <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-1">Active Employees</p>
-          <p className="text-2xl md:text-3xl font-bold text-emerald-400">{stats.active}</p>
-          <p className="text-xs text-[oklch(0.65_0_0)] mt-0.5">Employment status marked active</p>
-        </div>
-        <div className="card-surface p-4 md:p-5 rounded-xl border border-[var(--border)]">
-          <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-1">Admins</p>
-          <p className="text-2xl md:text-3xl font-bold text-indigo-300">{stats.admins}</p>
-          <p className="text-xs text-[oklch(0.65_0_0)] mt-0.5">Users with admin privileges</p>
         </div>
       </div>
 
@@ -140,6 +97,7 @@ export default function UserList() {
           rows={users}
           loading={loading}
           defaultVisibleCount={6}
+          heightClass="h-full"
           renderActions={(row) => (
             <button
               onClick={() => handleViewUser(row)}

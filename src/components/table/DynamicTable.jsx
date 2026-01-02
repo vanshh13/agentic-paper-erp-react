@@ -21,7 +21,7 @@ export default function DynamicTable({
   rows = [],
   loading = false,
   defaultVisibleCount = 6,
-  heightClass = 'h-[60vh] sm:h-[65vh] md:h-[calc(100vh-320px)] lg:h-[calc(100vh-300px)]',
+  heightClass = 'h-[calc(100vh-100px)]',
   renderActions,
 }) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -37,23 +37,12 @@ export default function DynamicTable({
     return initial
   })
   const [resizing, setResizing] = useState(null)
-  const [containerWidth, setContainerWidth] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
   const [sortKey, setSortKey] = useState(null)
   const [sortOrder, setSortOrder] = useState(null)
+  const [columnFilters, setColumnFilters] = useState({})
   const tableContainerRef = useRef(null)
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (tableContainerRef.current) {
-        setContainerWidth(tableContainerRef.current.clientWidth)
-      }
-    }
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
-  }, [])
 
   useEffect(() => {
     setColumnWidths((prev) => {
@@ -67,6 +56,27 @@ export default function DynamicTable({
       const activeKeys = columns.map((c) => c.key)
       Object.keys(next).forEach((key) => {
         if (!activeKeys.includes(key)) delete next[key]
+      })
+      return next
+    })
+  }, [columns])
+
+  useEffect(() => {
+    const columnKeys = columns.map((c) => c.key)
+    setVisibleColumns((prev) => {
+      const next = prev.filter((key) => columnKeys.includes(key))
+      columnKeys.forEach((key) => {
+        if (!next.includes(key)) next.push(key)
+      })
+      return next
+    })
+
+    setColumnFilters((prev) => {
+      const next = {}
+      columnKeys.forEach((key) => {
+        if (prev[key] !== undefined) {
+          next[key] = prev[key]
+        }
       })
       return next
     })
@@ -96,15 +106,56 @@ export default function DynamicTable({
     }
   }, [resizing])
 
-  const filteredRows = useMemo(() => {
-    if (!searchTerm) return rows
-    const term = searchTerm.toLowerCase()
+  const filterableColumns = useMemo(
+    () => columns.filter((col) => col.filterable !== false),
+    [columns]
+  )
+
+  const matchesFilter = (value, filterValue, column) => {
+    if (filterValue === undefined || filterValue === null || filterValue === '') {
+      return true
+    }
+
+    if (typeof column.filterPredicate === 'function') {
+      return column.filterPredicate(value, filterValue, column)
+    }
+
+    const type = column.filterType || 'text'
+    const valueStr = String(value ?? '').toLowerCase()
+    const filterStr = String(filterValue ?? '').toLowerCase()
+
+    if (type === 'select') {
+      return valueStr === filterStr
+    }
+
+    if (type === 'number') {
+      return Number(value) === Number(filterValue)
+    }
+
+    if (type === 'date') {
+      return valueStr.startsWith(filterStr)
+    }
+
+    return valueStr.includes(filterStr)
+  }
+
+  const filteredByColumns = useMemo(() => {
     return rows.filter((row) =>
+      filterableColumns.every((col) =>
+        matchesFilter(row[col.key], columnFilters[col.key], col)
+      )
+    )
+  }, [rows, filterableColumns, columnFilters])
+
+  const filteredRows = useMemo(() => {
+    if (!searchTerm) return filteredByColumns
+    const term = searchTerm.toLowerCase()
+    return filteredByColumns.filter((row) =>
       Object.values(row || {}).some((val) =>
         String(val ?? '').toLowerCase().includes(term)
       )
     )
-  }, [rows, searchTerm])
+  }, [filteredByColumns, searchTerm])
 
   const sortedRows = useMemo(() => {
     if (!sortKey) return filteredRows
@@ -155,6 +206,11 @@ export default function DynamicTable({
     setCurrentPage(1) // Reset to first page on sort
   }
 
+  const handleFilterChange = (key, value) => {
+    setColumnFilters((prev) => ({ ...prev, [key]: value }))
+    setCurrentPage(1)
+  }
+
   const handlePageChange = (page) => {
     setCurrentPage(Math.max(1, Math.min(page, totalPages)))
   }
@@ -177,6 +233,7 @@ export default function DynamicTable({
   }
 
   const displayColumns = columns.filter((c) => visibleColumns.includes(c.key))
+  const emptyRowCount = Math.max(0, pageSize - paginatedRows.length)
 
   return (
     <div 
@@ -184,18 +241,45 @@ export default function DynamicTable({
       className={`card-surface rounded-xl border border-[var(--border)] overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
     >
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-[var(--border)] space-y-3 bg-[oklch(0.20_0_0)]">
-        <div className="flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold text-[oklch(0.95_0_0)]">{title} ({sortedRows.length})</h3>
+      <div className="flex-shrink-0 px-3 py-2 border-b border-[var(--border)] space-y-1.5 bg-[oklch(0.20_0_0)]">
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold text-[oklch(0.95_0_0)]">{title} ({filteredRows.length})</h3>
+          {sortedRows.length > 0 && (
+            <div className="w-full md:w-auto">
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                totalRows={sortedRows.length}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Search and Columns */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="w-[200px] sm:w-[240px]">
+            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-2 py-1 text-xs text-[oklch(0.85_0_0)]">
+              <Search className="w-3.5 h-3.5 text-[oklch(0.65_0_0)]" />
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                className="bg-transparent focus:outline-none w-full text-xs placeholder:text-[oklch(0.65_0_0)]"
+              />
+            </div>
+          </div>
 
           <div className="relative">
             <button
               onClick={() => setShowColumnSelector((v) => !v)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-sm font-medium"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-xs font-medium"
             >
-              <SlidersHorizontal className="w-4 h-4" />
+              <SlidersHorizontal className="w-3.5 h-3.5" />
               Columns
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown className="w-2.5 h-2.5" />
             </button>
 
             {showColumnSelector && (
@@ -229,21 +313,6 @@ export default function DynamicTable({
             )}
           </div>
         </div>
-
-        {/* Search */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <div className="flex-1 min-w-[200px]">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="bg-transparent focus:outline-none w-full placeholder:text-[oklch(0.65_0_0)]"
-              />
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Scrollable Table Area */}
@@ -261,29 +330,77 @@ export default function DynamicTable({
                       className={`px-4 py-3 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider whitespace-nowrap relative border-r border-[var(--border)] ${col.minWidth || ''}`}
                       style={{ width: `${width}px`, minWidth: minWidth ? `${minWidth}px` : undefined, maxWidth: `${width}px` }}
                     >
-                        <div className="flex items-center justify-between gap-1 pr-2">
-                          <ColumnSortFilter
-                            column={col}
-                            sortKey={sortKey}
-                            sortOrder={sortOrder}
-                            onSort={handleSort}
+                      <div className="flex items-center justify-between gap-1 pr-2">
+                        <ColumnSortFilter
+                          column={col}
+                          sortKey={sortKey}
+                          sortOrder={sortOrder}
+                          onSort={handleSort}
+                        />
+                      </div>
+                      <span
+                        className="absolute right-[-2px] top-0 h-full w-2 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors"
+                        onMouseDown={(event) => handleResizeStart(event, col)}
+                        role="presentation"
+                      ></span>
+                    </th>
+                  )
+                })}
+                {renderActions && (
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.26_0_0)] border-l border-[var(--border)] whitespace-nowrap z-30">
+                    Actions
+                  </th>
+                )}
+              </tr>
+              {displayColumns.length > 0 && (
+                <tr className="border-b border-[var(--border)] bg-[oklch(0.24_0_0)]">
+                  {displayColumns.map((col) => {
+                    const width = columnWidths[col.key] || getInitialWidth(col)
+                    const minWidth = parseMinWidth(col.minWidth)
+                    const filterType = col.filterType || 'text'
+                    const value = columnFilters[col.key] ?? ''
+
+                    return (
+                      <th
+                        key={`${col.key}-filter`}
+                        className={`px-4 py-2 text-left text-xs font-medium text-[oklch(0.78_0_0)] whitespace-nowrap border-r border-[var(--border)] ${col.minWidth || ''}`}
+                        style={{ width: `${width}px`, minWidth: minWidth ? `${minWidth}px` : undefined, maxWidth: `${width}px` }}
+                      >
+                        {col.filterable === false ? (
+                          <span className="text-[oklch(0.60_0_0)]">—</span>
+                        ) : filterType === 'select' && Array.isArray(col.filterOptions) ? (
+                          <select
+                            value={value}
+                            onChange={(e) => handleFilterChange(col.key, e.target.value)}
+                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs focus:outline-none"
+                          >
+                            <option value="">All</option>
+                            {col.filterOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type={filterType === 'number' ? 'number' : filterType === 'date' ? 'date' : 'text'}
+                            value={value}
+                            onChange={(e) => handleFilterChange(col.key, e.target.value)}
+                            placeholder="Filter"
+                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
                           />
-                        </div>
-                        <span
-                          className="absolute right-[-2px] top-0 h-full w-2 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors"
-                          onMouseDown={(event) => handleResizeStart(event, col)}
-                          role="presentation"
-                        ></span>
+                        )}
                       </th>
                     )
                   })}
                   {renderActions && (
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.26_0_0)] border-l border-[var(--border)] whitespace-nowrap z-30">
-                      Actions
+                    <th className="px-4 py-2 text-left text-xs font-medium text-[oklch(0.78_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.24_0_0)] border-l border-[var(--border)] whitespace-nowrap z-30">
+                      
                     </th>
                   )}
                 </tr>
-              </thead>
+              )}
+            </thead>
               <tbody>
                 {loading ? (
                   <tr>
@@ -326,6 +443,29 @@ export default function DynamicTable({
                     </tr>
                   ))
                 )}
+                {emptyRowCount > 0 &&
+                  Array.from({ length: emptyRowCount }).map((_, idx) => (
+                    <tr
+                      key={`empty-row-${idx}`}
+                      className="border-b border-[var(--border)]"
+                      style={{ height: '48px' }}
+                    >
+                      {displayColumns.map((col) => (
+                        <td
+                          key={`${col.key}-empty-${idx}`}
+                          className={`px-4 py-3 text-sm text-[oklch(0.70_0_0)] border-r border-[var(--border)] ${col.minWidth || ''}`}
+                          style={{ width: `${columnWidths[col.key] || getInitialWidth(col)}px` }}
+                        >
+                          {'\u00A0'}
+                        </td>
+                      ))}
+                      {renderActions && (
+                        <td className="px-4 py-3 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.20_0_0)] border-l border-[var(--border)] z-20">
+                          {'\u00A0'}
+                        </td>
+                      )}
+                    </tr>
+                  ))}
               </tbody>
             </table>
         </div>
@@ -333,18 +473,6 @@ export default function DynamicTable({
           <div className="h-1 bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent"></div>
         )}
       </div>
-
-      {/* Pagination */}
-      {sortedRows.length > 0 && (
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          totalRows={sortedRows.length}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-        />
-      )}
     </div>
   )
 }
