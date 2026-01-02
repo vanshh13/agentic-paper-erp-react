@@ -54,35 +54,4 @@ export const inquiryServiceApi = {
     const response = await apiClient.delete(`/inquiries-service/${id}`);
     return response.data;
   },
-
-  /**
-   * INTERACTION METHODS
-   */
-
-  /**
-   * Get all interactions for a specific inquiry
-   * API Route: GET /api/inquiries/:id/interactions
-   */
-  getInteractions: async (inquiryId) => {
-    const response = await apiClient.get(`/inquiry-interactions-service/${inquiryId}`);
-    return response.data;
-  },
-
-  /**
-   * Add a new interaction to an inquiry
-   * API Route: POST /api/inquiries/:id/interactions
-   */
-  addInteraction: async (inquiryId, interactionData) => {
-    const response = await apiClient.post(`/inquiry-interactions-service/${inquiryId}`, interactionData);
-    return response.data;
-  },
-
-  /**
-   * Delete a specific interaction
-   * API Route: DELETE /api/interactions/:id
-   */
-  deleteInteraction: async (interactionId) => {
-    const response = await apiClient.delete(`/inquiry-interactions-service/${interactionId}`);
-    return response.data;
-  }
 };
