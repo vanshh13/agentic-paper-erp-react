@@ -20,6 +20,7 @@ import Approvals from './pages/Approvals/Approvals'
 import Settings from './pages/Settings/Settings'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
+import UserList from './pages/UserList/UserList'
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
           <Route path="/dispatch" element={<Dispatch />} />
           <Route path="/grn" element={<GRN />} />
           <Route path="/approvals" element={<Approvals />} />
+          <Route path="/users" element={<UserList />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
       </Routes>

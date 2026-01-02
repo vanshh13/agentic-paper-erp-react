@@ -60,20 +60,21 @@ export default function Sidebar() {
 
   const menuItems = [
     { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
-    { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
-    { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
+    { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: null },
+    { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: null },
     { label: 'Rules', icon: FileCheck, path: '/rules', badge: null }, 
-    { label: 'Sales', icon: IndianRupee, path: '/sales-orders', badge: '8' },
-    { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
+    { label: 'Sales', icon: IndianRupee, path: '/sales-orders', badge: null },
+    { label: 'Stock', icon: Package, path: '/stock', badge: null },
     { label: 'Products', icon: Package, path: '/products', badge: null },
     { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
+    { label: 'User List', icon: Users, path: '/users', badge: null },
     { label: 'Customers', icon: Users, path: '/customers', badge: null },
     { label: 'Vendors', icon: Users, path: '/vendors', badge: null },
     { label: 'Transporters', icon: Truck, path: '/transporters', badge: null },
     { label: 'Quotations', icon: FileText, path: '/quotations', badge: null },
     { label: 'Dispatch', icon: Truck, path: '/dispatch', badge: null },
-    { label: 'GRN', icon: ClipboardList, path: '/grn', badge: '2' },
-    { label: 'Approvals', icon: CheckSquare, path: '/approvals', badge: '4' },
+    { label: 'GRN', icon: ClipboardList, path: '/grn', badge: null },
+    { label: 'Approvals', icon: CheckSquare, path: '/approvals', badge: null },
   ]
 
   const isActive = (path) => location.pathname.startsWith(path)
