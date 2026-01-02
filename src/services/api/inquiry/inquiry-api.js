@@ -1,5 +1,7 @@
 import axios from 'axios';
-import  { API_BASE_URL }  from '../config'; // Ensure path is correct
+
+// Get API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/v1';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,7 +18,7 @@ export const inquiryServiceApi = {
    * Get all inquiries
    */
   getAll: async () => {
-    const response = await apiClient.get('/inquiries');
+    const response = await apiClient.get('/inquiries-service/');
     console.log('Fetched Inquiries:', response.data);
     return response.data;
   },
@@ -25,7 +27,7 @@ export const inquiryServiceApi = {
    * Get inquiry by ID
    */
   getById: async (id) => {
-    const response = await apiClient.get(`/inquiries/${id}`);
+    const response = await apiClient.get(`/inquiries-service/${id}`);
     return response.data;
   },
 
@@ -33,7 +35,7 @@ export const inquiryServiceApi = {
    * Create new inquiry
    */
   create: async (inquiryData) => {
-    const response = await apiClient.post('/inquiries', inquiryData);
+    const response = await apiClient.post('/inquiries-service', inquiryData);
     return response.data;
   },
 
@@ -41,7 +43,7 @@ export const inquiryServiceApi = {
    * Update existing inquiry
    */
   update: async (id, updates) => {
-    const response = await apiClient.put(`/inquiries/${id}`, updates);
+    const response = await apiClient.put(`/inquiries-service/${id}`, updates);
     return response.data;
   },
 
@@ -49,38 +51,7 @@ export const inquiryServiceApi = {
    * Delete inquiry (Soft Delete)
    */
   delete: async (id) => {
-    const response = await apiClient.delete(`/inquiries/${id}`);
+    const response = await apiClient.delete(`/inquiries-service/${id}`);
     return response.data;
   },
-
-  /**
-   * INTERACTION METHODS
-   */
-
-  /**
-   * Get all interactions for a specific inquiry
-   * API Route: GET /api/inquiries/:id/interactions
-   */
-  getInteractions: async (inquiryId) => {
-    const response = await apiClient.get(`/inquiries/${inquiryId}/interactions`);
-    return response.data;
-  },
-
-  /**
-   * Add a new interaction to an inquiry
-   * API Route: POST /api/inquiries/:id/interactions
-   */
-  addInteraction: async (inquiryId, interactionData) => {
-    const response = await apiClient.post(`/inquiries/${inquiryId}/interactions`, interactionData);
-    return response.data;
-  },
-
-  /**
-   * Delete a specific interaction
-   * API Route: DELETE /api/interactions/:id
-   */
-  deleteInteraction: async (interactionId) => {
-    const response = await apiClient.delete(`/interactions/${interactionId}`);
-    return response.data;
-  }
 };

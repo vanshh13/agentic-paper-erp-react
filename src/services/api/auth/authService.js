@@ -1,10 +1,12 @@
 import axios from 'axios';
-import { API_BASE_URL } from '../config';
 
 /**
  * Authentication Service
  * Handles all auth-related API calls to backend
  */
+
+// Get API base URL from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/v1';
 
 // Create axios client with default config
 const apiClient = axios.create({

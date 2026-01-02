@@ -4,8 +4,8 @@ const PasswordInput = ({ label, error, required, value, onChange, name, ...props
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="mb-4">
-      <label className="block text-xs font-medium text-gray-300 mb-1">
+    <div>
+      <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-2">
         {label} {required && <span className="text-red-400">*</span>}
       </label>
       <div className="relative">
@@ -14,15 +14,16 @@ const PasswordInput = ({ label, error, required, value, onChange, name, ...props
           name={name}
           value={value}
           onChange={onChange}
-          className={`w-full px-2 py-1.5 pr-8 text-sm bg-gray-800 border rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all text-white ${
-            error ? 'border-red-500' : 'border-gray-700'
+          className={`w-full px-4 py-2.5 pr-11 text-sm bg-[oklch(0.30_0_0)] border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-[oklch(0.95_0_0)] placeholder:text-[oklch(0.60_0_0)] ${
+            error ? 'border-red-500 focus:ring-red-500' : 'border-[oklch(0.25_0_0)]'
           }`}
           {...props}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[oklch(0.60_0_0)] hover:text-[oklch(0.80_0_0)] transition-colors p-1"
+          aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +37,12 @@ const PasswordInput = ({ label, error, required, value, onChange, name, ...props
           )}
         </button>
       </div>
-      {error && <p className="text-red-400 text-xs mt-0.5">{error}</p>}
+      {error && <p className="text-red-400 text-xs mt-1.5 flex items-center gap-1">
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {error}
+      </p>}
     </div>
   );
 };

@@ -18,6 +18,7 @@ import Dispatch from './pages/Dispatch/Dispatch'
 import GRN from './pages/GRN/GRN'
 import Approvals from './pages/Approvals/Approvals'
 import Settings from './pages/Settings/Settings'
+import Profile from './pages/Profile/Profile'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
 import UserList from './pages/UserList/UserList'
@@ -54,6 +55,7 @@ function App() {
           <Route path="/approvals" element={<Approvals />} />
           <Route path="/users" element={<UserList />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </BrowserRouter>
