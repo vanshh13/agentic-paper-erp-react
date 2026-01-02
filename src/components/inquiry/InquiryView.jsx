@@ -8,6 +8,7 @@ const statusConfig = {
   follow_up: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
   converted: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
   rejected: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
+  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
 }
 
 const sourceConfig = {
@@ -411,11 +412,11 @@ export default function InquiryView({
                       className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                     >
                       <option value="">Select type</option>
-                      <option value="Call">Call</option>
-                      <option value="Email">Email</option>
-                      <option value="WhatsApp">WhatsApp</option>
-                      <option value="Meeting">Meeting</option>
-                      <option value="Visit">Visit</option>
+                      <option value="CALL">Call</option>
+                      <option value="EMAIL">Email</option>
+                      <option value="WHATSAPP">WhatsApp</option>
+                      <option value="MEETING">Meeting</option>
+                      <option value="VISIT">Visit</option>
                     </select>
                   </div>
                   <div>
@@ -473,9 +474,10 @@ export default function InquiryView({
                           onChange={(e) => setInteractionForm({ ...interactionForm, followUpStatus: e.target.value })}
                           className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                         >
-                          <option value="pending">Pending</option>
-                          <option value="scheduled">Scheduled</option>
-                          <option value="completed">Completed</option>
+                          <option value="PENDING">Pending</option>
+                          <option value="SCHEDULED">Scheduled</option>
+                          <option value="NO SCHEDULED">Not  Scheduled</option>
+                          <option value="COMPLETED">Completed</option>
                         </select>
                       </div>
                     </>
@@ -489,7 +491,7 @@ export default function InquiryView({
                     Cancel
                   </button>
                   <button
-                    onClick={onAddInteraction}
+                    onClick={() => onAddInteraction(selectedInquiry.id)}
                     className="px-3 py-1.5 gradient-primary text-[oklch(0.98_0_0)] rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition-colors"
                   >
                     Add
@@ -527,7 +529,7 @@ export default function InquiryView({
                           <td className="px-4 py-3 text-sm text-[oklch(0.75_0_0)] font-mono">{index + 1}</td>
                           <td className="px-4 py-3 text-sm text-[oklch(0.92_0_0)]">{interaction.interaction_type}</td>
                           <td className="px-4 py-3 text-sm text-[oklch(0.92_0_0)]">
-                            {formatDateTime(interaction.dateTime || interaction.created_at)}
+                            {formatDateTime(interaction.dateTime || interaction.interaction_datetime || interaction.created_at)}
                           </td>
                           <td className="px-4 py-3">
                             <span className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-[oklch(0.26_0_0)] text-[oklch(0.90_0_0)]">
@@ -552,9 +554,9 @@ export default function InquiryView({
                           <td className="px-4 py-3">
                             {interaction.follow_up_status ? (
                               <span className={`inline-flex px-2 py-1 rounded-md text-xs font-medium capitalize ${
-                                interaction.follow_up_status === 'completed' 
+                                interaction.follow_up_status.toLowerCase() === 'completed' 
                                   ? 'bg-emerald-500/15 text-emerald-200'
-                                  : interaction.follow_up_status === 'scheduled'
+                                  : interaction.follow_up_status.toLowerCase() === 'scheduled'
                                   ? 'bg-sky-500/15 text-sky-200'
                                   : 'bg-amber-500/15 text-amber-200'
                               }`}>
@@ -566,7 +568,7 @@ export default function InquiryView({
                           </td>
                           <td className="px-4 py-3 text-right">
                             <button
-                              onClick={() => onDeleteInteraction(interaction.id)}
+                              onClick={() => onDeleteInteraction(interaction.id, selectedInquiry.id)}
                               className="p-1.5 text-rose-400 hover:text-rose-100 hover:bg-rose-500/20 rounded-lg transition-all"
                               title="Delete Interaction"
                             >

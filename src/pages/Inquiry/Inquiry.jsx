@@ -3,6 +3,7 @@ import { inquiryService } from '../../services/inquiryService'
 import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../../types/inquiry'
 import { Plus, MessageSquare } from 'lucide-react'
 import { inquiryServiceApi } from '../../services/api/inquiry/inquiry-api'
+import {inquiryInteractionServiceApi} from '../../services/api/inquiry/inquiry-interaction-api'
 // Import components
 import InquiryForm from '../../components/inquiry/InquiryForm'
 import InquiryList from '../../components/inquiry/InquiryList'
@@ -280,39 +281,77 @@ export default function Inquiry() {
   
     } catch (error) {
       console.error('Failed to fetch inquiry details:', error)
-      // Optional: Show error toast/message
+      const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to fetch inquiry details'
+      showToast(errorMessage, 'error')
     } finally {
       setLoadingDetail(false)
     }
   }
 
-  const handleAddInteraction = () => {
+  const handleAddInteraction = async (id) =>  {
     if (!interactionForm.type || !interactionForm.outcome || !interactionForm.summary) {
-      alert('Please fill all required fields')
+      showToast('Please fill all required fields', 'error')
       return
     }
-
-    const newInteraction = {
-      id: interactions.length + 1,
-      type: interactionForm.type,
-      dateTime: new Date().toISOString(),
-      outcome: interactionForm.outcome,
-      summary: interactionForm.summary,
-      followUpRequired: interactionForm.followUpRequired,
-      followUpDateTime: interactionForm.followUpRequired ? interactionForm.followUpDateTime : null,
-      followUpStatus: interactionForm.followUpRequired ? interactionForm.followUpStatus : null
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    console.log('user_id:', user.user_id);
+    
+    try {
+      const newInteraction = {
+        inquiry_id: id,
+        interaction_type: interactionForm.type,
+        interaction_datetime: new Date().toISOString(),
+        outcome: interactionForm.outcome,
+        summary: interactionForm.summary,
+        follow_up_required: interactionForm.followUpRequired,
+        follow_up_datetime: interactionForm.followUpRequired ? interactionForm.followUpDateTime : null,
+        follow_up_status: interactionForm.followUpRequired ? interactionForm.followUpStatus : null,
+        created_by:  user.user_id 
+      }
+      console.log('add interaction: ', newInteraction)
+      
+      const response = await inquiryInteractionServiceApi.addInteraction(newInteraction)
+      console.log(response);
+      if (response?.data) {
+        // Update interactions list with the new interaction
+        setInteractions([...interactions, response.data.interaction])
+        
+        // Refresh inquiry details to update total interactions count
+        if (selectedInquiry?.id) {
+          const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+          const detailData = detailResponse?.data?.data
+          if (detailData) {
+            const interactionSummary = detailData.interaction_summary || {}
+            setSelectedInquiry(prev => ({
+              ...prev,
+              totalInteractions: interactionSummary.total_interactions || interactions.length + 1,
+              lastInteractionType: interactionSummary.last_interaction_type || response.data.interaction.interaction_type,
+              lastInteractionDate: interactionSummary.last_interaction_date || response.data.interaction.interaction_datetime,
+              interaction_summary: interactionSummary
+            }))
+          }
+        }
+        
+        // Reset form
+        setInteractionForm({
+          type: '',
+          outcome: '',
+          summary: '',
+          followUpRequired: false,
+          followUpDateTime: '',
+          followUpStatus: 'pending'
+        })
+        
+        setShowInteractionForm(false)
+        showToast('Interaction added successfully', 'success')
+      } else {
+        showToast('Failed to add interaction: Invalid response', 'error')
+      }
+    } catch (error) {
+      console.error('Error adding interaction:', error)
+      const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to add interaction'
+      showToast(errorMessage, 'error')
     }
-
-    setInteractions([...interactions, newInteraction])
-    setInteractionForm({
-      type: '',
-      outcome: '',
-      summary: '',
-      followUpRequired: false,
-      followUpDateTime: '',
-      followUpStatus: 'pending'
-    })
-    setShowInteractionForm(false)
   }
 
   const resetForm = () => {
@@ -366,10 +405,7 @@ export default function Inquiry() {
       uom: inquiry.uom || '',
       specialInstructions: inquiry.specialInstructions || inquiry.special_instructions || '',
       transcript: inquiry.transcript || inquiry.rawMessage || '',
-      assignedSalesPerson: inquiry.assignedSalesPersonId || 
-                         inquiry.assigned_sales_person?.user_id || 
-                         inquiry.assigned_sales_person || 
-                         '',
+      assignedSalesPerson: inquiry.assignedSalesPersonId ||  '',
       isWithinWorkingHours: inquiry.isWithinWorkingHours ?? 
                           inquiry.is_within_working_hours ?? 
                           true,
@@ -547,21 +583,37 @@ export default function Inquiry() {
     )
   }
 
-  const handleDeleteInteraction = (interactionId) => {
+  const handleDeleteInteraction = (interactionId, inquiryId) => {
     showConfirmation(
       'Are you sure you want to delete this interaction?',
       async () => {
         try {
-          await inquiryService.deleteInteraction(interactionId);
+          await inquiryInteractionServiceApi.deleteInteraction(interactionId);
           
-          // Refresh the interactions list for the currently selected inquiry
-          const updatedInteractions = await inquiryService.getInteractions(selectedInquiry.id);
-          setInteractions(updatedInteractions);
+          // Remove the deleted interaction from the list
+          setInteractions(interactions.filter(interaction => interaction.id !== interactionId));
           
-          showToast('Interaction removed successfully', 'success');
+          // Refresh inquiry details to update total interactions count
+          if (selectedInquiry?.id) {
+            const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+            const detailData = detailResponse?.data?.data
+            if (detailData) {
+              const interactionSummary = detailData.interaction_summary || {}
+              setSelectedInquiry(prev => ({
+                ...prev,
+                totalInteractions: interactionSummary.total_interactions || Math.max(0, interactions.length - 1),
+                lastInteractionType: interactionSummary.last_interaction_type || null,
+                lastInteractionDate: interactionSummary.last_interaction_date || null,
+                interaction_summary: interactionSummary
+              }))
+            }
+          }
+          
+          showToast('Interaction deleted successfully', 'success');
         } catch (error) {
           console.error('Error deleting interaction:', error);
-          showToast('Failed to delete interaction', 'error');
+          const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to delete interaction'
+          showToast(errorMessage, 'error');
         }
       }
     );
