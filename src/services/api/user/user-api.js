@@ -1,6 +1,3 @@
-import axios from 'axios'
-import { API_BASE_URL } from '../config'
-
 const DEPARTMENT_MAP = {
 	1: 'Sales',
 	2: 'Procurement',
@@ -456,11 +453,6 @@ const FALLBACK_USERS = [
 ];
 
 
-const apiClient = axios.create({
-	baseURL: API_BASE_URL,
-	headers: { 'Content-Type': 'application/json' },
-})
-
 const toDisplayUser = (user) => {
 	const fullName = user.full_name || [user.first_name, user.middle_name, user.last_name]
 		.filter(Boolean)
@@ -485,30 +477,15 @@ const fallbackList = () => FALLBACK_USERS.map((user) => toDisplayUser(user))
 
 export const userApi = {
 	/**
-	 * Fetch all users from backend with a safe fallback to local data.
+	 * Return local fallback users only (no network call while backend is unavailable).
 	 */
-	getAll: async () => {
-		try {
-			const response = await apiClient.get('/users')
-			const data = Array.isArray(response?.data) ? response.data : []
-			if (!data.length) return fallbackList()
-			return data.map((user) => toDisplayUser(user))
-		} catch (error) {
-			console.error('Failed to fetch users, serving fallback data', error)
-			return fallbackList()
-		}
-	},
+	getAll: async () => fallbackList(),
 
 	/**
-	 * Fetch a single user by id with a safe fallback.
+	 * Return a single user from local fallback data.
 	 */
 	getById: async (id) => {
-		try {
-			const response = await apiClient.get(`/users/${id}`)
-			return toDisplayUser(response?.data || {})
-		} catch (error) {
-			const fallbackUser = FALLBACK_USERS.find((user) => `${user.user_id}` === `${id}`)
-			return fallbackUser ? toDisplayUser(fallbackUser) : null
-		}
+		const fallbackUser = FALLBACK_USERS.find((user) => `${user.user_id}` === `${id}`)
+		return fallbackUser ? toDisplayUser(fallbackUser) : null
 	},
 }
