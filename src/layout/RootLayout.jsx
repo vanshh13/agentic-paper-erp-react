@@ -1,23 +1,48 @@
 import Sidebar from './Sidebar'
-import { Bell, Menu } from 'lucide-react'
-import { Outlet } from 'react-router-dom'
+import { Bell, Menu, ChevronRight, Home } from 'lucide-react'
+import { Outlet, useLocation, Link } from 'react-router-dom'
 import { useSidebar } from '../contexts/SidebarContext'
 
 export default function RootLayout() {
   const { isOpen, setIsOpen } = useSidebar()
+  const location = useLocation()
+
+  // Generate breadcrumb from location pathname
+  const getBreadcrumbs = () => {
+    const paths = location.pathname.split('/').filter(Boolean)
+    const breadcrumbs = [{ label: 'Home', path: '/dashboard' }]
+    
+    if (paths.length === 0) {
+      return breadcrumbs
+    }
+
+    let currentPath = ''
+    paths.forEach((path, index) => {
+      currentPath += `/${path}`
+      const label = path
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+      breadcrumbs.push({ label, path: currentPath })
+    })
+
+    return breadcrumbs
+  }
+
+  const breadcrumbs = getBreadcrumbs()
 
   return (
-    <div className="flex min-h-screen bg-[oklch(0.18_0_0)]">
+    <div className="flex h-screen bg-[oklch(0.18_0_0)] overflow-hidden">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${
-        isOpen ? 'lg:ml-60' : 'lg:ml-0'
+      <div className={`flex-1 flex flex-col transition-all duration-300 overflow-hidden ${
+        isOpen ? 'lg:ml-[19.5rem]' : 'lg:ml-0'
       }`}>
         {/* Top Bar */}
-        <header className="bg-[oklch(0.22_0_0)] border-b border-[var(--border)] sticky top-0 z-20">
-          <div className="px-4 md:px-6 py-3 flex justify-between items-center">
+        <header className="bg-[oklch(0.22_0_0)] border-b border-[oklch(0.25_0_0)] flex-shrink-0 z-20 h-20">
+          <div className="h-full px-4 md:px-6 flex justify-between items-center">
             <div className="flex items-center gap-2">
               {!isOpen && (
                 <button 
@@ -29,7 +54,7 @@ export default function RootLayout() {
                   <Menu className="w-5 h-5" />
                 </button>
               )}
-              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.70_0_0)] truncate">{document.title || 'Dashboard'}</h1>
+              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.90_0_0)] truncate">{document.title || 'Dashboard'}</h1>
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">
@@ -45,8 +70,41 @@ export default function RootLayout() {
           </div>
         </header>
 
+        {/* Breadcrumb */}
+        <div className="bg-[oklch(0.20_0_0)] border-b border-[oklch(0.25_0_0)] px-4 md:px-6 py-3 flex-shrink-0">
+          <nav className="flex items-center gap-2 text-sm">
+            {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.path} className="flex items-center gap-2">
+                {index === 0 ? (
+                  <Link
+                    to={crumb.path}
+                    className="flex items-center gap-1.5 text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                  >
+                    <Home size={16} />
+                    <span>{crumb.label}</span>
+                  </Link>
+                ) : (
+                  <>
+                    <ChevronRight size={16} className="text-[oklch(0.50_0_0)]" />
+                    {index === breadcrumbs.length - 1 ? (
+                      <span className="text-[oklch(0.90_0_0)] font-medium">{crumb.label}</span>
+                    ) : (
+                      <Link
+                        to={crumb.path}
+                        className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                      >
+                        {crumb.label}
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
+            ))}
+          </nav>
+        </div>
+
         {/* Page Content */}
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)]">
+        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6">
           <Outlet />
         </main>
       </div>

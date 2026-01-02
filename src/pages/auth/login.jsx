@@ -60,30 +60,42 @@ const Login = () => {
   };
 
       return (
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950 flex items-center justify-center px-4 py-8">
           <div className="max-w-md w-full">
-            <div className="bg-gray-900 rounded-2xl shadow-2xl p-8 border border-gray-800">
-              <div className="flex items-center justify-center mb-8">
-                <div className="w-12 h-12 bg-indigo-600 rounded-lg flex items-center justify-center mr-3">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-[oklch(0.22_0_0)] rounded-2xl shadow-2xl p-8 md:p-10 border border-[oklch(0.25_0_0)] backdrop-blur-sm">
+              {/* Logo and Branding */}
+              <div className="flex flex-col items-center mb-8">
+                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30">
+                  <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 </div>
-                <span className="text-2xl font-bold text-white">Rahul Papers</span>
+                <span className="text-2xl font-bold text-[oklch(0.95_0_0)] mb-1">Rahul Papers</span>
+                <p className="text-sm text-[oklch(0.65_0_0)]">Enterprise Resource Planning</p>
               </div>
     
-              <h2 className="text-2xl font-bold text-white mb-2 text-center">Welcome Back</h2>
-              <p className="text-gray-400 mb-6 text-center">Sign in to your account</p>
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-[oklch(0.98_0_0)] mb-2">Welcome Back</h2>
+                <p className="text-[oklch(0.70_0_0)]">Sign in to continue to your account</p>
+              </div>
     
+              {/* Error Message */}
               {apiError && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg text-sm">
-                  {apiError}
+                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{apiError}</span>
+                  </div>
                 </div>
               )}
     
-              <form onSubmit={handleSubmit}>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <Input
-                  label="Username"
+                  label="Username or Email"
                   type="text"
                   name="username"
                   value={formData.username}
@@ -91,8 +103,9 @@ const Login = () => {
                   error={errors.username}
                   required
                   autoComplete="username"
+                  placeholder="Enter your username or email"
                 />
-                <div className="mb-4"></div>
+                
                 <PasswordInput
                   label="Password"
                   name="password"
@@ -101,21 +114,25 @@ const Login = () => {
                   error={errors.password}
                   required
                   autoComplete="current-password"
+                  placeholder="Enter your password"
                 />
     
-                <div className="flex flex-col items-center gap-2 pt-2">
-                  <Button type="submit" loading={loading}>
+                <div className="pt-2">
+                  <Button type="submit" loading={loading} className="w-full">
                     Sign In
                   </Button>
                 </div>
               </form>
     
-              <p className="mt-6 text-center text-sm text-gray-400">
-                Don't have an account?{' '}
-                <Link to="/auth/register" className="text-gray-400 font-medium hover:text-gray-300 transition-colors">
-                  Register here
-                </Link>
-              </p>
+              {/* Footer Link */}
+              <div className="mt-8 pt-6 border-t border-[oklch(0.25_0_0)]">
+                <p className="text-center text-sm text-[oklch(0.70_0_0)]">
+                  Don't have an account?{' '}
+                  <Link to="/auth/register" className="text-indigo-400 font-semibold hover:text-indigo-300 transition-colors">
+                    Create Account
+                  </Link>
+                </p>
+              </div>
             </div>
           </div>
         </div>
