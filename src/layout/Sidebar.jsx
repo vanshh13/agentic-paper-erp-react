@@ -1,8 +1,9 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Users, Package, ShoppingCart, FileText, Truck, MessageSquare, Menu, X, Tag, DollarSign, FileCheck, ClipboardList, CheckSquare, Settings, LogOut, ChevronUp, ChevronDown, IndianRupee } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { X, Settings, LogOut, ChevronUp, ChevronDown, Search } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
 import { logoutUser, getCurrentUser } from '../services/api/auth'
+import NavItems from './NavItems'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
@@ -11,6 +12,7 @@ export default function Sidebar() {
   const [isMobile, setIsMobile] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
   
@@ -58,26 +60,6 @@ export default function Sidebar() {
     };
   }, []);
 
-  const menuItems = [
-    { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
-    { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
-    { label: 'Purchases', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
-    { label: 'Rules', icon: FileCheck, path: '/rules', badge: null }, 
-    { label: 'Sales', icon: IndianRupee, path: '/sales-orders', badge: '8' },
-    { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
-    { label: 'Products', icon: Package, path: '/products', badge: null },
-    { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
-    { label: 'Customers', icon: Users, path: '/customers', badge: null },
-    { label: 'Vendors', icon: Users, path: '/vendors', badge: null },
-    { label: 'Transporters', icon: Truck, path: '/transporters', badge: null },
-    { label: 'Quotations', icon: FileText, path: '/quotations', badge: null },
-    { label: 'Dispatch', icon: Truck, path: '/dispatch', badge: null },
-    { label: 'GRN', icon: ClipboardList, path: '/grn', badge: '2' },
-    { label: 'Approvals', icon: CheckSquare, path: '/approvals', badge: '4' },
-  ]
-
-  const isActive = (path) => location.pathname.startsWith(path)
-
   const handleLinkClick = () => {
     if (isMobile) setIsOpen(false)
   }
@@ -120,25 +102,27 @@ export default function Sidebar() {
           </button>
         </div>
 
+        {/* Search Bar */}
+        <div className="flex-shrink-0 p-3 border-b border-[oklch(0.25_0_0)]">
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[oklch(0.60_0_0)]" />
+            <input
+              type="text"
+              placeholder="Search navigation..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-[oklch(0.12_0_0)] border border-[oklch(0.25_0_0)] rounded-lg text-sm text-[oklch(0.92_0_0)] placeholder-[oklch(0.60_0_0)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+            />
+          </div>
+        </div>
+
         {/* Navigation Menu */}
-        <nav className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-1 min-h-0">
-          {menuItems.map((item) => {
-            const IconComponent = item.icon
-            const active = isActive(item.path)
-            return (
-              <Link key={item.path} to={item.path} onClick={handleLinkClick} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm relative group ${active ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40' : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'}`}>
-                <IconComponent size={18} className="flex-shrink-0 min-w-[18px]" />
-                <span className="flex-1 truncate">{item.label}</span>
-                {item.badge && <span className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${active ? 'bg-white/20 text-white' : 'bg-[oklch(0.25_0_0)] text-[oklch(0.85_0_0)]'}`}>{item.badge}</span>}
-              </Link>
-            )
-          })}
-        </nav>
+        <NavItems onLinkClick={handleLinkClick} searchQuery={searchQuery} />
 
         {/* 3. Wrap Account Section and Footer in a div with the ref */}
-        <div ref={accountRef} className="flex flex-col">
+        <div ref={accountRef} className="flex flex-col relative z-10 flex-shrink-0 mt-auto">
           {isAccountOpen && (
-            <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2">
+            <div className="card-surface backdrop-blur-sm flex-shrink-0 border border-gray-200/50 pt-3 px-3 rounded-lg shadow-lg mx-2 mb-2 relative z-20 bg-[oklch(0.15_0_0)]">
               <p className="text-xs font-semibold text-white/60 uppercase tracking-wider px-3 mb-2">My Account</p>
               <div className="space-y-1 mb-3">
                 <Link to="/settings" onClick={() => { handleLinkClick(); setIsAccountOpen(false); }} className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm ${location.pathname === '/settings' ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40' : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'}`}>
@@ -159,7 +143,7 @@ export default function Sidebar() {
 
           {/* Sidebar Footer */}
           <div 
-            className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.12_0_0)] cursor-pointer hover:bg-[oklch(0.15_0_0)] transition-colors rounded-t-lg ${isHighlighted ? 'ring-2 ring-white/20' : ''}`} 
+            className={`flex-shrink-0 p-2 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)] cursor-pointer hover:bg-[oklch(0.18_0_0)] transition-colors rounded-t-lg relative z-10 ${isHighlighted ? 'ring-2 ring-white/20' : ''}`} 
             onClick={() => {
               setIsAccountOpen(!isAccountOpen)
               setIsHighlighted(!isAccountOpen)
