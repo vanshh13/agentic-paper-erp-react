@@ -22,6 +22,7 @@ import Profile from './pages/Profile/Profile'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
 import UserList from './pages/UserList/UserList'
+import ChatScreenUI from './pages/automatic-intelligence/chat-screen-ui'
 import UserDetailForm from './components/user/UserDetailForm'
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
           <Route path="/users/:userId" element={<UserDetailForm />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/chat" element={<ChatScreenUI />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSidebar } from '../contexts/SidebarContext'
 import { getCurrentUser, logoutUser } from '../services/api/auth'
 import NavItems from './NavItems'
+import InteractiveAIAvatar from '../components/InteractiveAIAvatar'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
@@ -78,7 +79,7 @@ export default function Sidebar() {
 
       <aside className={`fixed top-0 left-0 h-screen w-78 bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)] transform transition-all duration-300 ease-in-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         {/* Sidebar Header */}
-        <div className="flex-shrink-0 p-4 border-b border-[oklch(0.25_0_0)] flex items-center gap-3">
+        <div className="flex-shrink-0 p-4 pb-3 border-b border-[oklch(0.25_0_0)] flex items-center gap-3">
           <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">RP</div>
           <div className="min-w-0 flex-1">
             <h2 className="text-sm font-semibold text-[oklch(0.92_0_0)] truncate">Rahul Papers</h2>
@@ -86,6 +87,14 @@ export default function Sidebar() {
           <button onClick={handleToggleSidebar} className="p-1.5 hover:bg-[oklch(0.20_0_0)] rounded-md text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)] transition-colors flex-shrink-0">
             <X size={18} />
           </button>
+        </div>
+
+        {/* AI Avatar */}
+        <div 
+          className="flex-shrink-0 border-b border-[oklch(0.25_0_0)] pt-4 pb-3 cursor-pointer"
+          onClick={() => navigate('/chat')}
+        >
+          <InteractiveAIAvatar />
         </div>
 
         {/* Search Bar */}
