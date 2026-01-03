@@ -175,4 +175,109 @@
   .custom-scrollbar::-webkit-scrollbar-track { background: oklch(0.20 0 0); }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: oklch(0.35 0 0); border-radius: 3px; }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: oklch(0.45 0 0); }
+
+  /* Row animations (butter smooth) */
+  .row-animate {
+    animation: rowFadeIn 520ms ease-in-out;
+    will-change: opacity, transform;
+  }
+
+  .row-animate-soft {
+    animation: rowFadeSoft 420ms ease-in-out;
+    will-change: opacity, transform;
+  }
+
+  /* Sorting uses transitions (smooth, no bounce) */
+  .row-animate-sort {
+    transition: opacity 380ms ease-in-out,
+                transform 380ms ease-in-out;
+    will-change: opacity, transform;
+  }
+
+  /* Optional: blur-in for search-heavy transitions */
+  .row-animate-blur {
+    animation: rowBlurIn 520ms ease-in-out;
+    will-change: opacity, transform, filter;
+  }
+
+  /* Stagger helper (set --row-index inline for per-row offsets) */
+  .row-stagger {
+    animation-delay: calc(var(--row-index, 0) * 12ms);
+    transition-delay: calc(var(--row-index, 0) * 12ms);
+  }
+
+  /* Exit animation for removed rows */
+  .row-exit {
+    animation: rowExit 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    will-change: opacity, transform;
+  }
+
+  /* Disable animations when wrapping container has this class (e.g., during active search typing) */
+  .disable-row-animations .row-animate,
+  .disable-row-animations .row-animate-soft,
+  .disable-row-animations .row-animate-sort,
+  .disable-row-animations .row-animate-blur,
+  .disable-row-animations .row-exit,
+  .disable-row-animations .row-stagger {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  @keyframes rowFadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(1.5px);
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rowFadeSoft {
+    0% {
+      opacity: 0;
+      transform: translateY(1px);
+    }
+    60% {
+      opacity: 0.8;
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rowBlurIn {
+    0% {
+      opacity: 0;
+      transform: translateY(1.5px);
+      filter: blur(2px);
+    }
+    40% {
+      filter: blur(1px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes rowExit {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(1.5px);
+    }
+  }
 }

@@ -139,11 +139,19 @@ export default function DynamicTable({
     }
 
     if (type === 'number') {
-      return Number(value) === Number(filterValue)
+      const normalize = (val) => String(val ?? '').replace(/\D/g, '')
+      const valueDigits = normalize(value)
+      const filterDigits = normalize(filterValue)
+      if (!filterDigits) return true
+      return valueDigits.includes(filterDigits)
     }
 
     if (type === 'date') {
-      return valueStr.startsWith(filterStr)
+      const normalize = (val) => String(val ?? '').replace(/\D/g, '')
+      const valueDigits = normalize(value)
+      const filterDigits = normalize(filterValue)
+      if (!filterDigits) return true
+      return valueDigits.startsWith(filterDigits)
     }
 
     return valueStr.includes(filterStr)
@@ -265,11 +273,33 @@ export default function DynamicTable({
       className={`card-surface rounded-xl border border-[var(--border)] overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
     >
       {/* Header */}
-      <div className="flex-shrink-0 px-3 py-2 border-b border-[var(--border)] space-y-1.5 bg-[oklch(0.20_0_0)]">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-[oklch(0.95_0_0)]">{title} ({filteredRows.length})</h3>
+      <div className="flex-shrink-0 px-4 py-1.5 border-b border-[var(--border)] bg-[oklch(0.20_0_0)]">
+        {/* Search, Columns, and Pagination in single row */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-[280px] sm:w-[320px]">
+            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.85_0_0)]">
+              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
+              <input
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search..."
+                className="bg-transparent focus:outline-none w-full text-sm placeholder:text-[oklch(0.65_0_0)]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              onClick={() => setShowColumnSelector(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-sm font-medium"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              Columns
+            </button>
+          </div>
+
           {sortedRows.length > 0 && (
-            <div className="w-full md:w-auto">
+            <div className="ml-auto">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -281,37 +311,12 @@ export default function DynamicTable({
             </div>
           )}
         </div>
-
-        {/* Search and Columns */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="w-[200px] sm:w-[240px]">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-2 py-1 text-xs text-[oklch(0.85_0_0)]">
-              <Search className="w-3.5 h-3.5 text-[oklch(0.65_0_0)]" />
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="bg-transparent focus:outline-none w-full text-xs placeholder:text-[oklch(0.65_0_0)]"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              onClick={() => setShowColumnSelector(true)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-xs font-medium"
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              Columns
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Scrollable Table Area */}
       <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col bg-[oklch(0.20_0_0)] isolate">
         <div className="flex-1 min-h-0 w-full overflow-x-auto overflow-y-auto overscroll-x-contain custom-scrollbar scroll-smooth relative">
-          <table className="border-collapse" style={{ tableLayout: 'fixed', width: totalTableWidth }}>
+          <table className="border-collapse w-full" style={{ tableLayout: 'fixed', minWidth: totalTableWidth }}>
             {/* COLGROUP - Controls column widths */}
             <colgroup>
               {displayColumns.map((col) => (
@@ -330,7 +335,7 @@ export default function DynamicTable({
                   return (
                     <th
                       key={col.key}
-                      className={`px-4 py-2 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
+                      className={`px-3 py-1.5 text-left text-base font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
                     >
                       <div className="flex items-center justify-between gap-1 pr-2">
                         <ColumnSortFilter
@@ -353,7 +358,7 @@ export default function DynamicTable({
                 })}
                 {renderActions && (
                   <th
-                    className="px-4 py-1 text-left text-xs font-semibold text-[oklch(0.92_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                    className="px-3 py-1.5 text-left text-sm font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                   >
                     <div className="relative">
                       Actions
@@ -380,15 +385,15 @@ export default function DynamicTable({
                     return (
                       <th
                         key={`${col.key}-filter`}
-                        className={`px-4 py-1 text-left text-xs font-medium text-[oklch(0.78_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
+                        className={`px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.82_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
                       >
                         {col.filterable === false ? (
-                          <span className="text-[oklch(0.60_0_0)]">—</span>
+                          <span className="block h-[18px]"></span>
                         ) : filterType === 'select' && Array.isArray(col.filterOptions) ? (
                           <select
                             value={value}
                             onChange={(e) => handleFilterChange(col.key, e.target.value)}
-                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs focus:outline-none"
+                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-sm focus:outline-none"
                           >
                             <option value="">All</option>
                             {col.filterOptions.map((opt) => (
@@ -397,13 +402,50 @@ export default function DynamicTable({
                               </option>
                             ))}
                           </select>
+                        ) : filterType === 'date' ? (
+                          <div className="relative">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              maxLength="10"
+                              value={value}
+                              onChange={(e) => {
+                                let val = e.target.value.replace(/[^\d]/g, '')
+                                if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2)
+                                if (val.length >= 5) val = val.slice(0, 5) + '/' + val.slice(5, 9)
+                                handleFilterChange(col.key, val)
+                              }}
+                              placeholder="DD/MM/YYYY"
+                              className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 pr-8 text-[oklch(0.90_0_0)] text-sm focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
+                            />
+                            <input
+                              type="date"
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const [y, m, d] = e.target.value.split('-')
+                                  handleFilterChange(col.key, `${d}/${m}/${y}`)
+                                } else {
+                                  handleFilterChange(col.key, '')
+                                }
+                              }}
+                              className="absolute right-2 top-0 w-10 h-full opacity-0 cursor-pointer"
+                            />
+                            <svg
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.65_0_0)] pointer-events-none"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                          </div>
                         ) : (
                           <input
-                            type={filterType === 'number' ? 'number' : filterType === 'date' ? 'date' : 'text'}
+                            type={filterType === 'number' ? 'number' : 'text'}
                             value={value}
                             onChange={(e) => handleFilterChange(col.key, e.target.value)}
                             placeholder="Filter"
-                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
+                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-sm focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
                           />
                         )}
                         <span
@@ -419,7 +461,7 @@ export default function DynamicTable({
                   })}
                   {renderActions && (
                     <th
-                      className="px-4 py-1 text-left text-xs font-medium text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                      className="px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                     >
                       <span
                         className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
@@ -448,11 +490,13 @@ export default function DynamicTable({
                   </td>
                 </tr>
               ) : (
-                paginatedRows.map((row, idx) => (
-                  <tr
-                    key={row.id || row.user_id || idx}
-                    className="border-b border-[var(--border)] hover:bg-[oklch(0.24_0_0)] transition-colors"
-                  >
+                paginatedRows.map((row, idx) => {
+                  const stripeClass = idx % 2 === 0 ? 'bg-[oklch(0.21_0_0)]' : 'bg-[oklch(0.23_0_0)]'
+                  return (
+                    <tr
+                      key={row.id || row.user_id || idx}
+                      className={`border-b border-[var(--border)] ${stripeClass} hover:bg-[oklch(0.24_0_0)] transition-colors row-animate`}
+                    >
                     {displayColumns.map((col) => {
                       const value = row[col.key]
                       const content = col.render ? col.render(value, row) : value || '--'
@@ -461,7 +505,7 @@ export default function DynamicTable({
                       return (
                         <td
                           key={col.key}
-                          className={`px-4 py-3.5 text-sm text-[oklch(0.90_0_0)] truncate ${col.minWidth || ''}`}
+                          className={`px-3 py-0.1 text-base text-[oklch(0.80_0_0)] truncate ${col.minWidth || ''}`}
                         >
                           {content}
                         </td>
@@ -469,7 +513,7 @@ export default function DynamicTable({
                     })}
                     {renderActions && (
                       <td
-                        className="px-4 py-2 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                        className="px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                       >
                         <div className="relative h-full w-full">
                           {renderActions(row)}
@@ -485,26 +529,27 @@ export default function DynamicTable({
                       </td>
                     )}
                   </tr>
-                ))
+                  )
+                })
               )}
               {emptyRowCount > 0 &&
                 Array.from({ length: emptyRowCount }).map((_, idx) => (
                   <tr
                     key={`empty-row-${idx}`}
-                    className="border-b border-[var(--border)]"
-                    style={{ height: '48px' }}
+                    className={`border-b border-[var(--border)] ${(paginatedRows.length + idx) % 2 === 0 ? 'bg-[oklch(0.21_0_0)]' : 'bg-[oklch(0.23_0_0)]'} row-animate-soft`}
+                    style={{ height: '38px' }}
                   >
                     {displayColumns.map((col) => (
                       <td
                         key={`${col.key}-empty-${idx}`}
-                        className={`px-4 py-3.5 text-sm text-[oklch(0.70_0_0)] ${col.minWidth || ''}`}
+                        className={`px-3 py-1.5 text-base text-[oklch(0.65_0_0)] ${col.minWidth || ''}`}
                       >
-                        {'\u00A0'}
+                        {' '}
                       </td>
                     ))}
                     {renderActions && (
                       <td
-                        className="px-4 py-3.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                        className="px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                       >
                         <div className="relative h-full w-full">
                           {'\u00A0'}
