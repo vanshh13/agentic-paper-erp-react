@@ -256,15 +256,58 @@ const Register = () => {
               </select>
               {errors.gender && <p className="text-red-400 text-xs mt-1">{errors.gender}</p>}
             </div>
-            <Input 
-              label="Date of Birth" 
-              type="date" 
-              name="date_of_birth" 
-              value={formData.date_of_birth} 
-              onChange={handleChange} 
-              error={errors.date_of_birth} 
-              required 
-            />
+            <div>
+              <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-2">
+                Date of Birth <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength="10"
+                  name="date_of_birth"
+                  value={formData.date_of_birth}
+                  onChange={(e) => {
+                    let val = e.target.value.replace(/[^\d]/g, '')
+                    if (val.length >= 2) val = val.slice(0, 2) + '/' + val.slice(2)
+                    if (val.length >= 5) val = val.slice(0, 5) + '/' + val.slice(5, 9)
+                    setFormData(prev => ({ ...prev, date_of_birth: val }))
+                    if (errors.date_of_birth) {
+                      setErrors(prev => ({ ...prev, date_of_birth: '' }))
+                    }
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  className={`w-full px-4 py-2.5 text-sm bg-[oklch(0.30_0_0)] border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-[oklch(0.95_0_0)] pr-10 transition-all ${
+                    errors.date_of_birth ? 'border-red-500' : 'border-[oklch(0.25_0_0)]'
+                  }`}
+                  required
+                />
+                <input
+                  type="date"
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const [y, m, d] = e.target.value.split('-')
+                      setFormData(prev => ({ ...prev, date_of_birth: `${d}/${m}/${y}` }))
+                    } else {
+                      setFormData(prev => ({ ...prev, date_of_birth: '' }))
+                    }
+                    if (errors.date_of_birth) {
+                      setErrors(prev => ({ ...prev, date_of_birth: '' }))
+                    }
+                  }}
+                  className="absolute right-3 top-0 w-10 h-full opacity-0 cursor-pointer"
+                />
+                <svg
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.65_0_0)] pointer-events-none"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              {errors.date_of_birth && <p className="text-red-400 text-xs mt-1">{errors.date_of_birth}</p>}
+            </div>
             <Input 
               label="Mobile Number" 
               type="tel" 

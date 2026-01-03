@@ -64,14 +64,14 @@ export default function UserList() {
   return (
     <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="pt-2 pb-1 flex-shrink-0">
+      <div className="pt-2 pb-4 flex-shrink-0">
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-indigo-500/20 text-indigo-400">
-              <UsersIcon className="w-5 h-5" />
+            <div className="p-2.5 rounded-lg bg-indigo-500/20 text-indigo-400">
+              <UsersIcon className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
+              <h1 className="text-2xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
             </div>
           </div>
         </div>
