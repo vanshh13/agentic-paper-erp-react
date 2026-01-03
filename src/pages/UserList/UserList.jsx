@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Eye as EyeIcon, Users as UsersIcon } from 'lucide-react'
 import { userApi } from '../../services/api/user/user-api'
 import { DynamicTable } from '../../components/table'
-import UserView from '../../components/user/UserView'
 import { userColumns } from './UserColums'
 
 const normalizeUser = (user) => {
@@ -17,11 +17,10 @@ const normalizeUser = (user) => {
 }
 
 export default function UserList() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [selectedUser, setSelectedUser] = useState(null)
-  const [showDetailDialog, setShowDetailDialog] = useState(false)
 
   const loadUsers = async () => {
     setLoading(true)
@@ -43,42 +42,29 @@ export default function UserList() {
   }, [])
 
   const handleViewUser = (user) => {
-    setSelectedUser(user)
-    setShowDetailDialog(true)
-  }
-
-  const handleEdit = (user) => {
-    console.log('Edit user:', user)
-    setShowDetailDialog(false)
-    // TODO: Implement edit functionality
-  }
-
-  const handleDelete = (user) => {
-    console.log('Delete user:', user)
-    setShowDetailDialog(false)
-    // TODO: Implement delete functionality
+    navigate(`/users/${user.user_id}`)
   }
 
   const columns = useMemo(() => userColumns, [])
 
   return (
-    <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-4 sm:px-6 lg:px-8">
+    <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-3 sm:px-4 lg:px-8">
       {/* Header */}
-      <div className="pt-2 pb-4 flex-shrink-0">
+      <div className="pt-2 pb-3 sm:pb-4 flex-shrink-0">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2">
-            <div className="p-2.5 rounded-lg bg-indigo-500/20 text-indigo-400">
-              <UsersIcon className="w-7 h-7" />
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="p-2 sm:p-2.5 rounded-lg bg-indigo-500/20 text-indigo-400 flex-shrink-0">
+              <UsersIcon className="w-5 sm:w-7 h-5 sm:h-7" />
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold text-[oklch(0.98_0_0)]">User List</h1>
             </div>
           </div>
         </div>
       </div>
 
-      {/* User List Table */}
-      <div className="flex-1 min-h-0 flex flex-col">
+      {/* User List Table - Desktop */}
+      <div className="flex-1 min-h-0 flex flex-col hidden sm:flex">
         <DynamicTable
           title="User List"
           columns={columns}
@@ -98,14 +84,53 @@ export default function UserList() {
         />
       </div>
 
-      {/* User View Modal */}
-      <UserView
-        selectedUser={selectedUser}
-        showDetailDialog={showDetailDialog}
-        setShowDetailDialog={setShowDetailDialog}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      {/* Mobile Card View */}
+      <div className="flex-1 min-h-0 flex flex-col overflow-y-auto sm:hidden px-2">
+        {loading ? (
+          <div className="flex items-center justify-center h-full text-[oklch(0.70_0_0)]">
+            Loading users...
+          </div>
+        ) : users.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-[oklch(0.65_0_0)]">
+            No users found
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 py-3">
+            {users.map((user) => (
+              <div
+                key={user.user_id}
+                className="bg-[oklch(0.22_0_0)] border border-[oklch(0.28_0_0)] rounded-lg p-4 hover:bg-[oklch(0.24_0_0)] transition-colors"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm font-semibold text-[oklch(0.95_0_0)] truncate">
+                      {user.full_name}
+                    </h3>
+                    <p className="text-xs text-[oklch(0.70_0_0)] mt-1 truncate">
+                      {user.employee_code}
+                    </p>
+                    <div className="flex flex-col gap-1 mt-2 text-xs text-[oklch(0.75_0_0)]">
+                      {user.designation_name && (
+                        <p>{user.designation_name}</p>
+                      )}
+                      {user.department_name && (
+                        <p>{user.department_name}</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleViewUser(user)}
+                    className="flex items-center justify-center p-2 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg hover:bg-indigo-500/20 transition-all flex-shrink-0"
+                    aria-label="View user"
+                  >
+                    <EyeIcon className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

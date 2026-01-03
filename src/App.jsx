@@ -22,6 +22,7 @@ import Profile from './pages/Profile/Profile'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
 import UserList from './pages/UserList/UserList'
+import UserDetailForm from './components/user/UserDetailForm'
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
           <Route path="/grn" element={<GRN />} />
           <Route path="/approvals" element={<Approvals />} />
           <Route path="/users" element={<UserList />} />
+          <Route path="/users/:userId" element={<UserDetailForm />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/profile" element={<Profile />} />
         </Route>

@@ -166,7 +166,7 @@ export default function PurchaseOrderForm({
                 </div>
                 <div className="grid gap-3 md:grid-cols-3 mt-3">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Location <span className="text-rose-300">*</span></label>
+                    <label className="block text-sm font-medium mb-2">City <span className="text-rose-300">*</span></label>
                     <input
                       type="text"
                       placeholder="City"
@@ -299,14 +299,14 @@ export default function PurchaseOrderForm({
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2">Deliver To Address <span className="text-rose-300">*</span></label>
+                    {/* <label className="block text-sm font-medium mb-2">Deliver To Address <span className="text-rose-300">*</span></label>
                     <textarea
                       placeholder="Address line, city, state, country, pincode"
                       value={formData.deliverToAddress || ''}
                       onChange={(e) => setFormData({ ...formData, deliverToAddress: e.target.value })}
                       rows={3}
                       className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] text-sm"
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
