@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Users as UsersIcon } from 'lucide-react'
+import { Eye as EyeIcon, Users as UsersIcon } from 'lucide-react'
 import { userApi } from '../../services/api/user/user-api'
 import { DynamicTable } from '../../components/table'
 import UserView from '../../components/user/UserView'
+import { userColumns } from './UserColums'
 
 const normalizeUser = (user) => {
   const fullName = user.full_name || [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(' ')
@@ -58,20 +59,7 @@ export default function UserList() {
     // TODO: Implement delete functionality
   }
 
-  const userColumns = useMemo(() => [
-    { key: 'user_id', label: 'User ID', minWidth: 'min-w-[100px]' },
-    { key: 'username', label: 'Username', minWidth: 'min-w-[150px]' },
-    { key: 'email', label: 'Email', minWidth: 'min-w-[250px]' },
-    { key: 'employee_code', label: 'Code', minWidth: 'min-w-[120px]' },
-    { key: 'full_name', label: 'Full Name', minWidth: 'min-w-[180px]' },
-    { key: 'gender', label: 'Gender', minWidth: 'min-w-[100px]' },
-    { key: 'date_of_birth', label: 'DOB', minWidth: 'min-w-[130px]' },
-    { key: 'marital_status', label: 'Marital Status', minWidth: 'min-w-[150px]' },
-    { key: 'mobile_number', label: 'Mobile', minWidth: 'min-w-[140px]' },
-    { key: 'department_name', label: 'Department', minWidth: 'min-w-[150px]' },
-    { key: 'designation_name', label: 'Designation', minWidth: 'min-w-[160px]' },
-    { key: 'reporting_manager_name', label: 'Manager', minWidth: 'min-w-[150px]' },
-  ], [])
+  const columns = useMemo(() => userColumns, [])
 
   return (
     <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-4 sm:px-6 lg:px-8">
@@ -93,7 +81,7 @@ export default function UserList() {
       <div className="flex-1 min-h-0 flex flex-col">
         <DynamicTable
           title="User List"
-          columns={userColumns}
+          columns={columns}
           rows={users}
           loading={loading}
           defaultVisibleCount={6}
@@ -103,7 +91,8 @@ export default function UserList() {
               onClick={() => handleViewUser(row)}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs font-semibold hover:bg-indigo-500/20 transition-all whitespace-nowrap"
             >
-              View
+              <EyeIcon className="w-4 h-4" aria-hidden="true" />
+              <span className="sr-only">View</span>
             </button>
           )}
         />

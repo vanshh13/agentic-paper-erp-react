@@ -53,6 +53,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
       id: 'masterData',
       label: 'Master Data',
       items: [
+        { label: 'Users-List', icon: Users, path: '/users', badge: null },
         { label: 'Customers', icon: Users, path: '/customers', badge: null },
         { label: 'Vendors', icon: Users, path: '/vendors', badge: null },
         { label: 'Transporters', icon: Truck, path: '/transporters', badge: null },

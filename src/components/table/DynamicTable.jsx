@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import { Search, SlidersHorizontal, ChevronDown, X } from 'lucide-react'
+import { Search, SlidersHorizontal } from 'lucide-react'
 import TablePagination from './TablePagination'
 import ColumnSortFilter from './ColumnSortFilter'
+import ColumnSelectorModal from './ColumnSelectorModal'
 
 const parseMinWidth = (minWidth) => {
   if (!minWidth) return null
@@ -26,14 +27,15 @@ export default function DynamicTable({
 }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [showColumnSelector, setShowColumnSelector] = useState(false)
-  const [visibleColumns, setVisibleColumns] = useState(
-    columns.map((c) => c.key)
-  )
+  const [visibleColumns, setVisibleColumns] = useState(columns.map((c) => c.key))
   const [columnWidths, setColumnWidths] = useState(() => {
     const initial = {}
     columns.forEach((col) => {
       initial[col.key] = getInitialWidth(col)
     })
+    if (renderActions) {
+      initial.__actions__ = getInitialWidth({ minWidth: 'min-w-[120px]', width: 120 })
+    }
     return initial
   })
   const [resizing, setResizing] = useState(null)
@@ -52,14 +54,17 @@ export default function DynamicTable({
           next[col.key] = getInitialWidth(col)
         }
       })
+      if (renderActions && !next.__actions__) {
+        next.__actions__ = getInitialWidth({ minWidth: 'min-w-[120px]', width: 120 })
+      }
 
       const activeKeys = columns.map((c) => c.key)
       Object.keys(next).forEach((key) => {
-        if (!activeKeys.includes(key)) delete next[key]
+        if (key !== '__actions__' && !activeKeys.includes(key)) delete next[key]
       })
       return next
     })
-  }, [columns])
+  }, [columns, renderActions])
 
   useEffect(() => {
     const columnKeys = columns.map((c) => c.key)
@@ -81,6 +86,11 @@ export default function DynamicTable({
       return next
     })
   }, [columns])
+
+  // When search changes, jump to first page to show results immediately
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm])
 
   useEffect(() => {
     if (!resizing) return
@@ -192,13 +202,14 @@ export default function DynamicTable({
     return sortedRows.slice(startIdx, endIdx)
   }, [sortedRows, currentPage, pageSize])
 
-  const totalPages = Math.ceil(sortedRows.length / pageSize)
+  // If filtered results shrink below a single page, snap back to page 1
+  useEffect(() => {
+    if (currentPage > 1 && sortedRows.length <= pageSize) {
+      setCurrentPage(1)
+    }
+  }, [sortedRows.length, pageSize, currentPage])
 
-  const toggleColumn = (key) => {
-    setVisibleColumns((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    )
-  }
+  const totalPages = Math.ceil(sortedRows.length / pageSize)
 
   const handleSort = (key, order) => {
     setSortKey(key)
@@ -233,7 +244,20 @@ export default function DynamicTable({
   }
 
   const displayColumns = columns.filter((c) => visibleColumns.includes(c.key))
+  const actionWidth = columnWidths.__actions__ || getInitialWidth({ minWidth: 'min-w-[120px]', width: 120 })
   const emptyRowCount = Math.max(0, pageSize - paginatedRows.length)
+
+  // Calculate total table width for infinite horizontal growth
+  const totalTableWidth = useMemo(() => {
+    let total = 0
+    displayColumns.forEach((col) => {
+      total += columnWidths[col.key] || getInitialWidth(col)
+    })
+    if (renderActions) {
+      total += actionWidth
+    }
+    return total
+  }, [displayColumns, columnWidths, renderActions, actionWidth])
 
   return (
     <div 
@@ -272,45 +296,14 @@ export default function DynamicTable({
             </div>
           </div>
 
-          <div className="relative">
+          <div>
             <button
-              onClick={() => setShowColumnSelector((v) => !v)}
+              onClick={() => setShowColumnSelector(true)}
               className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-xs font-medium"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               Columns
-              <ChevronDown className="w-2.5 h-2.5" />
             </button>
-
-            {showColumnSelector && (
-              <div className="absolute right-0 top-full mt-2 w-72 bg-[oklch(0.22_0_0)] border border-[var(--border)] rounded-lg shadow-xl z-40 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <p className="text-sm font-semibold text-[oklch(0.95_0_0)]">Select Columns</p>
-                  <button
-                    onClick={() => setShowColumnSelector(false)}
-                    className="p-1 hover:bg-[oklch(0.28_0_0)] rounded transition-colors"
-                  >
-                    <X className="w-4 h-4 text-[oklch(0.75_0_0)]" />
-                  </button>
-                </div>
-                <div className="space-y-2 max-h-80 overflow-y-auto custom-scrollbar">
-                  {columns.map((col) => (
-                    <label
-                      key={col.key}
-                      className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[oklch(0.26_0_0)] cursor-pointer text-sm text-[oklch(0.90_0_0)]"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={visibleColumns.includes(col.key)}
-                        onChange={() => toggleColumn(col.key)}
-                        className="w-4 h-4 rounded border-[var(--border)] bg-[oklch(0.28_0_0)] checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-500"
-                      />
-                      {col.label}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -318,17 +311,26 @@ export default function DynamicTable({
       {/* Scrollable Table Area */}
       <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col bg-[oklch(0.20_0_0)] isolate">
         <div className="flex-1 min-h-0 w-full overflow-x-auto overflow-y-auto overscroll-x-contain custom-scrollbar scroll-smooth relative">
-          <table className="min-w-max border-collapse">
-            <thead className="sticky top-0 bg-[oklch(0.26_0_0)] z-10">
-              <tr className="border-b border-[var(--border)]">
+          <table className="border-collapse" style={{ tableLayout: 'fixed', width: totalTableWidth }}>
+            {/* COLGROUP - Controls column widths */}
+            <colgroup>
+              {displayColumns.map((col) => (
+                <col key={col.key} style={{ width: columnWidths[col.key] || getInitialWidth(col) }} />
+              ))}
+              {renderActions && (
+                <col style={{ width: actionWidth }} />
+              )}
+            </colgroup>
+
+            <thead className="sticky top-0 bg-[oklch(0.26_0_0)] z-50">
+              <tr className="border-b-0">
                 {displayColumns.map((col) => {
                   const width = columnWidths[col.key] || getInitialWidth(col)
                   const minWidth = parseMinWidth(col.minWidth)
                   return (
                     <th
                       key={col.key}
-                      className={`px-4 py-3 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider whitespace-nowrap relative border-r border-[var(--border)] ${col.minWidth || ''}`}
-                      style={{ width: `${width}px`, minWidth: minWidth ? `${minWidth}px` : undefined, maxWidth: `${width}px` }}
+                      className={`px-4 py-2 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
                     >
                       <div className="flex items-center justify-between gap-1 pr-2">
                         <ColumnSortFilter
@@ -339,21 +341,36 @@ export default function DynamicTable({
                         />
                       </div>
                       <span
-                        className="absolute right-[-2px] top-0 h-full w-2 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors"
-                        onMouseDown={(event) => handleResizeStart(event, col)}
+                        className="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors z-10"
+                        onMouseDown={(event) => {
+                          event.stopPropagation()
+                          handleResizeStart(event, col)
+                        }}
                         role="presentation"
                       ></span>
                     </th>
                   )
                 })}
                 {renderActions && (
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.26_0_0)] border-l border-[var(--border)] whitespace-nowrap z-30">
-                    Actions
+                  <th
+                    className="px-4 py-1 text-left text-xs font-semibold text-[oklch(0.92_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                  >
+                    <div className="relative">
+                      Actions
+                      <span
+                        className="absolute right-0 top-0 h-full w-0 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors z-10"
+                        onMouseDown={(event) => {
+                          event.stopPropagation()
+                          handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                        }}
+                        role="presentation"
+                      ></span>
+                    </div>
                   </th>
                 )}
               </tr>
               {displayColumns.length > 0 && (
-                <tr className="border-b border-[var(--border)] bg-[oklch(0.24_0_0)]">
+                <tr className="bg-[oklch(0.24_0_0)]">
                   {displayColumns.map((col) => {
                     const width = columnWidths[col.key] || getInitialWidth(col)
                     const minWidth = parseMinWidth(col.minWidth)
@@ -363,8 +380,7 @@ export default function DynamicTable({
                     return (
                       <th
                         key={`${col.key}-filter`}
-                        className={`px-4 py-2 text-left text-xs font-medium text-[oklch(0.78_0_0)] whitespace-nowrap border-r border-[var(--border)] ${col.minWidth || ''}`}
-                        style={{ width: `${width}px`, minWidth: minWidth ? `${minWidth}px` : undefined, maxWidth: `${width}px` }}
+                        className={`px-4 py-1 text-left text-xs font-medium text-[oklch(0.78_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
                       >
                         {col.filterable === false ? (
                           <span className="text-[oklch(0.60_0_0)]">—</span>
@@ -390,89 +406,136 @@ export default function DynamicTable({
                             className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
                           />
                         )}
+                        <span
+                          className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
+                          onMouseDown={(event) => {
+                            event.stopPropagation()
+                            handleResizeStart(event, col)
+                          }}
+                          role="presentation"
+                        ></span>
                       </th>
                     )
                   })}
                   {renderActions && (
-                    <th className="px-4 py-2 text-left text-xs font-medium text-[oklch(0.78_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.24_0_0)] border-l border-[var(--border)] whitespace-nowrap z-30">
-                      
+                    <th
+                      className="px-4 py-1 text-left text-xs font-medium text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                    >
+                      <span
+                        className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
+                        onMouseDown={(event) => {
+                          event.stopPropagation()
+                          handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                        }}
+                        role="presentation"
+                      ></span>
                     </th>
                   )}
                 </tr>
               )}
             </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.70_0_0)] text-sm">
-                      Loading data...
-                    </td>
-                  </tr>
-                ) : sortedRows.length === 0 ? (
-                  <tr>
-                    <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.65_0_0)] text-sm">
-                      No data found
-                    </td>
-                  </tr>
-                ) : (
-                  paginatedRows.map((row, idx) => (
-                    <tr
-                      key={row.id || row.user_id || idx}
-                      className="border-b border-[var(--border)] hover:bg-[oklch(0.24_0_0)] transition-colors"
-                    >
-                      {displayColumns.map((col) => {
-                        const value = row[col.key]
-                        const content = col.render ? col.render(value, row) : value || '--'
-                        const width = columnWidths[col.key] || getInitialWidth(col)
-                        const minWidth = parseMinWidth(col.minWidth)
-                        return (
-                          <td
-                            key={col.key}
-                            className={`px-4 py-3 text-sm text-[oklch(0.90_0_0)] truncate border-r border-[var(--border)] ${col.minWidth || ''}`}
-                            style={{ width: `${width}px`, minWidth: minWidth ? `${minWidth}px` : undefined, maxWidth: `${width}px` }}
-                          >
-                            {content}
-                          </td>
-                        )
-                      })}
-                      {renderActions && (
-                        <td className="px-4 py-3 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.20_0_0)] border-l border-[var(--border)] z-20">
-                          {renderActions(row)}
-                        </td>
-                      )}
-                    </tr>
-                  ))
-                )}
-                {emptyRowCount > 0 &&
-                  Array.from({ length: emptyRowCount }).map((_, idx) => (
-                    <tr
-                      key={`empty-row-${idx}`}
-                      className="border-b border-[var(--border)]"
-                      style={{ height: '48px' }}
-                    >
-                      {displayColumns.map((col) => (
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.70_0_0)] text-sm">
+                    Loading data...
+                  </td>
+                </tr>
+              ) : sortedRows.length === 0 ? (
+                <tr>
+                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.65_0_0)] text-sm">
+                    No data found
+                  </td>
+                </tr>
+              ) : (
+                paginatedRows.map((row, idx) => (
+                  <tr
+                    key={row.id || row.user_id || idx}
+                    className="border-b border-[var(--border)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+                  >
+                    {displayColumns.map((col) => {
+                      const value = row[col.key]
+                      const content = col.render ? col.render(value, row) : value || '--'
+                      const width = columnWidths[col.key] || getInitialWidth(col)
+                      const minWidth = parseMinWidth(col.minWidth)
+                      return (
                         <td
-                          key={`${col.key}-empty-${idx}`}
-                          className={`px-4 py-3 text-sm text-[oklch(0.70_0_0)] border-r border-[var(--border)] ${col.minWidth || ''}`}
-                          style={{ width: `${columnWidths[col.key] || getInitialWidth(col)}px` }}
+                          key={col.key}
+                          className={`px-4 py-3.5 text-sm text-[oklch(0.90_0_0)] truncate ${col.minWidth || ''}`}
                         >
-                          {'\u00A0'}
+                          {content}
                         </td>
-                      ))}
-                      {renderActions && (
-                        <td className="px-4 py-3 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.20_0_0)] border-l border-[var(--border)] z-20">
+                      )
+                    })}
+                    {renderActions && (
+                      <td
+                        className="px-4 py-2 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                      >
+                        <div className="relative h-full w-full">
+                          {renderActions(row)}
+                          <span
+                            className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
+                            onMouseDown={(event) => {
+                              event.stopPropagation()
+                              handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                            }}
+                            role="presentation"
+                          ></span>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+              {emptyRowCount > 0 &&
+                Array.from({ length: emptyRowCount }).map((_, idx) => (
+                  <tr
+                    key={`empty-row-${idx}`}
+                    className="border-b border-[var(--border)]"
+                    style={{ height: '48px' }}
+                  >
+                    {displayColumns.map((col) => (
+                      <td
+                        key={`${col.key}-empty-${idx}`}
+                        className={`px-4 py-3.5 text-sm text-[oklch(0.70_0_0)] ${col.minWidth || ''}`}
+                      >
+                        {'\u00A0'}
+                      </td>
+                    ))}
+                    {renderActions && (
+                      <td
+                        className="px-4 py-3.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                      >
+                        <div className="relative h-full w-full">
                           {'\u00A0'}
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
+                          <span
+                            className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
+                            onMouseDown={(event) => {
+                              event.stopPropagation()
+                              handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                            }}
+                            role="presentation"
+                          ></span>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-        {filteredRows.length > 0 && (
-          <div className="h-1 bg-gradient-to-r from-transparent via-indigo-500/30 to-transparent"></div>
-        )}
       </div>
+
+      <ColumnSelectorModal
+        open={showColumnSelector}
+        columns={columns}
+        selectedKeys={visibleColumns}
+        onApply={(next) => {
+          setVisibleColumns(next)
+          setShowColumnSelector(false)
+        }}
+        onClose={() => setShowColumnSelector(false)}
+      />
     </div>
   )
 }
