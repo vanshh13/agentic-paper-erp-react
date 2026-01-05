@@ -270,20 +270,20 @@ export default function DynamicTable({
   return (
     <div 
       ref={tableContainerRef}
-      className={`card-surface rounded-xl border border-[var(--border)] overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
+      className={`card-surface rounded-lg sm:rounded-xl border border-[var(--border)] overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
     >
       {/* Header */}
-      <div className="flex-shrink-0 px-4 py-1.5 border-b border-[var(--border)] bg-[oklch(0.20_0_0)]">
+      <div className="flex-shrink-0 px-3 sm:px-4 py-2 border-b border-[var(--border)] bg-[oklch(0.20_0_0)]">
         {/* Search, Columns, and Pagination in single row */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="w-[280px] sm:w-[320px]">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="w-[200px] sm:w-[280px] lg:w-[320px]">
+            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-[oklch(0.85_0_0)]">
+              <Search className="w-4 h-4 text-[oklch(0.65_0_0)] flex-shrink-0" />
               <input
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search..."
-                className="bg-transparent focus:outline-none w-full text-sm placeholder:text-[oklch(0.65_0_0)]"
+                className="bg-transparent focus:outline-none w-full text-xs sm:text-sm placeholder:text-[oklch(0.65_0_0)]"
               />
             </div>
           </div>
@@ -335,7 +335,7 @@ export default function DynamicTable({
                   return (
                     <th
                       key={col.key}
-                      className={`px-3 py-1.5 text-left text-base font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-base font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
                     >
                       <div className="flex items-center justify-between gap-1 pr-2">
                         <ColumnSortFilter
@@ -358,15 +358,15 @@ export default function DynamicTable({
                 })}
                 {renderActions && (
                   <th
-                    className="px-3 py-1.5 text-left text-sm font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                   >
-                    <div className="relative">
+                    <div className="relative flex items-center justify-center">
                       Actions
                       <span
                         className="absolute right-0 top-0 h-full w-0 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors z-10"
                         onMouseDown={(event) => {
                           event.stopPropagation()
-                          handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                          handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[180px]' })
                         }}
                         role="presentation"
                       ></span>
@@ -385,7 +385,7 @@ export default function DynamicTable({
                     return (
                       <th
                         key={`${col.key}-filter`}
-                        className={`px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.82_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-medium text-[oklch(0.82_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
                       >
                         {col.filterable === false ? (
                           <span className="block h-[18px]"></span>
@@ -393,7 +393,7 @@ export default function DynamicTable({
                           <select
                             value={value}
                             onChange={(e) => handleFilterChange(col.key, e.target.value)}
-                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-sm focus:outline-none"
+                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs sm:text-sm focus:outline-none"
                           >
                             <option value="">All</option>
                             {col.filterOptions.map((opt) => (
@@ -461,7 +461,7 @@ export default function DynamicTable({
                   })}
                   {renderActions && (
                     <th
-                      className="px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.90_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                      className="px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.120_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                     >
                       <span
                         className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
@@ -505,7 +505,7 @@ export default function DynamicTable({
                       return (
                         <td
                           key={col.key}
-                          className={`px-3 py-0.1 text-base text-[oklch(0.80_0_0)] truncate ${col.minWidth || ''}`}
+                          className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-base text-[oklch(0.80_0_0)] truncate ${col.minWidth || ''}`}
                         >
                           {content}
                         </td>
@@ -513,15 +513,15 @@ export default function DynamicTable({
                     })}
                     {renderActions && (
                       <td
-                        className="px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                        className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                       >
-                        <div className="relative h-full w-full">
+                        <div className="relative h-full w-full flex items-center justify-center">
                           {renderActions(row)}
                           <span
                             className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
                             onMouseDown={(event) => {
                               event.stopPropagation()
-                              handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })
+                              handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[180px]' })
                             }}
                             role="presentation"
                           ></span>
@@ -551,7 +551,7 @@ export default function DynamicTable({
                       <td
                         className="px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
                       >
-                        <div className="relative h-full w-full">
+                        <div className="relative h-full w-full flex items-center justify-center">
                           {'\u00A0'}
                           <span
                             className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"

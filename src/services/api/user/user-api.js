@@ -602,4 +602,31 @@ export const userApi = {
 		const fallbackUser = FALLBACK_USERS.find((user) => `${user.user_id}` === `${id}`)
 		return fallbackUser ? toDisplayUser(fallbackUser) : null
 	},
+
+	/**
+	 * Update a user (mocked for now - updates in-memory data only)
+	 */
+	update: async (id, data) => {
+		const userIndex = FALLBACK_USERS.findIndex((user) => `${user.user_id}` === `${id}`)
+		if (userIndex === -1) throw new Error('User not found')
+		
+		FALLBACK_USERS[userIndex] = {
+			...FALLBACK_USERS[userIndex],
+			...data,
+			updatedAt: new Date().toISOString(),
+		}
+		
+		return toDisplayUser(FALLBACK_USERS[userIndex])
+	},
+
+	/**
+	 * Delete a user (mocked for now - removes from in-memory data only)
+	 */
+	delete: async (id) => {
+		const userIndex = FALLBACK_USERS.findIndex((user) => `${user.user_id}` === `${id}`)
+		if (userIndex === -1) throw new Error('User not found')
+		
+		FALLBACK_USERS.splice(userIndex, 1)
+		return { success: true }
+	},
 }
