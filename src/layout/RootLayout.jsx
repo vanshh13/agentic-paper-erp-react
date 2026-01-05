@@ -1,9 +1,9 @@
 import Sidebar from './Sidebar'
-import { Bell, Menu, ChevronRight, Home } from 'lucide-react'
 import { Outlet, useLocation, Link } from 'react-router-dom'
+import { Bell, Menu, ChevronRight, Home } from 'lucide-react'
 import { useSidebar } from '../contexts/SidebarContext'
 
-export default function RootLayout() {
+export default function RootLayout({ children }) {
   const { isOpen, setIsOpen } = useSidebar()
   const location = useLocation()
 
@@ -74,7 +74,7 @@ export default function RootLayout() {
         <div className="bg-[oklch(0.20_0_0)] border-b border-[oklch(0.25_0_0)] px-4 md:px-6 py-3 flex-shrink-0">
           <nav className="flex items-center gap-2 text-sm">
             {breadcrumbs.map((crumb, index) => (
-              <div key={crumb.path} className="flex items-center gap-2">
+              <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
                 {index === 0 ? (
                   <Link
                     to={crumb.path}
@@ -105,7 +105,8 @@ export default function RootLayout() {
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6">
-          <Outlet />
+          {/* <Outlet key={location.pathname} />  */}
+          {children}
         </main>
       </div>
     </div>

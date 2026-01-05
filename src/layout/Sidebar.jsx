@@ -1,10 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, Search, Settings, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useDispatch } from 'react-redux';
 import { useSidebar } from '../contexts/SidebarContext'
 import { getCurrentUser, logoutUser } from '../services/api/auth'
 import NavItems from './NavItems'
 import InteractiveAIAvatar from '../components/InteractiveAIAvatar'
+import { logoutSuccess } from '../store/slices/userSlice';
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
@@ -14,6 +16,7 @@ export default function Sidebar() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // Get current user from localStorage
@@ -58,9 +61,11 @@ export default function Sidebar() {
     try {
       await logoutUser()
       navigate('/auth/login')
+      dispatch(logoutSuccess());
     } catch (error) {
       console.error('Logout error:', error)
       // Still navigate to login even if logout fails
+      dispatch(logoutSuccess());
       navigate('/auth/login')
     } finally {
       setIsLoggingOut(false)

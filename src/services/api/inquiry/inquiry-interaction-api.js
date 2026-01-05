@@ -39,5 +39,14 @@ export const inquiryInteractionServiceApi = {
     deleteInteraction: async (id) => {
       const response = await apiClient.delete(`/inquiry-interactions-service/${id}`);
       return response.data;
+    },
+
+    /**
+     * update a specific interaction
+     * API Route: UPDATE /api/interactions/:id
+     */
+    updateInquiryInteraction: async (id, interactionData) => {
+      const response = await apiClient.put(`/inquiry-interactions-service/${id}`, interactionData);
+      return response.data;
     }
 };
