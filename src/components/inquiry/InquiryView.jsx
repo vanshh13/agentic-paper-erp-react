@@ -1,4 +1,4 @@
-import { X, FileText, User, MapPin, Phone, Mail, MessageSquare, Package, UserCircle, Plus, Trash2 } from 'lucide-react'
+import { X, FileText, User, MapPin, Phone, Mail, MessageSquare, Package, UserCircle, Plus, Trash2, Edit2 } from 'lucide-react'
 
 const statusConfig = {
   new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
@@ -36,9 +36,12 @@ export default function InquiryView({
   interactionForm,
   setInteractionForm,
   onAddInteraction,
+  onUpdateInteraction,
   onEdit,
   onDelete,
   onDeleteInteraction,
+  editingInteractionId,
+  setEditingInteractionId,
   loadingDetail = false
 }) {
   if (!showDetailDialog || !selectedInquiry) return null
@@ -102,6 +105,22 @@ export default function InquiryView({
     if (!quantity && quantity !== 0) return '-'
     const numQuantity = typeof quantity === 'string' ? parseFloat(quantity) : quantity
     return numQuantity.toLocaleString('en-IN')
+  }
+
+  // Convert date to datetime-local format (YYYY-MM-DDTHH:mm)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return ''
+    try {
+      const date = new Date(dateString)
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      return `${year}-${month}-${day}T${hours}:${minutes}`
+    } catch {
+      return ''
+    }
   }
 
   return (
@@ -392,7 +411,21 @@ export default function InquiryView({
                 Interactions
               </h4>
               <button
-                onClick={() => setShowInteractionForm(!showInteractionForm)}
+                onClick={() => {
+                  if (!showInteractionForm) {
+                    // Reset form when opening new interaction form
+                    setInteractionForm({
+                      type: '',
+                      outcome: '',
+                      summary: '',
+                      followUpRequired: false,
+                      followUpDateTime: '',
+                      followUpStatus: 'pending'
+                    })
+                    setEditingInteractionId(null)
+                  }
+                  setShowInteractionForm(!showInteractionForm)
+                }}
                 className="flex items-center gap-2 px-3 py-1.5 gradient-primary text-[oklch(0.98_0_0)] rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition"
               >
                 <Plus className="w-4 h-4" />
@@ -402,7 +435,9 @@ export default function InquiryView({
 
             {showInteractionForm && (
               <div className="card-surface p-4 mb-4 space-y-3">
-                <h5 className="font-semibold text-sm text-[oklch(0.90_0_0)] mb-2">New Interaction</h5>
+                <h5 className="font-semibold text-sm text-[oklch(0.90_0_0)] mb-2">
+                  {editingInteractionId ? 'Edit Interaction' : 'New Interaction'}
+                </h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Type <span className="text-rose-300">*</span></label>
@@ -485,16 +520,33 @@ export default function InquiryView({
                 </div>
                 <div className="flex gap-2 justify-end pt-2 border-t border-[var(--border)]">
                   <button
-                    onClick={() => setShowInteractionForm(false)}
+                    onClick={() => {
+                      setShowInteractionForm(false)
+                      setEditingInteractionId(null)
+                      setInteractionForm({
+                        type: '',
+                        outcome: '',
+                        summary: '',
+                        followUpRequired: false,
+                        followUpDateTime: '',
+                        followUpStatus: 'pending'
+                      })
+                    }}
                     className="px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={() => onAddInteraction(selectedInquiry.id)}
+                    onClick={() => {
+                      if (editingInteractionId) {
+                        onUpdateInteraction(selectedInquiry.id, editingInteractionId)
+                      } else {
+                        onAddInteraction(selectedInquiry.id)
+                      }
+                    }}
                     className="px-3 py-1.5 gradient-primary text-[oklch(0.98_0_0)] rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition-colors"
                   >
-                    Add
+                    {editingInteractionId ? 'Update' : 'Add'}
                   </button>
                 </div>
               </div>
@@ -513,7 +565,7 @@ export default function InquiryView({
                       <th className="px-4 py-3 text-center text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up?</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Date</th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Status</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Remove</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)]">
@@ -567,13 +619,34 @@ export default function InquiryView({
                             )}
                           </td>
                           <td className="px-4 py-3 text-right">
-                            <button
-                              onClick={() => onDeleteInteraction(interaction.id, selectedInquiry.id)}
-                              className="p-1.5 text-rose-400 hover:text-rose-100 hover:bg-rose-500/20 rounded-lg transition-all"
-                              title="Delete Interaction"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => {
+                                  // Populate form with interaction data
+                                  setInteractionForm({
+                                    type: interaction.interaction_type || '',
+                                    outcome: interaction.outcome || '',
+                                    summary: interaction.summary || '',
+                                    followUpRequired: interaction.follow_up_required || false,
+                                    followUpDateTime: formatDateForInput(interaction.follow_up_datetime),
+                                    followUpStatus: interaction.follow_up_status || 'pending'
+                                  })
+                                  setEditingInteractionId(interaction.id)
+                                  setShowInteractionForm(true)
+                                }}
+                                className="p-1.5 text-indigo-400 hover:text-indigo-100 hover:bg-indigo-500/20 rounded-lg transition-all"
+                                title="Edit Interaction"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => onDeleteInteraction(interaction.id, selectedInquiry.id)}
+                                className="p-1.5 text-rose-400 hover:text-rose-100 hover:bg-rose-500/20 rounded-lg transition-all"
+                                title="Delete Interaction"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))

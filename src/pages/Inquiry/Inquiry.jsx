@@ -36,6 +36,7 @@ export default function Inquiry() {
   const [showDetailDialog, setShowDetailDialog] = useState(false)
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [showInteractionForm, setShowInteractionForm] = useState(false)
+  const [editingInteractionId, setEditingInteractionId] = useState(null)
 
   // Data states
   const [selectedInquiry, setSelectedInquiry] = useState(null)
@@ -341,7 +342,7 @@ export default function Inquiry() {
           followUpDateTime: '',
           followUpStatus: 'pending'
         })
-        
+        setEditingInteractionId(null)
         setShowInteractionForm(false)
         showToast('Interaction added successfully', 'success')
       } else {
@@ -705,6 +706,69 @@ export default function Inquiry() {
     })
   }
 
+  const handleUpdateInteraction = async (inquiryId, interactionId) => {
+    if (!interactionForm.type || !interactionForm.outcome || !interactionForm.summary) {
+      showToast('Please fill all required fields', 'error')
+      return
+    }
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    try {
+      const updateData = {
+        inquiry_id: inquiryId,
+        interaction_type: interactionForm.type,
+        outcome: interactionForm.outcome,
+        summary: interactionForm.summary,
+        follow_up_required: interactionForm.followUpRequired,
+        follow_up_datetime: interactionForm.followUpRequired ? interactionForm.followUpDateTime : null,
+        follow_up_status: interactionForm.followUpRequired ? interactionForm.followUpStatus : null,
+      }
+      console.log('update interaction: ', updateData)
+      
+      const response = await inquiryInteractionServiceApi.updateInquiryInteraction(interactionId, updateData)
+      console.log(response);
+      if (response?.data) {
+        // Update interactions list with the updated interaction
+        setInteractions(prev =>
+          prev.map(interaction =>
+            interaction.id === interactionId
+              ? { ...interaction, ...response.data.data }
+              : interaction
+          )
+        )        
+        
+        // Refresh inquiry details to update total interactions count
+        if (selectedInquiry?.id) {
+          const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+          const detailData = detailResponse?.data?.data
+          console.log('detailData', detailData)
+          if (detailData) {
+            setSelectedInquiry(detailData)
+          }                   
+        }
+        
+        // Reset form and editing state
+        setInteractionForm({
+          type: '',
+          outcome: '',
+          summary: '',
+          followUpRequired: false,
+          followUpDateTime: '',
+          followUpStatus: 'pending'
+        })
+        setEditingInteractionId(null)
+        setShowInteractionForm(false)
+        showToast('Interaction updated successfully', 'success')
+      } else {
+        showToast('Failed to update interaction: Invalid response', 'error')
+      }
+    } catch (error) {
+      console.error('Error updating interaction:', error)
+      const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to update interaction'
+      showToast(errorMessage, 'error')
+    }
+  }
+
   const filteredInquiries = getFilteredInquiries()
 
   const counts = {
@@ -806,9 +870,12 @@ export default function Inquiry() {
         interactionForm={interactionForm}
         setInteractionForm={setInteractionForm}
         onAddInteraction={handleAddInteraction}
+        onUpdateInteraction={handleUpdateInteraction}
         onEdit={handleOpenEditForm}
         onDelete={handleDeleteInquiry}
         onDeleteInteraction={handleDeleteInteraction}
+        editingInteractionId={editingInteractionId}
+        setEditingInteractionId={setEditingInteractionId}
         loadingDetail={loadingDetail}
       />
 
