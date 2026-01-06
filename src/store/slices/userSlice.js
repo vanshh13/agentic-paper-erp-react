@@ -1,97 +1,78 @@
-// src/store/slices/userSlice.js
-import { createSlice } from '@reduxjs/toolkit';
-import { getCurrentUser, isAuthenticated } from '../../services/api/auth/';
+import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  user: getCurrentUser(),
-  isAuthenticated: isAuthenticated(),
+  user: null,
+  token: null,
+  isAuthenticated: false,
   loading: false,
   error: null,
-  token: null,
-};
+}
 
 const userSlice = createSlice({
-  name: 'user',
+  name: 'auth',
   initialState,
   reducers: {
-    // Sync with localStorage - call this after login/register in authService
-    syncUserFromStorage: (state) => {
-      state.user = getCurrentUser();
-      state.isAuthenticated = isAuthenticated();
-      state.loading = false;
-      console.log('Synced user from storage:', state.user);
-    },
-    
-    // Login success - update state
+    // Login success
     loginSuccess: (state, action) => {
-      state.user = action.payload.user;
-      state.isAuthenticated = true;
-      state.loading = false;
-      state.error = null;
-      console.log('Login success in Redux:', action.payload.user);
+      state.user = action.payload.user
+      state.token = action.payload.token || null
+      state.isAuthenticated = true
+      state.loading = false
+      state.error = null
     },
-    
+
     // Login failure
     loginFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.isAuthenticated = false;
-      console.error('Login failure:', action.payload);
+      state.loading = false
+      state.error = action.payload
+      state.isAuthenticated = false
     },
-    
+
     // Register success
     registerSuccess: (state, action) => {
-      state.user = action.payload.user;
-      state.isAuthenticated = true;
-      state.loading = false;
-      state.error = null;
+      state.user = action.payload.user
+      state.token = action.payload.token || null
+      state.isAuthenticated = true
+      state.loading = false
+      state.error = null
     },
-    
+
     // Register failure
     registerFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.isAuthenticated = false;
+      state.loading = false
+      state.error = action.payload
+      state.isAuthenticated = false
     },
-    
+
     // Logout
     logoutSuccess: (state) => {
-      state.user = null;
-      state.isAuthenticated = false;
-      state.loading = false;
-      state.error = null;
-      console.log('Logout Success.');
+      state.user = null
+      state.token = null
+      state.isAuthenticated = false
+      state.loading = false
+      state.error = null
     },
-    
-    // Set loading state
+
+    // Set loading
     setLoading: (state, action) => {
-      state.loading = action.payload;
+      state.loading = action.payload
     },
-    
+
     // Clear error
     clearError: (state) => {
-      state.error = null;
-    },
-    
-    // Clear credentials
-    clearCredentials: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
+      state.error = null
     },
   },
-});
+})
 
-export const { 
-  syncUserFromStorage,
-  loginSuccess, 
+export const {
+  loginSuccess,
   loginFailure,
   registerSuccess,
   registerFailure,
   logoutSuccess,
   setLoading,
   clearError,
-  clearCredentials 
-} = userSlice.actions;
+} = userSlice.actions
 
-export default userSlice.reducer;
+export default userSlice.reducer

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import Sidebar from './Sidebar'
 import { Outlet, useLocation, Link } from 'react-router-dom'
 import { Bell, Menu, ChevronRight, Home } from 'lucide-react'
@@ -6,6 +7,14 @@ import { useSidebar } from '../contexts/SidebarContext'
 export default function RootLayout({ children }) {
   const { isOpen, setIsOpen } = useSidebar()
   const location = useLocation()
+  const mainRef = useRef(null)
+
+  // Reset scroll position when route changes
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0)
+    }
+  }, [location.pathname])
 
   // Generate breadcrumb from location pathname
   const getBreadcrumbs = () => {
@@ -54,7 +63,9 @@ export default function RootLayout({ children }) {
                   <Menu className="w-5 h-5" />
                 </button>
               )}
-              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.90_0_0)] truncate">{document.title || 'Dashboard'}</h1>
+              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.90_0_0)] truncate">
+                {document.title || 'Dashboard'}
+              </h1>
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">
@@ -104,8 +115,10 @@ export default function RootLayout({ children }) {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6">
-          {/* <Outlet key={location.pathname} />  */}
+        <main 
+          ref={mainRef}
+          className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6"
+        >
           {children}
         </main>
       </div>

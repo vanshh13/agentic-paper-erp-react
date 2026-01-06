@@ -5,7 +5,7 @@ import Button from "../../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/ui/passwordInput";
 import { loginUser } from "../../services/api/auth";
-import { loginSuccess, loginFailure, setLoading } from '../../store/slices/userSlice';
+import { loginSuccess, loginFailure } from '../../store/slices/userSlice';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -41,17 +41,22 @@ const Login = () => {
           username_or_email: formData.username,
           password: formData.password,
         });
-
         if (response.success && response.data?.user) {
           // User data is stored in localStorage by loginUser function
           // Navigate to dashboard
           const user = response.data?.user || JSON.parse(localStorage.getItem('user'));
-          dispatch(loginSuccess({ user }));
+          const token = response.data?.token || JSON.parse(localStorage.getItem('token'));
+          dispatch(loginSuccess({ user, token }));
           navigate('/dashboard', { replace: true });
         }
       } catch (error) {
-        setApiError(error.message || 'Login failed. Please try again.');
-        dispatch(loginFailure(error.message));
+          const message =
+            error?.response?.data?.error?.message ||
+            error?.response?.data?.message ||
+            error?.message ||
+            'Invalid credentials'
+        
+          dispatch(loginFailure(message))        
       } finally {
         setLoading(false);
       }

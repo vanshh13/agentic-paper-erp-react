@@ -2,6 +2,7 @@ import Rules from '../../pages/Rules/Rules';
 import Approvals from '../../pages/Approvals/Approvals';
 import UserList from '../../pages/UserList/UserList';
 import Settings from '../../pages/Settings/Settings';
+import UserDetailForm from '../../components/user/UserDetailForm';
 
 const adminRoutes = [
   {
@@ -27,6 +28,15 @@ const adminRoutes = [
     element: UserList,
     isProtected: true,
     title: 'Users',
+    isSidebar: true,
+    category: 'admin',
+    isLayout: true,
+  },
+  {
+    path: '/users/:userId',
+    element: UserDetailForm,
+    isProtected: true,
+    title: 'UserDetails',
     isSidebar: true,
     category: 'admin',
     isLayout: true,

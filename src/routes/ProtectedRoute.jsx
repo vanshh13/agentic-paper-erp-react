@@ -1,34 +1,23 @@
-// src/components/ProtectedRoute.jsx
-import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { syncUserFromStorage } from '../store/slices/userSlice';
+import { Navigate, useLocation } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useSelector((state) => state.user);
-  const location = useLocation();
-  const dispatch = useDispatch();
+  const location = useLocation()
 
-  // Sync with localStorage on mount
-  useEffect(() => {
-    dispatch(syncUserFromStorage());
-  }, [dispatch]);
+  // auth slice (matches store)
+  const { isAuthenticated, loading } = useSelector((state) => state.auth)
 
-  // Show loading state
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  // If not authenticated, redirect to login
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to="/auth/login"
+        state={{ from: location }}
+        replace
+      />
+    )
   }
 
-  return <>{children}</>;
-};
+  return <>{children}</>
+}
 
-export default ProtectedRoute;
+export default ProtectedRoute

@@ -1,9 +1,9 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, Search, Settings, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useSidebar } from '../contexts/SidebarContext'
-import { getCurrentUser, logoutUser } from '../services/api/auth'
+import { logoutUser } from '../services/api/auth'
 import NavItems from './NavItems'
 import InteractiveAIAvatar from '../components/InteractiveAIAvatar'
 import { logoutSuccess } from '../store/slices/userSlice';
@@ -11,31 +11,17 @@ import { logoutSuccess } from '../store/slices/userSlice';
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
   const [isMobile, setIsMobile] = useState(false)
-  const [currentUser, setCurrentUser] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    // Get current user from localStorage
-    const user = getCurrentUser()
-    setCurrentUser(user)
-    
-    // Listen for storage changes (when user logs in or registers in another tab)
-    const handleStorageChange = (e) => {
-      if (e.key === 'user') {
-        const updatedUser = e.newValue ? JSON.parse(e.newValue) : null
-        setCurrentUser(updatedUser)
-      }
-    }
-    
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
-  }, [])
+  const currentUser = useSelector((state) => state.auth.user)
 
   useEffect(() => {
+    console.log("currentUser" ,currentUser)
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
     };
@@ -57,17 +43,16 @@ export default function Sidebar() {
   const handleLogout = async (e) => {
     e.preventDefault()
     e.stopPropagation()
+
     setIsLoggingOut(true)
+
     try {
-      await logoutUser()
-      navigate('/auth/login')
-      dispatch(logoutSuccess());
-    } catch (error) {
-      console.error('Logout error:', error)
-      // Still navigate to login even if logout fails
-      dispatch(logoutSuccess());
-      navigate('/auth/login')
+      await logoutUser() 
+    } catch (err) {
+      console.warn('Logout API failed, clearing client state anyway')
     } finally {
+      dispatch(logoutSuccess())    
+      navigate('/auth/login', { replace: true })
       setIsLoggingOut(false)
     }
   }

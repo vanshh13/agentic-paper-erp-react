@@ -1,15 +1,44 @@
-// src/store/index.js
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './slices/userSlice';
+import { configureStore } from '@reduxjs/toolkit'
+import { persistStore, persistReducer } from 'redux-persist'
+import storageSession from 'redux-persist/lib/storage/session'
 
+// reducers
+import authReducer from './slices/userSlice'
+// import themeReducer from './theme-slice'
+// import breadcrumbsReducer from './breadcrumbs-slice'
+
+// Persist config for auth slice
+const authPersistConfig = {
+  key: 'auth',
+  storage: storageSession,
+  whitelist: ['user', 'isAuthenticated', 'token'],
+}
+
+// Persist config for theme slice
+const themePersistConfig = {
+  key: 'theme',
+  storage: storageSession,
+}
+
+// Root reducer with persisted slices
+const rootReducer = {
+  auth: persistReducer(authPersistConfig, authReducer),
+  // theme: persistReducer(themePersistConfig, themeReducer),
+  // breadcrumbs: breadcrumbsReducer, // not persisted
+}
+
+// Store
 export const store = configureStore({
-  reducer: {
-    user: userReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false,
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+      },
     }),
-});
+})
 
-export default store;
+// Persistor
+export const persistor = persistStore(store)
+
+export default store

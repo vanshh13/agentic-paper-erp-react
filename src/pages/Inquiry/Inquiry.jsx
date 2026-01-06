@@ -1,22 +1,35 @@
 import { useState, useEffect } from 'react'
-import { inquiryService } from '../../services/inquiryService'
 import { INQUIRY_STATUS, INQUIRY_SOURCE, SLA_STATUS } from '../../types/inquiry'
 import { Plus, MessageSquare } from 'lucide-react'
-import { inquiryServiceApi } from '../../services/api/inquiry/inquiry-api'
-import {inquiryInteractionServiceApi} from '../../services/api/inquiry/inquiry-interaction-api'
+import {
+  getAllInquiries,
+  createInquiry,
+  updateInquiry,
+  deleteInquiry,
+  getInquiryById
+} from '../../services/api/inquiry/inquiry-api'
+import {
+  getInquiryInteractions,
+  addInquiryInteraction,
+  updateInquiryInteraction,
+  deleteInquiryInteraction,
+} from '../../services/api/inquiry/inquiry-interaction-api';
 // Import components
 import InquiryForm from '../../components/inquiry/InquiryForm'
 import InquiryList from '../../components/inquiry/InquiryList'
 import InquiryView from '../../components/inquiry/InquiryView'
 import Toast from '../../components/ui/Toast'
 import ConfirmationModal from '../../components/ui/ConfirmationModal'
+import Notification from '../../components/notifiction/notifiction'
+import { useSelector } from 'react-redux'
 
 export default function Inquiry() {
   // Main state
   const [inquiries, setInquiries] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('all')
-  
+  const user = useSelector((state) => state.auth.user)
+
   // Filter states
   const [searchInquiry, setSearchInquiry] = useState('')
   const [searchCustomer, setSearchCustomer] = useState('')
@@ -130,7 +143,7 @@ export default function Inquiry() {
     try {
       setLoading(true)
   
-      const response = await inquiryServiceApi.getAll()
+      const response = await getAllInquiries()
       const data = response?.data?.data ?? []
       console.log(response);
       const transformedData = data.map(inq => {
@@ -191,7 +204,7 @@ export default function Inquiry() {
         return
       }
   
-      const response = await inquiryServiceApi.getById(inquiryId)
+      const response = await getInquiryById(inquiryId)
       const data = response?.data.data
       
       console.log('Backend response:', data)
@@ -283,7 +296,6 @@ export default function Inquiry() {
     } catch (error) {
       console.error('Failed to fetch inquiry details:', error)
       const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to fetch inquiry details'
-      showToast(errorMessage, 'error')
     } finally {
       setLoadingDetail(false)
     }
@@ -291,10 +303,14 @@ export default function Inquiry() {
 
   const handleAddInteraction = async (id) =>  {
     if (!interactionForm.type || !interactionForm.outcome || !interactionForm.summary) {
-      showToast('Please fill all required fields', 'error')
-      return
+      throw {
+        name: 'ValidationError',
+        message: 'Please fill all required fields',
+        statusCode: 400,
+      }
     }
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    
     console.log('user_id:', user.user_id);
     
     try {
@@ -311,15 +327,16 @@ export default function Inquiry() {
       }
       console.log('add interaction: ', newInteraction)
       
-      const response = await inquiryInteractionServiceApi.addInteraction(newInteraction)
+      const response = await addInquiryInteraction(newInteraction)
       console.log(response);
+      
       if (response?.data) {
         // Update interactions list with the new interaction
         setInteractions([...interactions, response.data.interaction])
         
         // Refresh inquiry details to update total interactions count
         if (selectedInquiry?.id) {
-          const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+          const detailResponse = await getInquiryById(selectedInquiry.id)
           const detailData = detailResponse?.data?.data
           if (detailData) {
             const interactionSummary = detailData.interaction_summary || {}
@@ -344,14 +361,10 @@ export default function Inquiry() {
         })
         setEditingInteractionId(null)
         setShowInteractionForm(false)
-        showToast('Interaction added successfully', 'success')
       } else {
-        showToast('Failed to add interaction: Invalid response', 'error')
       }
     } catch (error) {
       console.error('Error adding interaction:', error)
-      const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to add interaction'
-      showToast(errorMessage, 'error')
     }
   }
 
@@ -493,7 +506,7 @@ export default function Inquiry() {
         console.log('Updating inquiry with data:', updateData)
         
         // Call your API to update the inquiry
-        const response = await inquiryServiceApi.update(editingInquiryId, updateData)
+        const response = await updateInquiry(editingInquiryId, updateData)
         
         console.log('Update response:', response.data)
         
@@ -505,12 +518,8 @@ export default function Inquiry() {
           // If we're viewing this inquiry, refresh the details
           if (selectedInquiry?.id === editingInquiryId) {
             handleViewDetails({ id: editingInquiryId })
-          }
-          
-          showToast('Inquiry updated successfully', 'success')
-        } else {
-          showToast('Failed to update inquiry', 'error')
-        }
+          }          
+        } 
       } else {
         // Create new inquiry
         const newInquiry = {
@@ -543,21 +552,15 @@ export default function Inquiry() {
         }
   
         console.log('Creating new inquiry with data:', newInquiry)
-        
-        // TODO: Uncomment when create API is ready
-        // const response = await inquiryServiceApi.create(newInquiry)
-        
-        // For now, using dummy data
-        const response = await inquiryServiceApi.create(newInquiry)
+
+        const response = await createInquiry(newInquiry)
         
         setShowFormDialog(false)
         resetForm()
         fetchInquiries()
-        showToast('Inquiry created successfully', 'success')
       }
     } catch (error) {
       console.error(`Error ${formMode === 'edit' ? 'updating' : 'creating'} inquiry:`, error)
-      showToast(`Failed to ${formMode === 'edit' ? 'update' : 'create'} inquiry: ${error.response.data.error.message}`, 'error')
     }
   }
 
@@ -567,18 +570,13 @@ export default function Inquiry() {
       async () => {
         try {
           // API is ready
-          await inquiryServiceApi.delete(inquiryId)
-          
-          // Using dummy data for now
-          // await inquiryService.delete(inquiryId)
+          await deleteInquiry(inquiryId)
           
           setShowDetailDialog(false)
           setSelectedInquiry(null)
           fetchInquiries()
-          showToast('Inquiry deleted successfully', 'success')
         } catch (error) {
           console.error('Error deleting inquiry:', error)
-          showToast('Failed to delete inquiry', 'error')
         }
       }
     )
@@ -589,14 +587,14 @@ export default function Inquiry() {
       'Are you sure you want to delete this interaction?',
       async () => {
         try {
-          await inquiryInteractionServiceApi.deleteInteraction(interactionId);
+          await deleteInquiryInteraction(interactionId);
           
           // Remove the deleted interaction from the list
           setInteractions(interactions.filter(interaction => interaction.id !== interactionId));
           
           // Refresh inquiry details to update total interactions count
           if (selectedInquiry?.id) {
-            const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+            const detailResponse = await getInquiryById(selectedInquiry.id)
             const detailData = detailResponse?.data?.data
             if (detailData) {
               const interactionSummary = detailData.interaction_summary || {}
@@ -610,11 +608,9 @@ export default function Inquiry() {
             }
           }
           
-          showToast('Interaction deleted successfully', 'success');
         } catch (error) {
           console.error('Error deleting interaction:', error);
           const errorMessage = error?.response?.data?.error?.message || error?.message || 'Failed to delete interaction'
-          showToast(errorMessage, 'error');
         }
       }
     );
@@ -708,10 +704,12 @@ export default function Inquiry() {
 
   const handleUpdateInteraction = async (inquiryId, interactionId) => {
     if (!interactionForm.type || !interactionForm.outcome || !interactionForm.summary) {
-      showToast('Please fill all required fields', 'error')
-      return
+      throw {
+        name: 'ValidationError',
+        message: 'Please fill all required fields',
+        statusCode: 400,
+      }
     }
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     
     try {
       const updateData = {
@@ -725,7 +723,7 @@ export default function Inquiry() {
       }
       console.log('update interaction: ', updateData)
       
-      const response = await inquiryInteractionServiceApi.updateInquiryInteraction(interactionId, updateData)
+      const response = await updateInquiryInteraction(interactionId, updateData)
       console.log(response);
       if (response?.data) {
         // Update interactions list with the updated interaction
@@ -739,7 +737,7 @@ export default function Inquiry() {
         
         // Refresh inquiry details to update total interactions count
         if (selectedInquiry?.id) {
-          const detailResponse = await inquiryServiceApi.getById(selectedInquiry.id)
+          const detailResponse = await getInquiryById(selectedInquiry.id)
           const detailData = detailResponse?.data?.data
           console.log('detailData', detailData)
           if (detailData) {
