@@ -277,7 +277,7 @@ export default function PurchaseOrderForm({
               {/* Addresses */}
               <div className="border-t border-[var(--border)] pt-4">
                 <h5 className="font-semibold text-[oklch(0.85_0_0)] mb-3">Delivery Addresses</h5>
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-2 md:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium mb-2">Bill To Address <span className="text-rose-300">*</span></label>
                     <textarea
@@ -711,7 +711,7 @@ export default function PurchaseOrderForm({
                   </div>
                 </div>
 
-                <div className="grid gap-3 md:grid-cols-3">
+                <div className="grid gap-2 md:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium mb-2">Port of Loading <span className="text-rose-300">*</span></label>
                     <input
@@ -732,16 +732,7 @@ export default function PurchaseOrderForm({
                       className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Final Destination <span className="text-rose-300">*</span></label>
-                    <input
-                      type="text"
-                      placeholder="Ultimate delivery location"
-                      value={formData.finalDestination || ''}
-                      onChange={(e) => setFormData({ ...formData, finalDestination: e.target.value })}
-                      className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
-                    />
-                  </div>
+                 
                 </div>
 
                 <div className="grid gap-3 md:grid-cols-3">

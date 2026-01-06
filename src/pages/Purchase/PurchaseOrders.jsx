@@ -1,26 +1,16 @@
+import { useNavigate } from 'react-router-dom'
+
 import { useEffect, useState } from 'react'
 import { Plus, Eye, Search, FileText } from 'lucide-react'
 import ConfirmationModal from '../../components/ui/ConfirmationModal'
 import Toast from '../../components/ui/Toast'
-import PurchaseOrderForm from './PurchaseOrderForm'
-import JKCompanyPOForm from './JKCompanyPOForm'
-import PurchaseOrderView from './PurchaseOrderView'
+import PurchaseOrderForm from '../../components/purchase/PurchaseOrderForm'
+import JKCompanyPOForm from '../../components/purchase/JKCompanyPOForm'
 import { purchaseOrderApi } from '../../services/api/purchase/purchase-order-api'
+import purchaseOrderColumns from './purchaseOrderColumns'
+import { DynamicTable } from '../../components/table'
+import { typeConfig, statusConfig } from './purchaseOrderConfigs'
 
-const typeConfig = {
-  jk_company: { label: 'JK Company', color: 'bg-indigo-500/15 text-indigo-200' },
-  others: { label: 'Others', color: 'bg-emerald-500/15 text-emerald-200' },
-  imports: { label: 'Imports', color: 'bg-purple-500/15 text-purple-200' },
-}
-
-const statusConfig = {
-  new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-  pending: { label: 'Pending', color: 'bg-amber-500/20 text-amber-200' },
-  approved: { label: 'Approved', color: 'bg-cyan-500/15 text-cyan-200' },
-  in_transit: { label: 'In Transit', color: 'bg-blue-500/15 text-blue-200' },
-  completed: { label: 'Completed', color: 'bg-emerald-500/20 text-emerald-100' },
-  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
-}
 
 const baseFormData = {
   vendorType: 'others',
@@ -84,7 +74,7 @@ export default function PurchaseOrders() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [toastState, setToastState] = useState({ isVisible: false, message: '', type: 'success' })
   const [loadingList, setLoadingList] = useState(false)
-
+  const navigate = useNavigate()
   // Calculate counts
   const counts = {
     jk_company: purchaseOrders.filter(po => po.type === 'jk_company').length,
@@ -339,159 +329,30 @@ export default function PurchaseOrders() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3">
-        <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">JK Company Orders</div>
-          <div className="text-xl md:text-2xl font-bold text-sky-300">{counts.jk_company}</div>
-        </div>
-        <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Others Orders</div>
-          <div className="text-xl md:text-2xl font-bold text-emerald-300">{counts.others}</div>
-        </div>
-        <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Imports Orders</div>
-          <div className="text-xl md:text-2xl font-bold text-purple-300">{counts.imports}</div>
-        </div>
-      </div>
-
-      {/* Search & Filter */}
-      <div className="card-surface shadow-card p-4 md:p-6">
-        <h3 className="text-lg font-bold text-[oklch(0.96_0_0)] mb-4">Search & Filter</h3>
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.60_0_0)]" />
-            <input
-              type="text"
-              placeholder="Search by PO number..."
-              value={searchPO}
-              onChange={(e) => setSearchPO(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded-lg"
-            />
-          </div>
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded-lg"
-          >
-            <option value="">All Types</option>
-            <option value="jk_company">JK Company</option>
-            <option value="others">Others</option>
-            <option value="imports">Imports</option>
-          </select>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded-lg"
-          >
-            <option value="">All Status</option>
-            <option value="new">New</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="in_transit">In Transit</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-      </div>
+      
 
       {/* Purchase Orders List */}
       <div className="card-surface shadow-card overflow-hidden">
-        <div className="p-4 md:p-6 border-b border-[var(--border)]">
-          <h3 className="text-lg md:text-xl font-bold text-[oklch(0.96_0_0)]">
-            Purchase Orders ({filteredPOs.length})
-          </h3>
-        </div>
+        
 
         {/* Desktop Table View - Hidden on Mobile */}
-        <div className="hidden md:block overflow-x-auto custom-scrollbar max-h-[600px]">
-          <table className="w-full min-w-full">
-            <thead className="bg-[oklch(0.20_0_0)] border-b border-[var(--border)] sticky top-0 z-10">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">PO Number</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Vendor</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Delivery</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Items</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Delivery Date</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border)]">
-              {loadingList ? (
-                <tr>
-                  <td colSpan={9} className="px-6 py-6 text-center text-[oklch(0.70_0_0)]">
-                    Loading purchase orders...
-                  </td>
-                </tr>
-              ) : filteredPOs.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center text-[oklch(0.70_0_0)]">
-                    No purchase orders found
-                  </td>
-                </tr>
-              ) : (
-                filteredPOs.map((po) => {
-                  const type = typeConfig[po.type] || typeConfig.others
-                  const status = statusConfig[po.status] || statusConfig.pending
-
-                  return (
-                    <tr key={po.id} className="hover:bg-[oklch(0.24_0_0)] transition-colors">
-                      <td className="px-4 py-4">
-                        <div className="font-mono text-sm font-semibold text-[oklch(0.90_0_0)]">{po.poNumber}</div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`inline-flex px-2 py-1 rounded-md text-xs font-medium ${type.color}`}>
-                          {type.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`inline-flex px-2 py-1 rounded-md text-xs font-medium ${status.color}`}>
-                          {status.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.88_0_0)]">{po.vendor}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.78_0_0)]">{po.delivery}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.88_0_0)]">{po.items}</span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className="text-sm font-medium text-[oklch(0.90_0_0)]">
-                          {po.amount > 0 ? `₹${po.amount.toLocaleString('en-IN')}` : '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.78_0_0)]">
-                          {po.deliveryDate !== '-' ? new Date(po.deliveryDate).toLocaleDateString('en-IN') : '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button
-                            onClick={() => {
-                              setSelectedOrder(po)
-                              setShowViewDialog(true)
-                            }}
-                            className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-1.5 rounded-lg transition-colors"
-                            title="View details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })
+        
+        <DynamicTable
+                  title="Purchase Orders"
+                  columns={purchaseOrderColumns}
+                  rows={purchaseOrders}      // 👈 your API data array
+                  loading={loading}
+                  renderActions={(row) => (
+                  <button
+                    onClick={() => navigate(`/purchase-orders/${row.id}`)}
+                    className="p-2 rounded-lg hover:bg-[oklch(0.28_0_0)]"
+                    title="View"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
               )}
-            </tbody>
-          </table>
-        </div>
+
+        />
 
         {/* Mobile Card View - Hidden on Desktop */}
         <div className="md:hidden max-h-[600px] overflow-y-auto custom-scrollbar">
@@ -530,10 +391,7 @@ export default function PurchaseOrders() {
                         </div>
                       </div>
                       <button
-                        onClick={() => {
-                          setSelectedOrder(po)
-                          setShowViewDialog(true)
-                        }}
+                        onClick={() => navigate(`/purchase-orders/${po.id}`)}
                         className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-2 rounded-lg transition-colors flex-shrink-0"
                         title="View details"
                       >
@@ -604,16 +462,6 @@ export default function PurchaseOrders() {
         submitLabel={jkFormMode === 'edit' ? 'Update Purchase Order' : undefined}
         title={jkFormMode === 'edit' ? 'Update Details' : undefined}
         loading={loading}
-      />
-
-      {/* Purchase Order View Dialog */}
-      <PurchaseOrderView
-        selectedOrder={selectedOrder}
-        showDetailDialog={showViewDialog}
-        setShowDetailDialog={setShowViewDialog}
-        loadingDetail={loading}
-        onEdit={handleEditFromView}
-        onDelete={handleRequestDelete}
       />
 
       <ConfirmationModal

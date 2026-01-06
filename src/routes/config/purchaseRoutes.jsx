@@ -1,6 +1,7 @@
 import PurchaseOrders from '../../pages/Purchase/PurchaseOrders';
 import Vendors from '../../pages/Vendors/Vendors';
 import GRN from '../../pages/GRN/GRN';
+import PurchaseOrderDetail from '../../components/purchase/PurchaseOrderDetail';
 
 const purchaseRoutes = [
   {
@@ -11,7 +12,15 @@ const purchaseRoutes = [
     isSidebar: true,
     category: 'purchase',
     isLayout: true,
-  },
+  },{
+    path: "/purchase-orders/:poId", 
+    element: PurchaseOrderDetail,
+    isProtected: true,
+    title: 'Purchase Order Detail',
+    isSidebar:  true,
+    category: 'purchase',
+    isLayout: true,
+},
   {
     path: '/vendors',
     element: Vendors,

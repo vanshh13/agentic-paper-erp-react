@@ -45,7 +45,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
       label: 'Inventory',
       items: [
         { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
-        { label: 'Products', icon: Package, path: '/products', badge: null },
+        { label: 'Products', icon: Package, path: '/productsList', badge: null },
         { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
       ]
     },

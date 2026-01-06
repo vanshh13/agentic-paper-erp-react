@@ -70,38 +70,53 @@ export default function RootLayout({ children }) {
           </div>
         </header>
 
-        {/* Breadcrumb */}
-        <div className="bg-[oklch(0.20_0_0)] border-b border-[oklch(0.25_0_0)] px-4 md:px-6 py-3 flex-shrink-0">
-          <nav className="flex items-center gap-2 text-sm">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
-                {index === 0 ? (
-                  <Link
-                    to={crumb.path}
-                    className="flex items-center gap-1.5 text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
-                  >
-                    <Home size={16} />
-                    <span>{crumb.label}</span>
-                  </Link>
-                ) : (
-                  <>
-                    <ChevronRight size={16} className="text-[oklch(0.50_0_0)]" />
-                    {index === breadcrumbs.length - 1 ? (
-                      <span className="text-[oklch(0.90_0_0)] font-medium">{crumb.label}</span>
-                    ) : (
-                      <Link
-                        to={crumb.path}
-                        className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
-                      >
-                        {crumb.label}
-                      </Link>
-                    )}
-                  </>
-                )}
-              </div>
-            ))}
-          </nav>
-        </div>
+          {/* Breadcrumb */}
+          <div className="bg-[oklch(0.20_0_0)] border-b border-[oklch(0.25_0_0)] px-4 md:px-6 py-3 flex-shrink-0">
+            <nav className="flex items-center gap-2 text-sm">
+                {breadcrumbs.map((crumb, index) => {
+                  const isLast = index === breadcrumbs.length - 1;
+
+                  //  Make Edit, View & numeric IDs text-only
+                  const isEditViewOrId =
+                    ['edit', 'view'].includes(crumb.label.toLowerCase()) ||
+                    !isNaN(Number(crumb.label));
+
+                  return (
+                    <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
+                      {index !== 0 && (
+                        <ChevronRight size={16} className="text-[oklch(0.50_0_0)]" />
+                      )}
+
+                      {index === 0 ? (
+                        // Home (always clickable)
+                        <Link
+                          to={crumb.path}
+                          className="flex items-center gap-1.5 text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                        >
+                          <Home size={16} />
+                          <span>{crumb.label}</span>
+                        </Link>
+                      ) : isLast || isEditViewOrId ? (
+                        // Edit / View / ID → text only
+                        <span className="text-[oklch(0.90_0_0)] font-medium cursor-default">
+                          {crumb.label}
+                        </span>
+                      ) : (
+                        // Other breadcrumbs clickable
+                        <Link
+                          to={crumb.path}
+                          className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                        >
+                          {crumb.label}
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
+
+            </nav>
+          </div>
+
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6">
