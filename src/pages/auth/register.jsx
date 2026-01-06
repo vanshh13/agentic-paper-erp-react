@@ -5,6 +5,13 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../../components/ui/passwordInput";
 import { registerUser } from "../../services/api/auth";
+import {
+  Notification,
+  NOTIFICATION_TYPE_SUCCESS,
+  NOTIFICATION_TYPE_ERROR
+} from '../../components/notifiction/notifiction'
+
+
 const Register = () => {
   const navigate = useNavigate();
   const [ formData, setFormData] = useState({
@@ -107,13 +114,20 @@ const Register = () => {
             date_of_birth: '',
             mobile_number: '',
           });
-          // Navigate to login after 2 seconds
-          setTimeout(() => {
-            navigate('/auth/login');
-          }, 1000);
+          Notification({
+            type: NOTIFICATION_TYPE_SUCCESS,
+            message: 'Registration successful! Please login.',
+          })
+          // Navigate to login 
+          navigate('/auth/login', { replace: true })
         }
       } catch (error) {
-        setApiError(error.message || 'Registration failed. Please try again.');
+        const message = error.message || 'Registration failed. Please try again.'
+        setApiError(message || 'Registration failed. Please try again.');
+        Notification({
+          type: NOTIFICATION_TYPE_ERROR,
+          message,
+        })
         setLoading(false);
       }
     };

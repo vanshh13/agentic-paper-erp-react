@@ -1,57 +1,53 @@
-import axios from 'axios';
+import Http from '../../http'
 
-// Get API base URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/v1';
+// Get all inquiries
+export const getAllInquiries = () =>
+  Http.get({
+    url: '/inquiries-service',
+    messageSettings: {
+      hideSuccessMessage: true,
+      errorMessage: 'Failed to fetch inquiries',
+    },
+  })
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Get inquiry by ID
+export const getInquiryById = (id) =>
+  Http.get({
+    url: `/inquiries-service/${id}`,
+    messageSettings: {
+      hideSuccessMessage: true,
+      errorMessage: 'Failed to fetch inquiry details',
+    },
+  })
 
-/**
- * Inquiry Service - Handles CRUD operations for inquiries via Backend API
- */
-export const inquiryServiceApi = {
-  /**
-   * Get all inquiries
-   */
-  getAll: async () => {
-    const response = await apiClient.get('/inquiries-service/');
-    console.log('Fetched Inquiries:', response.data);
-    return response.data;
-  },
+// Create new inquiry
+export const createInquiry = (inquiryData) =>
+  Http.post({
+    url: '/inquiries-service',
+    data: inquiryData,
+    messageSettings: {
+      successMessage: 'Inquiry created successfully',
+      errorMessage: 'Failed to create inquiry',
+    },
+  })
 
-  /**
-   * Get inquiry by ID
-   */
-  getById: async (id) => {
-    const response = await apiClient.get(`/inquiries-service/${id}`);
-    return response.data;
-  },
+// Update inquiry
+export const updateInquiry = (id, updates) =>
+  Http.put({
+    url: `/inquiries-service/${id}`,
+    data: updates,
+    messageSettings: {
+      successMessage: 'Inquiry updated successfully',
+      hideSuccessMessage:true
+    },
+  })
 
-  /**
-   * Create new inquiry
-   */
-  create: async (inquiryData) => {
-    const response = await apiClient.post('/inquiries-service', inquiryData);
-    return response.data;
-  },
-
-  /**
-   * Update existing inquiry
-   */
-  update: async (id, updates) => {
-    const response = await apiClient.put(`/inquiries-service/${id}`, updates);
-    return response.data;
-  },
-
-  /**
-   * Delete inquiry (Soft Delete)
-   */
-  delete: async (id) => {
-    const response = await apiClient.delete(`/inquiries-service/${id}`);
-    return response.data;
-  },
-};
+// Delete inquiry (soft delete)
+export const deleteInquiry = (id) =>
+  Http.delete({
+    url: `/inquiries-service/${id}`,
+    messageSettings: {
+      successMessage: 'Inquiry deleted successfully',
+      errorMessage: 'Failed to delete inquiry',
+    },
+  })

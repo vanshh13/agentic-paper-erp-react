@@ -1,43 +1,50 @@
-import axios from 'axios';
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/v1';
+import Http from '../../http';
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// Get all interactions for a specific inquiry
 
-
-export const inquiryInteractionServiceApi = {
-    /**
-     * INTERACTION METHODS
-     */
-  
-    /**
-     * Get all interactions for a specific inquiry
-     * API Route: GET /api/inquiries/:id/interactions
-     */
-    getInteractions: async (id) => {
-      const response = await apiClient.get(`/inquiry-interactions-service/${id}`);
-      return response.data;
+export const getInquiryInteractions = (id) => {
+  return Http.get({
+    url: `/inquiry-interactions-service/${id}`,
+    messageSettings: {
+      hideSuccessMessage: true, // usually no toast on fetch
     },
-  
-    /**
-     * Add a new interaction to an inquiry
-     * API Route: POST /api/inquiries/:id/interactions
-     */
-    addInteraction: async (interactionData) => {
-      const response = await apiClient.post(`/inquiry-interactions-service/`, interactionData);
-      return response.data;
+  });
+};
+
+// Add a new interaction to an inquiry
+
+export const addInquiryInteraction = (interactionData) => {
+  return Http.post({
+    url: '/inquiry-interactions-service',
+    data: interactionData,
+    messageSettings: {
+      successMessage: 'Interaction added successfully',
+      errorMessage: 'Failed to add interaction',
     },
-  
-    /**
-     * Delete a specific interaction
-     * API Route: DELETE /api/interactions/:id
-     */
-    deleteInteraction: async (id) => {
-      const response = await apiClient.delete(`/inquiry-interactions-service/${id}`);
-      return response.data;
-    }
+  });
+};
+
+// Update a specific interaction
+
+export const updateInquiryInteraction = (id, interactionData) => {
+  return Http.put({
+    url: `/inquiry-interactions-service/${id}`,
+    data: interactionData,
+    messageSettings: {
+      successMessage: 'Interaction updated successfully',
+      errorMessage: 'Failed to update interaction',
+    },
+  });
+};
+
+// Delete a specific interaction
+
+export const deleteInquiryInteraction = (id) => {
+  return Http.delete({
+    url: `/inquiry-interactions-service/${id}`,
+    messageSettings: {
+      successMessage: 'Interaction deleted successfully',
+      errorMessage: 'Failed to delete interaction',
+    },
+  });
 };
