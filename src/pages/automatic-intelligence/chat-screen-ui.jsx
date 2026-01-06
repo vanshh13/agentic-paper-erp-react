@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import InteractiveAIAvatar from '../../components/InteractiveAIAvatar'
+import InteractiveAIAvatar from '../../components/interactive-ai-avatar'
 import { Send, Paperclip, X } from 'lucide-react'
-import ChatInput from '../../components/Chats/chat-input-box'
+import ChatInput from '../../components/chats/chat-input-box'
 
 // Chat Messages Component
 const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {

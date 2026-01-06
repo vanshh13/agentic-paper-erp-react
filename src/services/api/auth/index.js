@@ -5,4 +5,4 @@ export {
   getCurrentUser,
   isAuthenticated,
   clearAuthData,
-} from './authService';
+} from './auth-service';

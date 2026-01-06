@@ -3,7 +3,7 @@ import Input from "../../components/ui/input";
 import Button from "../../components/ui/button";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import PasswordInput from "../../components/ui/passwordInput";
+import PasswordInput from "../../components/ui/password-input";
 import { registerUser } from "../../services/api/auth";
 const Register = () => {
   const navigate = useNavigate();
