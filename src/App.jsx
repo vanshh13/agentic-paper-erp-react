@@ -3,13 +3,11 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 
-import { store, persistor } from './store'
-import routes from './routes/config/routes'
-import ProtectedRoute from './routes/ProtectedRoute'
-
-import RootLayout from './layout/RootLayout'
-import { SidebarProvider } from './contexts/SidebarContext'
-import NotificationWrapper from './components/notifiction/notifiction'
+import { store } from './store'
+import routes  from './routes/config/routes'
+import ProtectedRoute from './routes/protected-route'
+import RootLayout from './layout/root-layout'
+import { SidebarProvider } from './contexts/side-bar-context'
 
 const LoadingSpinner = () => (
   <div className="flex h-screen w-screen items-center justify-center">

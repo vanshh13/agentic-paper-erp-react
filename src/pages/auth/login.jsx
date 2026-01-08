@@ -3,9 +3,9 @@ import { useDispatch } from 'react-redux';
 import Input from "../../components/ui/input";
 import Button from "../../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import PasswordInput from "../../components/ui/passwordInput";
+import PasswordInput from "../../components/ui/password-input";
 import { loginUser } from "../../services/api/auth";
-import { loginSuccess, loginFailure } from '../../store/slices/userSlice';
+import { loginSuccess, loginFailure, setLoading } from '../../store/slices/user-slice';
 
 const Login = () => {
     const navigate = useNavigate();
