@@ -1,11 +1,13 @@
 import { Plus, Settings, SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
+import { useSelector } from 'react-redux'
 
 export default function Rules() {
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
   const [activeTab, setActiveTab] = useState('All')
 
   const ruleStats = [
-    { label: 'Total Rules', value: '12', color: 'text-white' },
+    { label: 'Total Rules', value: '12', color: 'text-violet-600' },
     { label: 'Approval', value: '3', color: 'text-purple-400' },
     { label: 'Pricing', value: '4', color: 'text-emerald-400' },
     { label: 'Credit', value: '2', color: 'text-orange-400' },
@@ -101,7 +103,7 @@ export default function Rules() {
     : demoRules.filter(rule => rule.type === activeTab || activeTab === 'Discount')
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 text-foreground w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -110,8 +112,8 @@ export default function Rules() {
               <SlidersHorizontal className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Rules Management</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Rules Management</h1>
+              <p className="text-muted-foreground text-sm md:text-base mt-1">
                 Configure business rules for approvals, pricing, and more
               </p>
             </div>
@@ -121,7 +123,7 @@ export default function Rules() {
             Add Rule
           </button>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
             Showing data from all companies
@@ -136,7 +138,7 @@ export default function Rules() {
             key={stat.label}
             className="card-surface p-4 md:p-5 rounded-xl border border-[var(--border)]"
           >
-            <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-2">{stat.label}</p>
+            <p className="text-xs md:text-sm text-muted-foreground mb-2">{stat.label}</p>
             <p className={`text-3xl md:text-4xl font-bold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
@@ -145,7 +147,7 @@ export default function Rules() {
       {/* Tabs and Table */}
       <div className="card-surface rounded-xl border border-[var(--border)] overflow-hidden">
         {/* Tabs */}
-        <div className="border-b border-[var(--border)] bg-[oklch(0.32_0_0)]">
+        <div className="border-b border-[var(--border)] bg-muted">
           <div className="flex gap-1 p-4 overflow-x-auto">
             {tabs.map((tab) => (
               <button
@@ -154,7 +156,7 @@ export default function Rules() {
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                   activeTab === tab
                     ? 'bg-indigo-600/30 text-indigo-400 border border-indigo-500/50'
-                    : 'text-[oklch(0.70_0_0)] hover:text-[oklch(0.80_0_0)]'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tab}
@@ -167,32 +169,32 @@ export default function Rules() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[oklch(0.28_0_0)]">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Rule</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Threshold</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Action</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Priority</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Action</th>
+              <tr className="border-b border-[var(--border)] bg-muted">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Rule</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Threshold</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Action</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Priority</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredRules.map((rule, idx) => (
                 <tr
                   key={rule.id}
-                  className="border-b border-[var(--border)] hover:bg-[oklch(0.32_0_0)] transition-colors"
+                  className="border-b border-[var(--border)] hover:bg-accent transition-colors"
                 >
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.95_0_0)]">{rule.rule}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.80_0_0)]">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{rule.rule}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">
                     <span className="inline-block px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-medium">
                       {rule.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.80_0_0)]">{rule.category}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.80_0_0)]">{rule.threshold}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.80_0_0)]">{rule.action}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{rule.category}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{rule.threshold}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{rule.action}</td>
                   <td className="px-6 py-4 text-sm font-medium">
                     <span className={getPriorityColor(rule.priority)}>{rule.priority}</span>
                   </td>
@@ -215,7 +217,7 @@ export default function Rules() {
         {/* Empty State */}
         {filteredRules.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-[oklch(0.65_0_0)] text-sm">No rules found</p>
+            <p className="text-muted-foreground text-sm">No rules found</p>
           </div>
         )}
       </div>
@@ -223,8 +225,8 @@ export default function Rules() {
       {/* Info Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-surface p-5 md:p-6 rounded-xl border border-[var(--border)]">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)] mb-4">How Rules Work</h3>
-          <ul className="space-y-2 text-sm text-[oklch(0.75_0_0)]">
+          <h3 className="text-base md:text-lg font-semibold text-foreground mb-4">How Rules Work</h3>
+          <ul className="space-y-2 text-sm text-muted-foreground">
             <li className="flex gap-3">
               <span className="text-indigo-400 font-bold">•</span>
               <span>Approval rules automatically process orders based on amount thresholds</span>
@@ -241,7 +243,7 @@ export default function Rules() {
         </div>
 
         <div className="card-surface p-5 md:p-6 rounded-xl border border-[var(--border)]">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)] mb-4">Recent Changes</h3>
+          <h3 className="text-base md:text-lg font-semibold text-foreground mb-4">Recent Changes</h3>
           <div className="space-y-3">
             {[
               { action: 'Created: Auto Approve PO < 50K', time: '2 hours ago' },
@@ -249,8 +251,8 @@ export default function Rules() {
               { action: 'Deactivated: Stock Low Alert', time: '3 days ago' },
             ].map((item, idx) => (
               <div key={idx} className="flex items-center justify-between py-2 border-b border-[var(--border)] last:border-0">
-                <span className="text-sm text-[oklch(0.85_0_0)]">{item.action}</span>
-                <span className="text-xs text-[oklch(0.65_0_0)]">{item.time}</span>
+                <span className="text-sm text-foreground">{item.action}</span>
+                <span className="text-xs text-muted-foreground">{item.time}</span>
               </div>
             ))}
           </div>

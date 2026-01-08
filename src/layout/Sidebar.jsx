@@ -1,12 +1,12 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, Search, Settings, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux'
 import { useSidebar } from '../contexts/SidebarContext'
 import { logoutUser } from '../services/api/auth'
 import NavItems from './NavItems'
 import InteractiveAIAvatar from '../components/InteractiveAIAvatar'
-import { logoutSuccess } from '../store/slices/userSlice';
+import { logoutSuccess } from '../store/slices/userSlice'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
@@ -16,14 +16,14 @@ export default function Sidebar() {
 
   const location = useLocation()
   const navigate = useNavigate()
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const currentUser = useSelector((state) => state.auth.user)
 
   useEffect(() => {
     console.log("currentUser" ,currentUser)
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 1024)
     };
 
     handleResize();
@@ -67,44 +67,60 @@ export default function Sidebar() {
         />
       )}
 
-      <aside className={`fixed top-0 left-0 h-screen w-78 bg-[oklch(0.15_0_0)] border-r border-[oklch(0.25_0_0)] transform transition-all duration-300 ease-in-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside 
+        className={`fixed top-0 left-0 h-screen w-78 border-sidebar border-r bg-sidebar transform transition-all duration-300 ease-in-out z-50 flex flex-col ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
         {/* Sidebar Header */}
-        <div className="flex-shrink-0 p-4 pb-3 border-b border-[oklch(0.25_0_0)] flex items-center gap-3">
+        <div 
+          className="flex-shrink-0 p-4 pb-3 border-b border-sidebar flex items-center gap-3 transition-colors duration-300"
+        >
           <div className="w-8 h-8 flex-shrink-0 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">RP</div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-semibold text-[oklch(0.92_0_0)] truncate">Rahul Papers</h2>
+            <h2 
+              className="text-sm font-semibold text-sidebar-foreground truncate transition-colors duration-300"
+            >
+              Rahul Papers
+            </h2>
           </div>
-          <button onClick={handleToggleSidebar} className="p-1.5 hover:bg-[oklch(0.20_0_0)] rounded-md text-[oklch(0.75_0_0)] hover:text-[oklch(0.92_0_0)] transition-colors flex-shrink-0">
+          <button 
+            onClick={handleToggleSidebar} 
+            className="p-1.5 rounded-md text-sidebar-foreground transition-all"
+          >
             <X size={18} />
           </button>
         </div>
 
         {/* AI Avatar */}
         <div 
-          className="flex-shrink-0 border-b border-[oklch(0.25_0_0)] pt-4 pb-3 cursor-pointer"
+          className="flex-shrink-0 border-b border-sidebar pt-4 pb-3 cursor-pointer transition-colors duration-300"
           onClick={() => navigate('/chat')}
         >
           <InteractiveAIAvatar />
         </div>
 
         {/* Search Bar */}
-        <div className="flex-shrink-0 p-3 border-b border-[oklch(0.25_0_0)]">
+        <div 
+          className="flex-shrink-0 p-3 border-b border-sidebar transition-colors duration-300"
+        >
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[oklch(0.60_0_0)]" />
+            <Search 
+              size={16} 
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-sidebar-foreground" 
+            />
             <input
               type="text"
               placeholder="Search navigation..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-9 py-2 bg-[oklch(0.12_0_0)] border border-[oklch(0.25_0_0)] rounded-lg text-sm text-[oklch(0.92_0_0)] placeholder-[oklch(0.60_0_0)] focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              className="w-full pl-9 pr-9 py-2 border border-sidebar rounded-lg text-sm bg-input text-sidebar-foreground focus:outline-none focus:ring-2 transition-all"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-[oklch(0.20_0_0)] rounded transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded transition-colors text-muted-foreground"
                 aria-label="Clear search"
               >
-                <X size={14} className="text-[oklch(0.60_0_0)] hover:text-[oklch(0.90_0_0)]" />
+                <X size={14} />
               </button>
             )}
           </div>
@@ -114,25 +130,35 @@ export default function Sidebar() {
         <NavItems onLinkClick={handleLinkClick} searchQuery={searchQuery} />
 
         {/* Sidebar Footer - Profile Section */}
-        <div className="flex-shrink-0 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)] rounded-t-lg relative z-10 mt-auto">
+        <div 
+          className="flex-shrink-0 border-t border-sidebar rounded-t-lg relative z-10 mt-auto transition-colors duration-300"
+        >
           <div className="flex items-center gap-2 p-3">
             <Link
               to="/profile"
               onClick={handleLinkClick}
-              className={`flex-1 flex items-center gap-3 cursor-pointer hover:bg-[oklch(0.18_0_0)] transition-colors rounded-lg p-2 -m-2 ${location.pathname === '/profile' ? 'bg-[oklch(0.20_0_0)]' : ''}`}
+              className={`flex-1 flex items-center gap-3 cursor-pointer transition-all rounded-lg p-2 -m-2 ${location.pathname === '/profile' ? 'bg-sidebar-accent' : ''}`}
             >
               <div className="w-10 h-10 flex-shrink-0 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-indigo-500/30">
                 {currentUser?.first_name ? currentUser.first_name.charAt(0).toUpperCase() : (currentUser?.username?.charAt(0).toUpperCase() || 'U')}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-[oklch(0.95_0_0)] truncate">
+                <p 
+                  className="text-sm font-semibold text-sidebar-foreground truncate transition-colors duration-300"
+                >
                   {currentUser?.first_name && currentUser?.last_name 
                     ? `${currentUser.first_name} ${currentUser.middle_name ? currentUser.middle_name + ' ' : ''}${currentUser.last_name}`.trim()
                     : currentUser?.username || 'User'}
                 </p>
-                <p className="text-xs text-[oklch(0.65_0_0)] truncate mt-0.5">{currentUser?.email || 'user@company.com'}</p>
+                <p 
+                  className="text-xs text-sidebar-foreground truncate mt-0.5 transition-colors duration-300"
+                >
+                  {currentUser?.email || 'user@company.com'}
+                </p>
                 {currentUser?.is_admin && (
-                  <span className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 rounded-md">
+                  <span 
+                    className="inline-block mt-1 px-2 py-0.5 text-[10px] font-semibold rounded-md bg-primary/20 text-primary transition-colors duration-300"
+                  >
                     Admin
                   </span>
                 )}
@@ -142,7 +168,7 @@ export default function Sidebar() {
               <Link
                 to="/settings"
                 onClick={handleLinkClick}
-                className={`p-2 rounded-lg transition-colors ${location.pathname === '/settings' ? 'bg-indigo-600 text-white' : 'text-[oklch(0.70_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.90_0_0)]'}`}
+                className={`p-2 rounded-lg transition-all ${location.pathname === '/settings' ? 'bg-primary/20 text-primary' : 'text-sidebar-foreground'}`}
                 title="Settings"
               >
                 <Settings size={18} />
@@ -150,7 +176,7 @@ export default function Sidebar() {
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
-                className="p-2 rounded-lg transition-colors text-red-400 hover:bg-red-500/10 hover:text-red-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed text-destructive"
                 title="Logout"
               >
                 <LogOut size={18} />

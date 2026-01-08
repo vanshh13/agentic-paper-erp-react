@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { UserCheck, Search, Eye, CheckCircle2, XCircle, Clock3 } from 'lucide-react'
 
 const DEMO_REQUESTS = [
@@ -17,6 +18,7 @@ const STATUS_BADGES = {
 }
 
 export default function Approvals() {
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('Pending')
 
@@ -29,7 +31,7 @@ export default function Approvals() {
       { label: 'Pending', value: counts.pending, color: 'text-amber-400', icon: Clock3 },
       { label: 'Approved', value: counts.approved, color: 'text-emerald-400', icon: CheckCircle2 },
       { label: 'Rejected', value: counts.rejected, color: 'text-red-400', icon: XCircle },
-      { label: 'Total', value: DEMO_REQUESTS.length, color: 'text-white' },
+      { label: 'Total', value: DEMO_REQUESTS.length, color: 'text-violet-600' },
     ]
   }, [])
 
@@ -50,7 +52,7 @@ export default function Approvals() {
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-IN')
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 text-foreground w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -59,11 +61,11 @@ export default function Approvals() {
               <UserCheck className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Approval Queue</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">Review and approve pending requests</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Approval Queue</h1>
+              <p className="text-muted-foreground text-sm md:text-base mt-1">Review and approve pending requests</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
               Showing data from all companies
@@ -78,7 +80,7 @@ export default function Approvals() {
           const Icon = stat.icon
           return (
             <div key={stat.label} className="card-surface p-5 md:p-6 rounded-xl border border-[var(--border)]">
-              <div className="flex items-center gap-2 text-xs md:text-sm text-[oklch(0.70_0_0)] mb-2">
+              <div className="flex items-center gap-2 text-xs md:text-sm text-muted-foreground mb-2">
                 {Icon && <Icon className={`w-4 h-4 ${stat.color}`} />}
                 <span>{stat.label}</span>
               </div>
@@ -99,11 +101,11 @@ export default function Approvals() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   tab === item
                     ? 'bg-indigo-600 text-white'
-                    : 'bg-[oklch(0.30_0_0)] text-[oklch(0.85_0_0)] hover:bg-[oklch(0.32_0_0)]'
+                    : 'bg-input text-foreground hover:bg-accent'
                 }`}
               >
                 {item}
-                <span className="ml-1 text-[oklch(0.70_0_0)]">({
+                <span className="ml-1 text-muted-foreground">({
                   item === 'Pending'
                     ? stats[0].value
                     : item === 'Approved'
@@ -116,13 +118,13 @@ export default function Approvals() {
             ))}
           </div>
           <div className="flex-1 min-w-[240px] max-w-sm">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
+            <div className="flex items-center gap-2 bg-input border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-foreground">
+              <Search className="w-4 h-4 text-muted-foreground" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search requests..."
-                className="bg-transparent focus:outline-none w-full placeholder:text-[oklch(0.65_0_0)]"
+                className="bg-transparent focus:outline-none w-full placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -132,34 +134,34 @@ export default function Approvals() {
       {/* Requests Table */}
       <div className="card-surface rounded-xl border border-[var(--border)] overflow-hidden">
         <div className="px-4 md:px-6 py-4 border-b border-[var(--border)]">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)]">Requests ({filtered.length})</h3>
+          <h3 className="text-base md:text-lg font-semibold text-foreground">Requests ({filtered.length})</h3>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[oklch(0.28_0_0)]">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Request ID</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Type</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Requester</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Department</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Date</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Actions</th>
+              <tr className="border-b border-[var(--border)] bg-secondary">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Request ID</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Requester</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Department</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((r) => (
-                <tr key={r.id} className="border-b border-[var(--border)] hover:bg-[oklch(0.32_0_0)] transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.95_0_0)]">{r.requestId}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{r.type}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{r.requester}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{r.department}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{formatDate(r.date)}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.90_0_0)]">{formatCurrency(r.amount)}</td>
+                <tr key={r.id} className="border-b border-[var(--border)] hover:bg-accent transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{r.requestId}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{r.type}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{r.requester}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{r.department}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{formatDate(r.date)}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{formatCurrency(r.amount)}</td>
                   <td className="px-6 py-4 text-sm">
-                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_BADGES[r.status] || 'bg-[oklch(0.35_0_0)] text-[oklch(0.80_0_0)]'}`}>
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium capitalize ${STATUS_BADGES[r.status] || 'bg-muted text-foreground'}`}>
                       {r.status}
                     </span>
                   </td>
@@ -175,7 +177,7 @@ export default function Approvals() {
         </div>
 
         {filtered.length === 0 && (
-          <div className="py-12 text-center text-[oklch(0.65_0_0)] text-sm">No pending approvals at the moment.</div>
+          <div className="py-12 text-center text-muted-foreground text-sm">No pending approvals at the moment.</div>
         )}
       </div>
     </div>

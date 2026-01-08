@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Package, Plus, Search } from 'lucide-react'
 
 const DEMO_STOCK_DATA = [
@@ -13,7 +14,7 @@ const DEMO_STOCK_DATA = [
 ]
 
 const STATS = [
-  { label: 'Warehouses', value: '3', icon: 'package', color: 'text-slate-300' },
+  { label: 'Warehouses', value: '3', icon: 'package', color: 'text-violet-600' },
   { label: 'Available', value: '499,268', icon: 'check', color: 'text-emerald-400' },
   { label: 'Booked', value: '45,455', icon: 'lock', color: 'text-blue-400' },
   { label: 'In Transit', value: '20,572', icon: 'truck', color: 'text-purple-400' },
@@ -21,6 +22,7 @@ const STATS = [
 ]
 
 export default function Stock() {
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
   const [search, setSearch] = useState('')
   const [warehouseFilter, setWarehouseFilter] = useState('All Warehouses')
 
@@ -46,7 +48,7 @@ export default function Stock() {
   }
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 text-foreground w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -55,8 +57,8 @@ export default function Stock() {
               <Package className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Stock & Inventory</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">Multi-warehouse stock management</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Stock & Inventory</h1>
+              <p className="text-muted-foreground text-sm md:text-base mt-1">Multi-warehouse stock management</p>
             </div>
           </div>
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
@@ -64,7 +66,7 @@ export default function Stock() {
             Add Stock
           </button>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
             Showing data from all companies
@@ -75,35 +77,35 @@ export default function Stock() {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {STATS.map((stat) => (
-          <div key={stat.label} className="card-surface p-4 md:p-5 rounded-xl border border-[var(--border)]">
-            <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-2">{stat.label}</p>
+          <div key={stat.label} className="card-surface p-4 md:p-5 rounded-xl border border-border">
+            <p className="text-xs md:text-sm text-muted-foreground mb-2">{stat.label}</p>
             <p className={`text-2xl md:text-3xl font-bold ${stat.color}`}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Stock Listing */}
-      <div className="card-surface rounded-xl border border-[var(--border)] overflow-hidden">
+      <div className="card-surface rounded-xl border border-border overflow-hidden">
         {/* Header */}
-        <div className="px-4 md:px-6 py-4 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)]">Stock Listing</h3>
+        <div className="px-4 md:px-6 py-4 border-b border-border flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-base md:text-lg font-semibold text-foreground">Stock Listing</h3>
           <div className="flex flex-wrap gap-2 items-center">
             <select
               value={warehouseFilter}
               onChange={(e) => setWarehouseFilter(e.target.value)}
-              className="px-3 py-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg text-sm text-[oklch(0.90_0_0)] focus:outline-none"
+              className="px-3 py-2 bg-input border border-border rounded-lg text-sm text-foreground focus:outline-none"
             >
               {warehouses.map((wh) => (
                 <option key={wh}>{wh}</option>
               ))}
             </select>
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
+            <div className="flex items-center gap-2 bg-input border border-border rounded-lg px-3 py-2 text-sm text-foreground">
+              <Search className="w-4 h-4 text-muted-foreground" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search..."
-                className="bg-transparent focus:outline-none w-full placeholder:text-[oklch(0.65_0_0)]"
+                className="bg-transparent focus:outline-none w-full placeholder:text-muted-foreground"
               />
             </div>
           </div>
@@ -113,23 +115,23 @@ export default function Stock() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[oklch(0.28_0_0)]">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Location</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Bin</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Batch</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Available</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Booked</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">In Transit</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">QC Status</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Stock Level</th>
+              <tr className="border-b border-border bg-muted">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Location</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Bin</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Batch</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Available</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Booked</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">In Transit</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">QC Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Stock Level</th>
               </tr>
             </thead>
             <tbody>
               {filteredStock.map((stock, idx) => (
-                <tr key={idx} className="border-b border-[var(--border)] hover:bg-[oklch(0.32_0_0)] transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.95_0_0)]">{stock.location}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{stock.bin}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{stock.batch}</td>
+                <tr key={idx} className="border-b border-border hover:bg-accent transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{stock.location}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{stock.bin}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{stock.batch}</td>
                   <td className="px-6 py-4 text-sm font-medium text-emerald-400">{stock.available.toLocaleString()}</td>
                   <td className="px-6 py-4 text-sm font-medium text-blue-400">{stock.booked.toLocaleString()}</td>
                   <td className="px-6 py-4 text-sm font-medium text-purple-400">{stock.inTransit.toLocaleString()}</td>
@@ -139,7 +141,7 @@ export default function Stock() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <div className="w-full bg-[oklch(0.35_0_0)] rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                       <div
                         className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full rounded-full transition-all"
                         style={{ width: getStockLevelWidth(stock.stockLevel) }}
@@ -153,7 +155,7 @@ export default function Stock() {
         </div>
 
         {filteredStock.length === 0 && (
-          <div className="py-12 text-center text-[oklch(0.65_0_0)] text-sm">No stock items found</div>
+          <div className="py-12 text-center text-muted-foreground text-sm">No stock items found</div>
         )}
       </div>
     </div>

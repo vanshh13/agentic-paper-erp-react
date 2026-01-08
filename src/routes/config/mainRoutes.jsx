@@ -9,7 +9,6 @@ const mainRoutes = [
     isProtected: true,
     title: 'Dashboard',
     isSidebar: true,
-    category: 'main',
     isLayout: true,
   },
   {
@@ -18,7 +17,6 @@ const mainRoutes = [
     isProtected: true,
     title: 'Home',
     isSidebar: true,
-    category: 'main',
     isLayout: true,
   },
   {
@@ -27,7 +25,6 @@ const mainRoutes = [
     isProtected: true,
     title: 'Profile',
     isSidebar: false,
-    category: 'main',
     isLayout: true,
   },
 ];

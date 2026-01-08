@@ -16,13 +16,13 @@ export const SidebarProvider = ({ children }) => {
     if (saved !== null) {
       return JSON.parse(saved);
     }
-    return window.innerWidth >= 1024; // Default based on screen size
+    return window.innerWidth >= 768; // Default based on screen size
   });
 
   useEffect(() => {
     const handleResize = () => {
       // Only auto-close on mobile, don't force open on desktop
-      if (window.innerWidth < 1024 && isOpen) {
+      if (window.innerWidth < 768 && isOpen) {
         setIsOpen(false);
         localStorage.setItem('sidebarOpen', JSON.stringify(false));
       }

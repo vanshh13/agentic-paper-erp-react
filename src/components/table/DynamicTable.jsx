@@ -34,7 +34,7 @@ export default function DynamicTable({
       initial[col.key] = getInitialWidth(col)
     })
     if (renderActions) {
-      initial.__actions__ = getInitialWidth({ minWidth: 'min-w-[120px]', width: 120 })
+      initial.__actions__ = getInitialWidth({ minWidth: 'min-w-[110px]', width: 110 })
     }
     return initial
   })
@@ -55,7 +55,7 @@ export default function DynamicTable({
         }
       })
       if (renderActions && !next.__actions__) {
-        next.__actions__ = getInitialWidth({ minWidth: 'min-w-[120px]', width: 120 })
+        next.__actions__ = getInitialWidth({ minWidth: 'min-w-[180px]', width: 180 })
       }
 
       const activeKeys = columns.map((c) => c.key)
@@ -270,36 +270,38 @@ export default function DynamicTable({
   return (
     <div 
       ref={tableContainerRef}
-      className={`card-surface rounded-lg sm:rounded-xl border border-[var(--border)] overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
+      className={`card-surface rounded-lg sm:rounded-xl border border-border overflow-x-hidden overflow-y-hidden flex flex-col w-full max-w-full ${heightClass}`}
     >
       {/* Header */}
-      <div className="flex-shrink-0 px-3 sm:px-4 py-2 border-b border-[var(--border)] bg-[oklch(0.20_0_0)]">
-        {/* Search, Columns, and Pagination in single row */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <div className="w-[200px] sm:w-[280px] lg:w-[320px]">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)] flex-shrink-0" />
-              <input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search..."
-                className="bg-transparent focus:outline-none w-full text-xs sm:text-sm placeholder:text-[oklch(0.65_0_0)]"
-              />
+      <div className="flex-shrink-0 px-3 sm:px-4 py-2 sm:py-3 border-b border-border table-header-surface">
+        {/* Search, Columns, and Pagination - Responsive */}
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-2 lg:justify-between">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="w-full sm:w-[200px] md:w-[280px] lg:w-[320px]">
+              <div className="input-surface flex items-center gap-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-foreground">
+                <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search..."
+                  className="bg-transparent focus:outline-none w-full text-xs sm:text-sm placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            <div>
+              <button
+                onClick={() => setShowColumnSelector(true)}
+                className="flex items-center gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-secondary text-foreground hover:bg-accent border border-border transition-colors text-xs sm:text-sm font-medium flex-shrink-0"
+              >
+                <SlidersHorizontal className="w-3.5 sm:w-4 h-3.5 sm:h-4" />
+                <span className="hidden sm:inline">Columns</span>
+              </button>
             </div>
           </div>
 
-          <div>
-            <button
-              onClick={() => setShowColumnSelector(true)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[oklch(0.28_0_0)] text-[oklch(0.92_0_0)] hover:bg-[oklch(0.30_0_0)] border border-[var(--border)] transition-colors text-sm font-medium"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              Columns
-            </button>
-          </div>
-
           {sortedRows.length > 0 && (
-            <div className="ml-auto">
+            <div className="w-full lg:w-auto mt-2 lg:mt-0">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -314,9 +316,16 @@ export default function DynamicTable({
       </div>
 
       {/* Scrollable Table Area */}
-      <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col bg-[oklch(0.20_0_0)] isolate">
+      <div className="flex-1 min-h-0 w-full overflow-hidden flex flex-col bg-background isolate">
         <div className="flex-1 min-h-0 w-full overflow-x-auto overflow-y-auto overscroll-x-contain custom-scrollbar scroll-smooth relative">
-          <table className="border-collapse w-full" style={{ tableLayout: 'fixed', minWidth: totalTableWidth }}>
+          {renderActions && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute top-0 bottom-0 w-[2px] bg-border z-[80]"
+              style={{ right: actionWidth }}
+            />
+          )}
+          <table className="border-separate border-spacing-0 w-full" style={{ tableLayout: 'fixed', minWidth: totalTableWidth }}>
             {/* COLGROUP - Controls column widths */}
             <colgroup>
               {displayColumns.map((col) => (
@@ -327,15 +336,15 @@ export default function DynamicTable({
               )}
             </colgroup>
 
-            <thead className="sticky top-0 bg-[oklch(0.26_0_0)] z-50">
-              <tr className="border-b-0">
+            <thead className="sticky top-0 table-header-surface z-50">
+              <tr className="border-b-2 border-border">
                 {displayColumns.map((col) => {
                   const width = columnWidths[col.key] || getInitialWidth(col)
                   const minWidth = parseMinWidth(col.minWidth)
                   return (
                     <th
                       key={col.key}
-                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-base font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider whitespace-nowrap relative ${col.minWidth || ''}`}
+                      className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-base font-semibold uppercase tracking-wider whitespace-nowrap relative border-r border-border ${col.minWidth || ''}`}
                     >
                       <div className="flex items-center justify-between gap-1 pr-2">
                         <ColumnSortFilter
@@ -346,7 +355,7 @@ export default function DynamicTable({
                         />
                       </div>
                       <span
-                        className="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors z-10"
+                        className="absolute right-0 top-0 h-full w-1 cursor-col-resize select-none bg-border hover:bg-primary transition-colors z-10"
                         onMouseDown={(event) => {
                           event.stopPropagation()
                           handleResizeStart(event, col)
@@ -358,12 +367,12 @@ export default function DynamicTable({
                 })}
                 {renderActions && (
                   <th
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-semibold text-[oklch(0.90_0_0)] uppercase tracking-wider w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] border-l border-[var(--border)] whitespace-nowrap z-50 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                    className="px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-semibold uppercase tracking-wider w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 table-header-surface whitespace-nowrap z-[100] border-l-2 border-border"
                   >
                     <div className="relative flex items-center justify-center">
                       Actions
                       <span
-                        className="absolute right-0 top-0 h-full w-0 cursor-col-resize select-none bg-[oklch(0.35_0_0)]/40 hover:bg-indigo-500/50 transition-colors z-10"
+                        className="absolute right-0 top-0 h-full w-0 cursor-col-resize select-none bg-border hover:bg-primary transition-colors z-10"
                         onMouseDown={(event) => {
                           event.stopPropagation()
                           handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[180px]' })
@@ -375,7 +384,7 @@ export default function DynamicTable({
                 )}
               </tr>
               {displayColumns.length > 0 && (
-                <tr className="bg-[oklch(0.24_0_0)]">
+                <tr className="bg-card border-b-2 border-border">
                   {displayColumns.map((col) => {
                     const width = columnWidths[col.key] || getInitialWidth(col)
                     const minWidth = parseMinWidth(col.minWidth)
@@ -385,7 +394,7 @@ export default function DynamicTable({
                     return (
                       <th
                         key={`${col.key}-filter`}
-                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-medium text-[oklch(0.82_0_0)] whitespace-nowrap relative ${col.minWidth || ''}`}
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-left text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap relative border-r border-border ${col.minWidth || ''}`}
                       >
                         {col.filterable === false ? (
                           <span className="block h-[18px]"></span>
@@ -393,7 +402,7 @@ export default function DynamicTable({
                           <select
                             value={value}
                             onChange={(e) => handleFilterChange(col.key, e.target.value)}
-                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-xs sm:text-sm focus:outline-none"
+                            className="w-full bg-input border border-border rounded px-2 py-1 text-foreground text-xs sm:text-sm focus:outline-none"
                           >
                             <option value="">All</option>
                             {col.filterOptions.map((opt) => (
@@ -416,7 +425,7 @@ export default function DynamicTable({
                                 handleFilterChange(col.key, val)
                               }}
                               placeholder="DD/MM/YYYY"
-                              className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 pr-8 text-[oklch(0.90_0_0)] text-sm focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
+                              className="w-full bg-input border border-border rounded px-2 py-1 pr-8 text-foreground text-sm focus:outline-none placeholder:text-muted-foreground"
                             />
                             <input
                               type="date"
@@ -431,7 +440,7 @@ export default function DynamicTable({
                               className="absolute right-2 top-0 w-10 h-full opacity-0 cursor-pointer"
                             />
                             <svg
-                              className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.65_0_0)] pointer-events-none"
+                              className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -445,7 +454,7 @@ export default function DynamicTable({
                             value={value}
                             onChange={(e) => handleFilterChange(col.key, e.target.value)}
                             placeholder="Filter"
-                            className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded px-2 py-1 text-[oklch(0.90_0_0)] text-sm focus:outline-none placeholder:text-[oklch(0.60_0_0)]"
+                            className="w-full bg-input border border-border rounded px-2 py-1 text-foreground text-sm focus:outline-none placeholder:text-muted-foreground"
                           />
                         )}
                         <span
@@ -461,7 +470,7 @@ export default function DynamicTable({
                   })}
                   {renderActions && (
                     <th
-                      className="px-3 py-1.5 text-left text-sm font-medium text-[oklch(0.120_0_0)] uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.18_0_0)] border-l border-[var(--border)] whitespace-nowrap z-40 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                      className="px-3 py-1.5 text-left text-sm font-medium text-muted-foreground uppercase tracking-wider w-[120px] flex-shrink-0 sticky right-0 bg-card border-l-2 border-border whitespace-nowrap z-40"
                     >
                       <span
                         className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
@@ -479,23 +488,23 @@ export default function DynamicTable({
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.70_0_0)] text-sm">
+                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-muted-foreground text-sm">
                     Loading data...
                   </td>
                 </tr>
               ) : sortedRows.length === 0 ? (
                 <tr>
-                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-[oklch(0.65_0_0)] text-sm">
+                  <td colSpan={displayColumns.length + (renderActions ? 1 : 0)} className="px-6 py-10 text-center text-muted-foreground text-sm">
                     No data found
                   </td>
                 </tr>
               ) : (
                 paginatedRows.map((row, idx) => {
-                  const stripeClass = idx % 2 === 0 ? 'bg-[oklch(0.21_0_0)]' : 'bg-[oklch(0.23_0_0)]'
+                  const stripeClass = idx % 2 === 0 ? 'bg-card' : 'bg-secondary'
                   return (
                     <tr
                       key={row.id || row.user_id || idx}
-                      className={`border-b border-[var(--border)] ${stripeClass} hover:bg-[oklch(0.24_0_0)] transition-colors row-animate`}
+                      className={`border-b border-border ${stripeClass} hover:bg-accent transition-colors row-animate`}
                     >
                     {displayColumns.map((col) => {
                       const value = row[col.key]
@@ -505,7 +514,7 @@ export default function DynamicTable({
                       return (
                         <td
                           key={col.key}
-                          className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-base text-[oklch(0.80_0_0)] truncate ${col.minWidth || ''}`}
+                          className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-base text-foreground dark:text-foreground truncate border-r border-border ${col.minWidth || ''}`}
                         >
                           {content}
                         </td>
@@ -513,7 +522,7 @@ export default function DynamicTable({
                     })}
                     {renderActions && (
                       <td
-                        className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                        className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm w-[100px] sm:w-[180px] flex-shrink-0 sticky right-0 ${stripeClass} text-foreground z-[60] border-l-2 border-border`}
                       >
                         <div className="relative h-full w-full flex items-center justify-center">
                           {renderActions(row)}
@@ -536,25 +545,25 @@ export default function DynamicTable({
                 Array.from({ length: emptyRowCount }).map((_, idx) => (
                   <tr
                     key={`empty-row-${idx}`}
-                    className={`border-b border-[var(--border)] ${(paginatedRows.length + idx) % 2 === 0 ? 'bg-[oklch(0.21_0_0)]' : 'bg-[oklch(0.23_0_0)]'} row-animate-soft`}
+                    className={`border-b border-border ${(paginatedRows.length + idx) % 2 === 0 ? 'bg-card' : 'bg-secondary'} row-animate-soft`}
                     style={{ height: '38px' }}
                   >
                     {displayColumns.map((col) => (
                       <td
                         key={`${col.key}-empty-${idx}`}
-                        className={`px-3 py-1.5 text-base text-[oklch(0.65_0_0)] ${col.minWidth || ''}`}
+                        className={`px-3 py-1.5 text-base text-muted-foreground border-r border-border ${col.minWidth || ''}`}
                       >
                         {' '}
                       </td>
                     ))}
                     {renderActions && (
                       <td
-                        className="px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 bg-[oklch(0.16_0_0)] text-[oklch(0.92_0_0)] border-l border-[var(--border)] z-20 shadow-[rgba(0,0,0,0.35)_-4px_0_6px_0]"
+                        className={`px-3 py-1.5 text-sm w-[120px] flex-shrink-0 sticky right-0 ${(paginatedRows.length + idx) % 2 === 0 ? 'bg-card' : 'bg-secondary'} text-foreground z-[60] border-l-2 border-border`}
                       >
                         <div className="relative h-full w-full flex items-center justify-center">
                           {'\u00A0'}
                           <span
-                            className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent"
+                            className="absolute right-0 top-0 h-full w-3 cursor-col-resize select-none bg-transparent "
                             onMouseDown={(event) => {
                               event.stopPropagation()
                               handleResizeStart(event, { key: '__actions__', minWidth: 'min-w-[120px]' })

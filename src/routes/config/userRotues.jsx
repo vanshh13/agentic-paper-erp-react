@@ -7,7 +7,6 @@ const userRoutes = [
       isProtected: true,
       title: 'Login',
       isSidebar: true,
-      category: 'user',
       isLayout: true,
     }
   ];

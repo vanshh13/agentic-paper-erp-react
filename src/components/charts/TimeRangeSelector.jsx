@@ -7,15 +7,15 @@ export default function TimeRangeSelector({ selectedRange, onRangeChange }) {
   ]
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap justify-end gap-2 w-full md:w-auto">
       {ranges.map((range) => (
         <button
           key={range.value}
           onClick={() => onRangeChange(range.value)}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+          className={`px-2.5 py-1.5 text-[11px] font-medium rounded-lg whitespace-nowrap transition-colors ${
             selectedRange === range.value
               ? 'bg-indigo-600 text-white'
-              : 'bg-[oklch(0.22_0_0)] text-[oklch(0.75_0_0)] hover:bg-[oklch(0.24_0_0)] hover:text-[oklch(0.92_0_0)]'
+              : 'bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
           }`}
         >
           {range.label}

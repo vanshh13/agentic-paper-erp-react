@@ -1,15 +1,56 @@
 import { useState, useRef, useEffect } from 'react'
-import InteractiveAIAvatar from '../../components/InteractiveAIAvatar'
-import { Send, Paperclip, X } from 'lucide-react'
-import ChatInput from '../../components/Chats/chat-input-box'
+import { Send, Paperclip, X, Copy, Check, Loader2 } from 'lucide-react'
+import InteractiveAIAvatar from './components/InteractiveAIAvatar-main'
+
+// Placeholder for ChatInput - replace with your actual component
+const ChatInput = ({ onSend, isProcessingMessage, onStop }) => {
+  const [message, setMessage] = useState('')
+  
+  return (
+    <div className="flex gap-2 items-center">
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyPress={(e) => e.key === 'Enter' && !isProcessingMessage && onSend(message)}
+        placeholder="Type your message..."
+        className="flex-1 input-surface px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+        disabled={isProcessingMessage}
+      />
+      {isProcessingMessage ? (
+        <button
+          onClick={onStop}
+          className="px-4 py-3 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90 transition-opacity"
+        >
+          Stop
+        </button>
+      ) : (
+        <button
+          onClick={() => onSend(message)}
+          disabled={!message.trim()}
+          className="px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+        >
+          <Send className="w-5 h-5" />
+        </button>
+      )}
+    </div>
+  )
+}
 
 // Chat Messages Component
 const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
   const messagesEndRef = useRef(null)
+  const [copiedIndex, setCopiedIndex] = useState(null)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages, showSkeletonOfAi])
+
+  const handleCopy = (message, index) => {
+    navigator.clipboard.writeText(message)
+    setCopiedIndex(index)
+    setTimeout(() => setCopiedIndex(null), 2000)
+  }
 
   // Function to render file previews
   const renderFilePreview = (file) => {
@@ -35,16 +76,16 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
 
     if (file.type.startsWith('image/')) {
       return (
-        <div className="mt-2">
+        <div className="mt-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <img 
             src={URL.createObjectURL(file)} 
             alt={file.name}
-            className="max-w-[200px] max-h-[200px] rounded-lg object-cover cursor-pointer"
+            className="max-w-[280px] max-h-[280px] rounded-xl object-cover cursor-pointer shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-[1.02]"
             onClick={() => openFileInNewTab(file)}
           />
-          <div className="mt-1 flex space-x-2">
+          <div className="mt-2 flex gap-2">
             <button
-              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
+              className="px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded-lg hover:opacity-90 transition-all duration-200 font-medium"
               onClick={(e) => {
                 e.stopPropagation()
                 openFileInNewTab(file)
@@ -53,7 +94,7 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
               Open Full Size
             </button>
             <button
-              className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
+              className="px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-lg hover:bg-accent transition-all duration-200 font-medium"
               onClick={(e) => {
                 e.stopPropagation()
                 downloadFile(file)
@@ -62,68 +103,72 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
               Download
             </button>
           </div>
-          <p className="text-xs text-gray-400 mt-1">{file.name}</p>
+          <p className="text-xs text-muted-foreground mt-2">{file.name}</p>
         </div>
       )
     } else {
       // Determine file type icon
       let fileIcon = (
-        <svg className="w-8 h-8 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       )
 
       if (file.type.includes('pdf')) {
         fileIcon = (
-          <svg className="w-8 h-8 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         )
       } else if (file.type.includes('excel') || file.type.includes('spreadsheet') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
         fileIcon = (
-          <svg className="w-8 h-8 text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         )
       } else if (file.type.includes('word') || file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
         fileIcon = (
-          <svg className="w-8 h-8 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
         )
       }
 
       return (
-        <div className="mt-2 p-2 bg-gray-800 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors">
-          <div 
-            className="flex items-center"
-            onClick={() => openFileInNewTab(file)}
-          >
-            {fileIcon}
-            <div>
-              <p className="text-sm text-white">{file.name}</p>
-              <p className="text-xs text-gray-400">{(file.size / 1024).toFixed(1)} KB</p>
+        <div className="mt-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="p-3 card-surface cursor-pointer hover:bg-accent transition-all duration-200 group">
+            <div 
+              className="flex items-center gap-3"
+              onClick={() => openFileInNewTab(file)}
+            >
+              <div className="flex-shrink-0 transform group-hover:scale-110 transition-transform duration-200">
+                {fileIcon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
+              </div>
             </div>
-          </div>
-          <div className="mt-2 flex space-x-2">
-            <button
-              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation()
-                openFileInNewTab(file)
-              }}
-            >
-              Open
-            </button>
-            <button
-              className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors"
-              onClick={(e) => {
-                e.stopPropagation()
-                downloadFile(file)
-              }}
-            >
-              Download
-            </button>
+            <div className="mt-3 flex gap-2">
+              <button
+                className="flex-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded-lg hover:opacity-90 transition-all duration-200 font-medium"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  openFileInNewTab(file)
+                }}
+              >
+                Open
+              </button>
+              <button
+                className="flex-1 px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-lg hover:bg-accent transition-all duration-200 font-medium"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  downloadFile(file)
+                }}
+              >
+                Download
+              </button>
+            </div>
           </div>
         </div>
       )
@@ -133,45 +178,41 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
   if (!chatMessages?.length && !showSkeletonOfAi) return null
 
   return (
-    <div className="flex flex-col space-y-3 p-4">
+    <div className="flex flex-col space-y-6 p-6">
       {chatMessages.map(({ role, message, files }, index) => {
         return (
           <div
             key={index}
-            className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-3 duration-500`}
+            style={{ animationDelay: `${index * 50}ms` }}
           >
             <div
-              className={`flex items-start max-w-[80%] ${role === 'user'
-                ? 'flex-row-reverse space-x-reverse'
-                : 'flex-row'
-                }`}
+              className={`flex items-start max-w-[85%] gap-3 ${
+                role === 'user' ? 'flex-row-reverse' : 'flex-row'
+              }`}
             >
               {/* Avatar */}
-              {role === 'user' ? (
-                <></>
-              ) : (
-                <div className="w-10 h-10 flex-shrink-0">
+              {role === 'assistant' && (
+                <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden shadow-card">
                   <InteractiveAIAvatar />
                 </div>
               )}
 
               {/* Message Content */}
-              <div
-                className={`flex ${role === 'user' ? 'items-end' : 'items-start'
-                  }`}
-              >
+              <div className="flex flex-col gap-2">
                 <div
-                  className={`p-3 rounded-2xl ${role === 'user'
-                    ? 'bg-blue-500 text-white rounded-tr-none'
-                    : 'bg-gray-900 text-white rounded-tl-none'
-                    }`}
+                  className={`group relative px-5 py-3.5 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 ${
+                    role === 'user'
+                      ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                      : 'card-surface rounded-tl-sm'
+                  }`}
                 >
-                  <div className="text-sm">
+                  <div className="text-[15px] leading-relaxed">
                     <div style={{ whiteSpace: 'pre-line' }}>{message}</div>
                     
                     {/* File previews */}
                     {files && files.length > 0 && (
-                      <div className="mt-2">
+                      <div className="mt-2 space-y-2">
                         {files.map((file, fileIndex) => (
                           <div key={fileIndex}>
                             {renderFilePreview(file)}
@@ -179,21 +220,27 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
                         ))}
                       </div>
                     )}
-                    
-                    {/* Copy button for AI messages */}
-                    {role === 'assistant' && (
-                      <button
-                        className="ml-2 p-1 rounded hover:bg-gray-700 transition"
-                        onClick={() => navigator.clipboard.writeText(message)}
-                        title="Copy message"
-                      >
-                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                          <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012 2h9a2 2 0 012 2v1" />
-                        </svg>
-                      </button>
-                    )}
                   </div>
+
+                  {/* Copy button for AI messages */}
+                  {role === 'assistant' && (
+                    <button
+                      className="absolute -bottom-8 right-0 p-2 rounded-lg hover:bg-accent transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      onClick={() => handleCopy(message, index)}
+                      title="Copy message"
+                    >
+                      {copiedIndex === index ? (
+                        <Check className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* Timestamp */}
+                <div className={`text-xs text-muted-foreground px-2 ${role === 'user' ? 'text-right' : 'text-left'}`}>
+                  {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
             </div>
@@ -203,33 +250,31 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
       
       {/* AI Thinking Skeleton */}
       {showSkeletonOfAi && (
-        <div className="flex justify-start p-6">
-          <div className="flex items-start space-x-4 max-w-[80%] group">
-            {/* Avatar skeleton with pulse effect */}
-            <div className="relative overflow-hidden">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-cyan-800 via-cyan-700 to-cyan-800 animate-pulse shadow-lg" />
-            </div>
+        <div className="flex justify-start animate-in fade-in slide-in-from-bottom-3 duration-500">
+          <div className="flex items-start gap-3 max-w-[85%]">
+            {/* Avatar skeleton */}
+            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-secondary animate-pulse shadow-card" />
 
             {/* Message content */}
-            <div className="flex flex-col space-y-3">
-              {/* Message bubble */}
-              <div className="p-5 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl rounded-tl-none shadow-xl relative overflow-hidden transition-all duration-300 hover:shadow-cyan-700/20">
-                {/* Subtle background pattern */}
-                <div className="absolute inset-0 opacity-10">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 via-cyan-500/20 to-cyan-400/20" />
+            <div className="flex flex-col gap-2">
+              <div className="px-5 py-4 card-surface rounded-2xl rounded-tl-sm shadow-card min-w-[300px]">
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <div className="w-32 h-3.5 bg-muted rounded-full animate-pulse" />
+                    <div className="w-20 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                  </div>
+                  <div className="w-48 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
+                  <div className="flex gap-2">
+                    <div className="w-28 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '450ms' }} />
+                    <div className="w-24 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '600ms' }} />
+                  </div>
                 </div>
 
-                {/* Text lines with dynamic widths and smooth animations */}
-                <div className="space-y-3 relative">
-                  <div className="flex space-x-2">
-                    <div className="w-40 h-4 bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 rounded-full animate-pulse" />
-                    <div className="w-20 h-4 bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 rounded-full animate-pulse" />
-                  </div>
-                  <div className="w-56 h-4 bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 rounded-full animate-pulse" />
-                  <div className="flex space-x-2">
-                    <div className="w-32 h-4 bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 rounded-full animate-pulse" />
-                    <div className="w-24 h-4 bg-gradient-to-r from-cyan-800 via-cyan-700 to-cyan-800 rounded-full animate-pulse" />
-                  </div>
+                {/* Typing indicator */}
+                <div className="flex gap-1.5 mt-4">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>
@@ -245,12 +290,31 @@ const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
 
 // Main Chat Screen UI Component
 export default function ChatScreenUI() {
+  const [isDarkMode] = useState(true)
   const [chatMessages, setChatMessages] = useState([])
   const [showSkeletonOfAi, setShowSkeletonOfAi] = useState(false)
   const [isProcessingMessage, setIsProcessingMessage] = useState(false)
 
+  const getGreetingText = () => {
+    const hours = new Date().getHours()
+    if (hours >= 0 && hours < 12) return 'Good Morning'
+    if (hours >= 12 && hours < 17) return 'Good Afternoon'
+    return 'Good Evening'
+  }
+
+  useEffect(() => {
+    const greeting = getGreetingText()
+    setChatMessages([
+      {
+        role: 'assistant',
+        message: `${greeting}! I'm your AI Assistant. How can I help you today?`
+      }
+    ])
+  }, [])
+
   const handleSendMessage = (message, files = []) => {
-    // Add user message
+    if (!message.trim() && files.length === 0) return
+
     setChatMessages(prev => [
       ...prev,
       {
@@ -260,11 +324,9 @@ export default function ChatScreenUI() {
       }
     ])
 
-    // Show AI thinking skeleton
     setShowSkeletonOfAi(true)
     setIsProcessingMessage(true)
 
-    // Simulate AI response (replace with actual API call)
     setTimeout(() => {
       setChatMessages(prev => [
         ...prev,
@@ -282,74 +344,47 @@ export default function ChatScreenUI() {
     setShowSkeletonOfAi(false)
     setIsProcessingMessage(false)
   }
-
-  // Get time-based greeting
-  const getGreeting = () => {
-    const now = new Date()
-    const hours = now.getHours()
-    
-    if (hours >= 0 && hours < 12) {
-      return 'Good Morning'
-    } else if (hours >= 12 && hours < 17) {
-      return 'Good Afternoon'
-    } else {
-      return 'Good Evening'
-    }
-  }
-
-  const [greeting] = useState(getGreeting())
-
   return (
-    <div className="relative h-screen bg-[oklch(0.15_0_0)] text-[oklch(0.95_0_0)] overflow-hidden flex flex-col">
-      {/* Header */}
-      <div className="flex-shrink-0 p-4 border-b border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)]">
-        <div className="flex items-center justify-between">
+    <div
+      className="relative h-screen bg-background text-foreground overflow-hidden flex flex-col"
+      data-theme={isDarkMode ? 'dark' : 'light'}
+    >
+      {/* FIXED HEADER 
+          - Removed 'p-5' to eliminate top/side margins
+          - Added 'h-16' for a consistent fixed height
+          - Added 'px-5' for side padding only
+      */}
+      <header className="flex-shrink-0 h-16 border-b border-border bg-card/80 backdrop-blur-md z-20 flex items-center shadow-sm">
+        <div className="w-full px-5 flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden">
+            <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-primary/20">
               <InteractiveAIAvatar />
             </div>
-            <div>
-              <h1 className="text-lg font-semibold text-[oklch(0.95_0_0)]">
-                AI Assistant
-              </h1>
-              <p className="text-xs text-[oklch(0.70_0_0)]">
-                Hey {greeting}, I am Your AI Assistant
-              </p>
-            </div>
+            <h1 className="text-md font-bold text-foreground">AI Assistant</h1>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* Chat Messages Area */}
-      <div className="flex-1 overflow-y-auto bg-[oklch(0.15_0_0)]">
-        {chatMessages.length === 0 && (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="w-32 h-32 mx-auto mb-4">
-                <InteractiveAIAvatar />
-              </div>
-              <p className="text-lg text-[oklch(0.70_0_0)]">
-                Start a conversation with your AI Assistant
-              </p>
-            </div>
-          </div>
-        )}
+      {/* SCROLLABLE CONTENT 
+          - flex-1 ensures it takes up all space between header and footer
+      */}
+      <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
         <ChatMessagesComp 
           chatMessages={chatMessages}
           showSkeletonOfAi={showSkeletonOfAi}
         />
-      </div>
+      </main>
 
-      {/* Chat Input Area */}
-      <div className="flex-shrink-0 p-4 border-t border-[oklch(0.25_0_0)] bg-[oklch(0.15_0_0)]">
-        <ChatInput
-          onSend={handleSendMessage}
-          isProcessingMessage={isProcessingMessage}
-          onStop={handleStopRequest}
-          onAgenticChange={() => {}}
-        />
-      </div>
+      {/* FIXED FOOTER */}
+<footer className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl p-5 z-20">
+<div className="bg-card/80 backdrop-blur-md rounded-2xl border border-border shadow-lg p-2">
+  <ChatInput
+    onSend={handleSendMessage}
+    isProcessingMessage={isProcessingMessage}
+    onStop={handleStopRequest}
+  />
+</div>
+</footer>
     </div>
   )
 }
-

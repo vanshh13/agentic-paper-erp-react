@@ -24,6 +24,7 @@ import Notification from '../../components/notifiction/notifiction'
 import { useSelector } from 'react-redux'
 
 export default function Inquiry() {
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
   // Main state
   const [inquiries, setInquiries] = useState([])
   const [loading, setLoading] = useState(true)
@@ -780,21 +781,21 @@ export default function Inquiry() {
   }
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full">
+    <div className="space-y-6 pb-10 text-foreground w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg gradient-primary shadow-glow text-[oklch(0.98_0_0)]">
+            <div className="p-2 rounded-lg gradient-primary shadow-glow text-foreground">
               <MessageSquare className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[oklch(0.98_0_0)]">Inquiries</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Inquiries</h2>
             
           </div>
-          <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">
+          <p className="text-muted-foreground text-sm md:text-base">
             Track and manage customer inquiries from all sources
           </p>
-          <div className="flex items-center gap-2 mt-2 text-xs text-[oklch(0.65_0_0)]">
+          <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
               Showing data from all companies
@@ -803,7 +804,7 @@ export default function Inquiry() {
         </div>
         <button
           onClick={handleOpenCreateForm}
-          className="flex items-center gap-2 gradient-primary text-[oklch(0.98_0_0)] px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap"
+          className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           New Inquiry
@@ -813,14 +814,14 @@ export default function Inquiry() {
       {/* Stats Cards */}
       <div className="grid gap-3 md:gap-4 grid-cols-2 md:grid-cols-5">
         {[
-          { label: 'Total', value: counts.all, color: 'text-[oklch(0.96_0_0)]' },
+          { label: 'Total', value: counts.all, color: 'text-violet-600' },
           { label: 'Pending', value: counts.pending, color: 'text-sky-300' },
           { label: 'Follow Up', value: counts.follow_up, color: 'text-amber-300' },
           { label: 'Converted', value: counts.success, color: 'text-emerald-300' },
           { label: 'Rejected', value: counts.rejected, color: 'text-rose-300' },
         ].map((stat) => (
           <div key={stat.label} className="card-surface shadow-card-hover p-4 md:p-6">
-            <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">{stat.label}</div>
+            <div className="text-xs md:text-sm font-medium text-muted-foreground mb-1">{stat.label}</div>
             <div className={`text-xl md:text-2xl font-bold ${stat.color}`}>{stat.value}</div>
           </div>
         ))}

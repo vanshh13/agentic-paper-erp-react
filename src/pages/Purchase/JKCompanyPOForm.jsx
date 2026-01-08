@@ -1,4 +1,5 @@
 import { X } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 export default function JKCompanyPOForm({
   formData,
@@ -12,6 +13,8 @@ export default function JKCompanyPOForm({
   title,
 }) {
   if (!showDialog) return null
+
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
 
   const isEdit = mode === 'edit'
   const formTitle = title || (isEdit ? 'Update JK Company PO' : 'JK Company Purchase Order')
@@ -64,15 +67,17 @@ export default function JKCompanyPOForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
-      <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
-        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 flex justify-between items-start">
+    <div
+      className={`fixed inset-0 ${isDarkMode ? 'bg-black/70' : 'bg-black/50'} backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50`}
+    >
+      <div className="bg-card text-card-foreground rounded-xl shadow-card max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-border custom-scrollbar">
+        <div className="p-4 md:p-6 border-b border-border sticky top-0 bg-card z-10 flex justify-between items-start">
           <div>
             <h3 className="text-xl md:text-2xl font-bold">{formTitle}</h3>
           </div>
           <button
             onClick={() => setShowDialog(false)}
-            className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.95_0_0)] transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -81,7 +86,7 @@ export default function JKCompanyPOForm({
         <div className="p-4 md:p-6 space-y-6">
           {/* Basic Details Section */}
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Purchase Order Details</h4>
+            <h4 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">Purchase Order Details</h4>
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
@@ -146,21 +151,6 @@ export default function JKCompanyPOForm({
                     <option value="cif">CIF</option>
                     <option value="cpt">CPT</option>
                     <option value="dap">DAP</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Delivery Type <span className="text-rose-300">*</span>
-                  </label>
-                  <select
-                    value={formData.deliveryType || ''}
-                    onChange={(e) => setFormData({ ...formData, deliveryType: e.target.value })}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)] rounded"
-                  >
-                    <option value="">Select delivery type</option>
-                    <option value="warehouse">Warehouse</option>
-                    <option value="direct">Direct Delivery</option>
-                    <option value="mixed">Mixed</option>
                   </select>
                 </div>
                 <div>
@@ -328,8 +318,8 @@ export default function JKCompanyPOForm({
 
           {/* Import / Customs (Optional) */}
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Import / Customs (Optional)</h4>
-            <div className="grid gap-4 md:grid-cols-3 bg-[oklch(0.18_0_0)] p-4 rounded-lg">
+            <h4 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">Import / Customs (Optional)</h4>
+            <div className="grid gap-4 md:grid-cols-3 bg-background p-4 rounded-lg">
               <div>
                 <label className="block text-sm font-medium mb-2">Country of Origin</label>
                 <input
@@ -408,8 +398,8 @@ export default function JKCompanyPOForm({
 
           {/* Insurance Information Section */}
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Insurance Information</h4>
-            <div className="bg-[oklch(0.18_0_0)] p-4 rounded-lg space-y-4">
+            <h4 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">Insurance Information</h4>
+            <div className="bg-background p-4 rounded-lg space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
                   <label className="block text-sm font-medium mb-2">Insurance Terms</label>
@@ -456,15 +446,15 @@ export default function JKCompanyPOForm({
 
           {/* Product Line Items Section */}
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Product Line Items</h4>
-            <p className="text-sm text-[oklch(0.70_0_0)] mb-4">Add products to this purchase order</p>
+            <h4 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">Product Line Items</h4>
+            <p className="text-sm text-muted-foreground mb-4">Add products to this purchase order</p>
             
-            <div className="space-y-4 bg-[oklch(0.18_0_0)] p-4 rounded-lg">
+            <div className="space-y-4 bg-background p-4 rounded-lg">
               {formData.lineItems && formData.lineItems.length > 0 ? (
                 formData.lineItems.map((item, index) => (
-                  <div key={index} className="bg-[oklch(0.20_0_0)] p-4 rounded-lg border border-[var(--border)] space-y-4">
+                  <div key={index} className="bg-card p-4 rounded-lg border border-border space-y-4">
                     <div className="flex justify-between items-center mb-3">
-                      <h5 className="font-semibold text-[oklch(0.85_0_0)]">Item {index + 1}</h5>
+                      <h5 className="font-semibold text-foreground">Item {index + 1}</h5>
                       <button
                         onClick={() => handleRemoveItem(index)}
                         className="text-sm text-rose-300 hover:text-rose-200 transition-colors"
@@ -714,14 +704,14 @@ export default function JKCompanyPOForm({
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-[oklch(0.65_0_0)]">
+                <div className="text-center py-8 text-muted-foreground">
                   <p className="text-sm">No items added yet</p>
                 </div>
               )}
 
               <button
                 onClick={handleAddItem}
-                className="w-full py-2 border border-dashed border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm font-medium"
+                className="w-full py-2 border border-dashed border-border rounded-lg text-foreground hover:bg-accent transition-colors text-sm font-medium"
               >
                 + Add Another Item
               </button>
@@ -730,7 +720,7 @@ export default function JKCompanyPOForm({
 
           {/* Special Remarks Section */}
           <div>
-            <h4 className="text-lg font-bold mb-4 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Special Remarks</h4>
+            <h4 className="text-lg font-bold mb-4 text-foreground border-b border-border pb-2">Special Remarks</h4>
             <textarea
               placeholder="Any special instructions or requirements"
               value={formData.specialRemarks || ''}
@@ -741,10 +731,10 @@ export default function JKCompanyPOForm({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               onClick={() => setShowDialog(false)}
-              className="px-6 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors font-medium"
+              className="px-6 py-2 border border-border rounded-lg text-foreground hover:bg-accent transition-colors font-medium"
             >
               Cancel
             </button>

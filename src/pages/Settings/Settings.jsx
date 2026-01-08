@@ -25,7 +25,7 @@ export default function Settings() {
   }
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 text-foreground w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -34,8 +34,8 @@ export default function Settings() {
               <SettingsIcon className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Settings</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">Demo configuration options for the site</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Settings</h1>
+              <p className="text-muted-foreground text-sm md:text-base mt-1">Demo configuration options for the site</p>
             </div>
           </div>
           <button
@@ -46,7 +46,7 @@ export default function Settings() {
             Save Demo
           </button>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <span className="w-2 h-2 bg-purple-400 rounded-sm"></span>
             Showing dummy settings only
@@ -55,10 +55,10 @@ export default function Settings() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 grid-cols-3 gap-4">
         {STATS.map((item) => (
           <div key={item.label} className="card-surface p-5 md:p-6 rounded-xl border border-[var(--border)]">
-            <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-2">{item.label}</p>
+            <p className="text-xs md:text-sm text-muted-foreground mb-2">{item.label}</p>
             <p className={`text-3xl md:text-4xl font-bold ${item.color}`}>{item.value}</p>
           </div>
         ))}
@@ -70,42 +70,42 @@ export default function Settings() {
         <div className="card-surface rounded-xl border border-[var(--border)] p-5 md:p-6 space-y-4">
           <div className="flex items-center gap-2">
             <Globe className="w-5 h-5 text-purple-400" />
-            <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)]">General</h3>
+            <h3 className="text-base md:text-lg font-semibold text-foreground">General</h3>
           </div>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-1">Company Name</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Company Name</label>
               <input
                 value={settings.companyName}
                 onChange={(e) => handleChange('companyName', e.target.value)}
-                className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-4 py-2 text-[oklch(0.95_0_0)] placeholder:text-[oklch(0.65_0_0)] focus:outline-none"
+                className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-1">Email</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                 <input
                   value={settings.email}
                   onChange={(e) => handleChange('email', e.target.value)}
-                  className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-4 py-2 text-[oklch(0.95_0_0)] placeholder:text-[oklch(0.65_0_0)] focus:outline-none"
+                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-1">Phone</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
                 <input
                   value={settings.phone}
                   onChange={(e) => handleChange('phone', e.target.value)}
-                  className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-4 py-2 text-[oklch(0.95_0_0)] placeholder:text-[oklch(0.65_0_0)] focus:outline-none"
+                  className="w-full bg-input border border-border rounded-lg px-4 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none"
                 />
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-1">Language</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Language</label>
                 <select
                   value={settings.language}
                   onChange={(e) => handleChange('language', e.target.value)}
-                  className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-[oklch(0.95_0_0)] focus:outline-none"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none"
                 >
                   <option>English</option>
                   <option>Hindi</option>
@@ -113,11 +113,11 @@ export default function Settings() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-[oklch(0.85_0_0)] mb-1">Timezone</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Timezone</label>
                 <select
                   value={settings.timezone}
                   onChange={(e) => handleChange('timezone', e.target.value)}
-                  className="w-full bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-[oklch(0.95_0_0)] focus:outline-none"
+                  className="w-full bg-input border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none"
                 >
                   <option>IST (UTC+5:30)</option>
                   <option>PST (UTC-8:00)</option>
@@ -132,10 +132,10 @@ export default function Settings() {
         <div className="card-surface rounded-xl border border-[var(--border)] p-5 md:p-6 space-y-4">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-blue-400" />
-            <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)]">Security & Notifications</h3>
+            <h3 className="text-base md:text-lg font-semibold text-foreground">Security & Notifications</h3>
           </div>
           <div className="space-y-3">
-            <label className="flex items-center justify-between bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[oklch(0.90_0_0)]">
+            <label className="flex items-center justify-between bg-input border border-border rounded-lg px-4 py-3 text-sm text-foreground">
               <span className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-blue-400" />
                 OTP Enabled (demo)
@@ -148,7 +148,7 @@ export default function Settings() {
               />
             </label>
 
-            <label className="flex items-center justify-between bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[oklch(0.90_0_0)]">
+            <label className="flex items-center justify-between bg-input border border-border rounded-lg px-4 py-3 text-sm text-foreground">
               <span className="flex items-center gap-2">
                 <Bell className="w-4 h-4 text-emerald-400" />
                 Email Notifications (demo)

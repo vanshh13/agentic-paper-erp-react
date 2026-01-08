@@ -1,14 +1,14 @@
 import { X, FileText, User, MapPin, Phone, Mail, MessageSquare, Package, UserCircle, Plus, Trash2, Edit2 } from 'lucide-react'
 
 const statusConfig = {
-  new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-  open: { label: 'Open', color: 'bg-emerald-500/15 text-emerald-200' },
-  parsed: { label: 'Parsed', color: 'bg-indigo-500/15 text-indigo-200' },
-  pi_sent: { label: 'PI Sent', color: 'bg-cyan-500/15 text-cyan-200' },
-  follow_up: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
-  converted: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
-  rejected: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
-  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
+  new: { label: 'New', color: 'bg-emerald-500/15 text-foreground' },
+  open: { label: 'Open', color: 'bg-emerald-500/15 text-foreground' },
+  parsed: { label: 'Parsed', color: 'bg-indigo-500/15 text-foreground' },
+  pi_sent: { label: 'PI Sent', color: 'bg-cyan-500/15 text-foreground' },
+  follow_up: { label: 'Follow Up', color: 'bg-amber-500/20 text-foreground' },
+  converted: { label: 'Converted', color: 'bg-emerald-500/20 text-foreground' },
+  rejected: { label: 'Rejected', color: 'bg-rose-500/20 text-foreground' },
+  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-foreground' },
 }
 
 const sourceConfig = {
@@ -20,10 +20,10 @@ const sourceConfig = {
 }
 
 const slaConfig = {
-  pending: { label: 'Pending', color: 'bg-gray-500/15 text-gray-200' },
-  on_track: { label: 'On Track', color: 'bg-emerald-500/15 text-emerald-200' },
-  at_risk: { label: 'At Risk', color: 'bg-amber-500/20 text-amber-200' },
-  breached: { label: 'Breached', color: 'bg-rose-500/20 text-rose-100' },
+  pending: { label: 'Pending', color: 'bg-gray-500/15 text-foreground' },
+  on_track: { label: 'On Track', color: 'bg-emerald-500/15 text-foreground' },
+  at_risk: { label: 'At Risk', color: 'bg-amber-500/20 text-foreground' },
+  breached: { label: 'Breached', color: 'bg-rose-500/20 text-foreground' },
 }
 
 export default function InquiryView({
@@ -125,12 +125,12 @@ export default function InquiryView({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50 overflow-y-auto">
-      <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-6xl w-full my-8 border border-[var(--border)]">
+      <div className="card-surface rounded-xl shadow-card max-w-6xl w-full my-8 border border-[var(--border)]">
         {/* Header */}
-        <div className="p-4 md:p-6 border-b border-[var(--border)] flex justify-between items-start gap-4 sticky top-0 bg-[oklch(0.20_0_0)] z-10 rounded-t-xl">
+        <div className="p-4 md:p-6 border-b border-[var(--border)] flex justify-between items-start gap-4 sticky top-0 bg-card z-10 rounded-t-xl">
           <div className="flex-1 min-w-0">
             <h3 className="text-xl md:text-2xl font-bold truncate">Inquiry Details</h3>
-            <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1 font-mono truncate">
+            <p className="text-muted-foreground text-xs md:text-sm mt-1 font-mono truncate">
               {selectedInquiry.inquiryNumber || selectedInquiry.inquiry_code || 'No Inquiry Number'}
             </p>
           </div>
@@ -139,7 +139,7 @@ export default function InquiryView({
             {/* Edit Button */}
             <button
               onClick={() => onEdit && onEdit(selectedInquiry)}
-              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-indigo-500/20 transition-all"
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-input text-foreground border border-[var(--border)] rounded-lg text-xs md:text-sm font-semibold hover:bg-accent transition-all"
             >
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">Edit</span>
@@ -148,9 +148,9 @@ export default function InquiryView({
             {/* Delete Button */}
             <button
               onClick={() => onDelete && onDelete(selectedInquiry.id)}
-              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-lg text-xs md:text-sm font-semibold hover:bg-rose-500 hover:text-white transition-all duration-200 group"
+              className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-destructive text-destructive-foreground border border-[var(--border)] rounded-lg text-xs md:text-sm font-semibold hover:opacity-90 transition-all duration-200"
             >
-              <Trash2 className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
+              <Trash2 className="w-4 h-4" />
               <span className="hidden sm:inline">Delete</span>
             </button>
             
@@ -163,7 +163,7 @@ export default function InquiryView({
                 setShowDetailDialog(false)
                 setShowInteractionForm(false)
               }}
-              className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.96_0_0)] p-1.5 rounded-lg hover:bg-[oklch(0.24_0_0)] transition-colors"
+              className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-secondary transition-colors"
             >
               <X className="w-5 h-5 md:w-6 md:h-6" />
             </button>
@@ -174,38 +174,38 @@ export default function InquiryView({
           {/* Inquiry Information */}
           <div>
             <h4 className="text-lg font-bold mb-3 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-400" />
+              <FileText className="w-5 h-5 text-muted-foreground" />
               Inquiry Information
             </h4>
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3 card-surface p-4">
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Inquiry ID</label>
-                <p className="font-mono text-sm font-semibold text-[oklch(0.96_0_0)]">
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Inquiry ID</label>
+                <p className="font-mono text-sm font-semibold text-foreground">
                   {selectedInquiry.inquiryNumber || selectedInquiry.inquiry_code || '-'}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Date & Time</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Date & Time</label>
                 <p className="text-sm">
                   {formatDateTime(selectedInquiry.inquiryDateTime || selectedInquiry.inquiry_datetime || selectedInquiry.createdAt || selectedInquiry.created_at)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Source</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Source</label>
                 <p className="text-sm capitalize">{source.label}</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Source Reference</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Source Reference</label>
                 <p className="text-sm">{selectedInquiry.sourceReference || selectedInquiry.source_reference || '-'}</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Status</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Status</label>
                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${status.color}`}>
                   {status.label}
                 </span>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Linked Order ID</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Linked Order ID</label>
                 <p className="text-sm">{selectedInquiry.linkedOrderId || selectedInquiry.linked_order_id || '-'}</p>
               </div>
             </div>
@@ -224,25 +224,25 @@ export default function InquiryView({
             </h4>
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3 card-surface p-4">
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Customer ID</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Customer ID</label>
                 <p className="text-sm font-mono">
                   {selectedInquiry.customerId || selectedInquiry.customer_details?.id || 'Pending'}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Name</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Name</label>
                 <p className="text-sm">
                   {selectedInquiry.customerName || selectedInquiry.customer_details?.name || '-'}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">POC</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">POC</label>
                 <p className="text-sm">
                   {selectedInquiry.customerPOC || selectedInquiry.customer_details?.poc_name || '-'}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1 flex items-center gap-1">
+                <label className="block text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                   <Phone className="w-3 h-3" /> Phone
                 </label>
                 <p className="text-sm">
@@ -250,7 +250,7 @@ export default function InquiryView({
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1 flex items-center gap-1">
+                <label className="block text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                   <MessageSquare className="w-3 h-3" /> WhatsApp
                 </label>
                 <p className="text-sm">
@@ -258,7 +258,7 @@ export default function InquiryView({
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1 flex items-center gap-1">
+                <label className="block text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                   <Mail className="w-3 h-3" /> Email
                 </label>
                 <p className="text-sm">
@@ -266,7 +266,7 @@ export default function InquiryView({
                 </p>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1 flex items-center gap-1">
+                <label className="block text-xs font-medium text-muted-foreground mb-1 flex items-center gap-1">
                   <MapPin className="w-3 h-3" /> Address
                 </label>
                 <p className="text-sm">
@@ -274,7 +274,7 @@ export default function InquiryView({
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Preferred Contact</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Preferred Contact</label>
                 <p className="text-sm capitalize">
                   {/* {selectedInquiry.preferredContactMethod || selectedInquiry.customer_details?.preferred_contact_method || '-'} */}
                   {selectedInquiry.customer_details?.preferred_contact_method || '-'}
@@ -286,47 +286,47 @@ export default function InquiryView({
           {/* Product & Order Details */}
           <div>
             <h4 className="text-lg font-bold mb-3 flex items-center gap-2">
-              <Package className="w-5 h-5 text-cyan-400" />
+              <Package className="w-5 h-5 text-muted-foreground" />
               Product & Order Details
             </h4>
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3 card-surface p-4">
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Product Requested</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Product Requested</label>
                 <p className="text-sm">{selectedInquiry.productRequested || selectedInquiry.product_requested || '-'}</p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Expected Price</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Expected Price</label>
                 <p className="text-sm">
                   {formatPrice(selectedInquiry.expectedPrice || selectedInquiry.expected_price)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Expected Delivery</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Expected Delivery</label>
                 <p className="text-sm">
                   {formatDate(selectedInquiry.expectedDeliveryDate || selectedInquiry.expected_delivery_date)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Quantity</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Quantity</label>
                 <p className="text-sm">
                   {formatQuantity(selectedInquiry.quantity)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">UOM</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">UOM</label>
                 <p className="text-sm">{selectedInquiry.uom || '-'}</p>
               </div>
               <div className="md:col-span-3">
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Special Instructions</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Special Instructions</label>
                 <p className="text-sm whitespace-pre-wrap">
                   {selectedInquiry.specialInstructions || selectedInquiry.special_instructions || '-'}
                 </p>
               </div>
               {/* {(selectedInquiry.transcript || selectedInquiry.rawMessage) && ( */}
                 <div className="md:col-span-3">
-                  <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Transcript / Raw Message</label>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Transcript / Raw Message</label>
                   {/* <div className="bg-[oklch(0.24_0_0)] p-3 rounded-md"> */}
-                    <p className="text-sm whitespace-pre-wrap font-mono text-[oklch(0.88_0_0)]">
+                    <p className="text-sm whitespace-pre-wrap font-mono text-foreground">
                       {selectedInquiry.transcript || selectedInquiry.rawMessage}
                     </p>
                   {/* </div> */}
@@ -338,12 +338,12 @@ export default function InquiryView({
           {/* Assignment & SLA */}
           <div>
             <h4 className="text-lg font-bold mb-3 flex items-center gap-2">
-              <UserCircle className="w-5 h-5 text-purple-400" />
+              <UserCircle className="w-5 h-5 text-muted-foreground" />
               Assignment & SLA
             </h4>
             <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-4 card-surface p-4">
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Assigned To</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Assigned To</label>
                 <p className="text-sm">
                   {selectedInquiry.assignedSalesPerson || 
                    selectedInquiry.assigned_sales_person?.full_name || 
@@ -352,7 +352,7 @@ export default function InquiryView({
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Employee Code</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Employee Code</label>
                 <p className="text-sm">
                   {selectedInquiry.assignedSalesPersonCode || 
                    selectedInquiry.assigned_sales_person?.employee_code || 
@@ -361,41 +361,41 @@ export default function InquiryView({
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Working Hours</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Working Hours</label>
                 <p className="text-sm">
                   {!selectedInquiry.isWithinWorkingHours ? (
-                    <span className="text-amber-300">✗ No</span>  
+                    <span className="text-muted-foreground">✗ No</span>
                   ) : (
-                    <span className="text-emerald-300">✓ Yes</span>
+                    <span className="text-foreground">✓ Yes</span>
                   )}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Due Time</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Due Time</label>
                 <p className="text-sm">
                   {formatDateTime(selectedInquiry.interactionDueTime || selectedInquiry.interaction_due_time)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">SLA Status</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">SLA Status</label>
                 <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${sla.color}`}>
                   {sla.label}
                 </span>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Total Interactions</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Total Interactions</label>
                 <p className="text-sm">
                   {selectedInquiry.totalInteractions || selectedInquiry.interaction_summary?.total_interactions || 0}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Last Interaction</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Last Interaction</label>
                 <p className="text-sm">
                   {formatDateTime(selectedInquiry.lastInteractionDate || selectedInquiry.interaction_summary?.last_interaction_date)}
                 </p>
               </div>
               <div>
-                <label className="block text-xs font-medium text-[oklch(0.65_0_0)] mb-1">Last Interaction Type</label>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Last Interaction Type</label>
                 <p className="text-sm capitalize">
                   {selectedInquiry.lastInteractionType || selectedInquiry.interaction_summary?.last_interaction_type || '-'}
                 </p>
@@ -407,7 +407,7 @@ export default function InquiryView({
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-lg font-bold flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-amber-400" />
+                <MessageSquare className="w-5 h-5 text-muted-foreground" />
                 Interactions
               </h4>
               <button
@@ -426,7 +426,7 @@ export default function InquiryView({
                   }
                   setShowInteractionForm(!showInteractionForm)
                 }}
-                className="flex items-center gap-2 px-3 py-1.5 gradient-primary text-[oklch(0.98_0_0)] rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition"
+                className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition"
               >
                 <Plus className="w-4 h-4" />
                 Add
@@ -435,16 +435,16 @@ export default function InquiryView({
 
             {showInteractionForm && (
               <div className="card-surface p-4 mb-4 space-y-3">
-                <h5 className="font-semibold text-sm text-[oklch(0.90_0_0)] mb-2">
+                <h5 className="font-semibold text-sm text-foreground mb-2">
                   {editingInteractionId ? 'Edit Interaction' : 'New Interaction'}
                 </h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
-                    <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Type <span className="text-rose-300">*</span></label>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Type <span className="text-rose-300">*</span></label>
                     <select
                       value={interactionForm.type}
                       onChange={(e) => setInteractionForm({ ...interactionForm, type: e.target.value })}
-                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     >
                       <option value="">Select type</option>
                       <option value="CALL">Call</option>
@@ -455,11 +455,11 @@ export default function InquiryView({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Outcome <span className="text-rose-300">*</span></label>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Outcome <span className="text-rose-300">*</span></label>
                     <select
                       value={interactionForm.outcome}
                       onChange={(e) => setInteractionForm({ ...interactionForm, outcome: e.target.value })}
-                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     >
                       <option value="">Select outcome</option>
                       <option value="Customer Interested">Customer Interested</option>
@@ -471,13 +471,13 @@ export default function InquiryView({
                     </select>
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Summary <span className="text-rose-300">*</span></label>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Summary <span className="text-rose-300">*</span></label>
                     <textarea
                       value={interactionForm.summary}
                       onChange={(e) => setInteractionForm({ ...interactionForm, summary: e.target.value })}
                       rows={2}
                       placeholder="Describe the interaction..."
-                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                      className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                     />
                   </div>
                   <div className="md:col-span-2">
@@ -488,26 +488,26 @@ export default function InquiryView({
                         onChange={(e) => setInteractionForm({ ...interactionForm, followUpRequired: e.target.checked })}
                         className="w-4 h-4"
                       />
-                      <span className="text-sm text-[oklch(0.90_0_0)]">Follow-up required?</span>
+                      <span className="text-sm text-foreground">Follow-up required?</span>
                     </label>
                   </div>
                   {interactionForm.followUpRequired && (
                     <>
                       <div>
-                        <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Follow-up Date & Time</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">Follow-up Date & Time</label>
                         <input
                           type="datetime-local"
                           value={interactionForm.followUpDateTime}
                           onChange={(e) => setInteractionForm({ ...interactionForm, followUpDateTime: e.target.value })}
-                          className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                          className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-[oklch(0.70_0_0)] mb-1">Follow-up Status</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">Follow-up Status</label>
                         <select
                           value={interactionForm.followUpStatus}
                           onChange={(e) => setInteractionForm({ ...interactionForm, followUpStatus: e.target.value })}
-                          className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                          className="w-full px-3 py-2 input-surface text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
                         >
                           <option value="PENDING">Pending</option>
                           <option value="SCHEDULED">Scheduled</option>
@@ -532,7 +532,7 @@ export default function InquiryView({
                         followUpStatus: 'pending'
                       })
                     }}
-                    className="px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+                    className="px-3 py-1.5 border border-[var(--border)] rounded-lg text-sm text-foreground hover:bg-accent transition-colors"
                   >
                     Cancel
                   </button>
@@ -544,7 +544,7 @@ export default function InquiryView({
                         onAddInteraction(selectedInquiry.id)
                       }
                     }}
-                    className="px-3 py-1.5 gradient-primary text-[oklch(0.98_0_0)] rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition-colors"
+                    className="px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold shadow-glow hover:opacity-90 transition-colors"
                   >
                     {editingInteractionId ? 'Update' : 'Add'}
                   </button>
@@ -555,50 +555,51 @@ export default function InquiryView({
             <div className="border border-[var(--border)] rounded-lg overflow-hidden">
               <div className="overflow-x-auto custom-scrollbar">
                 <table className="w-full min-w-[800px]">
-                  <thead className="bg-[oklch(0.22_0_0)]">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase w-12">#</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Type</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Date & Time</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Outcome</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Summary</th>
-                      <th className="px-4 py-3 text-center text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up?</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Follow-up Status</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase">Actions</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase w-12">#</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Type</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Date & Time</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Outcome</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Summary</th>
+                      <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase">Follow-up?</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Follow-up Date</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase">Follow-up Status</th>
+                      <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)]">
                     {interactions.length === 0 ? (
                       <tr>
-                        <td colSpan={9} className="px-4 py-8 text-center text-[oklch(0.70_0_0)] text-sm">
+                        <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground text-sm">
                           No interactions recorded yet
                         </td>
                       </tr>
                     ) : (
                       interactions.map((interaction, index) => (
-                        <tr key={interaction.id} className="hover:bg-[oklch(0.24_0_0)] transition-colors">
-                          <td className="px-4 py-3 text-sm text-[oklch(0.75_0_0)] font-mono">{index + 1}</td>
-                          <td className="px-4 py-3 text-sm text-[oklch(0.92_0_0)]">{interaction.interaction_type}</td>
-                          <td className="px-4 py-3 text-sm text-[oklch(0.92_0_0)]">
+                        <tr key={interaction.id} className="hover:bg-accent transition-colors">
+                          <td className="px-4 py-3 text-sm text-foreground font-mono">{index + 1}</td>
+                          <td className="px-4 py-3 text-sm text-foreground font-mono">{index + 1}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">{interaction.interaction_type}</td>
+                          <td className="px-4 py-3 text-sm text-foreground">
                             {formatDateTime(interaction.dateTime || interaction.interaction_datetime || interaction.created_at)}
                           </td>
                           <td className="px-4 py-3">
-                            <span className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-[oklch(0.26_0_0)] text-[oklch(0.90_0_0)]">
+                            <span className="inline-flex px-2 py-1 rounded-md text-xs font-medium bg-muted text-foreground">
                               {interaction.outcome}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-sm text-[oklch(0.88_0_0)] max-w-xs truncate">
+                          <td className="px-4 py-3 text-sm text-foreground max-w-xs truncate">
                             {interaction.summary}
                           </td>
                           <td className="px-4 py-3 text-center">
                             {interaction.follow_up_required ? (
-                              <span className="text-emerald-300">✓</span>
+                              <span className="text-foreground">✓</span>
                             ) : (
-                              <span className="text-[oklch(0.60_0_0)]">-</span>
+                              <span className="text-muted-foreground">-</span>
                             )}
                           </td>
-                          <td className="px-4 py-3 text-sm text-[oklch(0.88_0_0)]">
+                          <td className="px-4 py-3 text-sm text-foreground">
                             {interaction.follow_up_datetime 
                               ? formatDateTime(interaction.follow_up_datetime)
                               : '-'}
@@ -607,15 +608,15 @@ export default function InquiryView({
                             {interaction.follow_up_status ? (
                               <span className={`inline-flex px-2 py-1 rounded-md text-xs font-medium capitalize ${
                                 interaction.follow_up_status.toLowerCase() === 'completed' 
-                                  ? 'bg-emerald-500/15 text-emerald-200'
+                                  ? 'bg-emerald-500/15 text-foreground'
                                   : interaction.follow_up_status.toLowerCase() === 'scheduled'
-                                  ? 'bg-sky-500/15 text-sky-200'
-                                  : 'bg-amber-500/15 text-amber-200'
+                                  ? 'bg-sky-500/15 text-foreground'
+                                  : 'bg-amber-500/15 text-foreground'
                               }`}>
                                 {interaction.follow_up_status}
                               </span>
                             ) : (
-                              <span className="text-[oklch(0.60_0_0)]">-</span>
+                              <span className="text-muted-foreground">-</span>
                             )}
                           </td>
                           <td className="px-4 py-3 text-right">
@@ -634,14 +635,14 @@ export default function InquiryView({
                                   setEditingInteractionId(interaction.id)
                                   setShowInteractionForm(true)
                                 }}
-                                className="p-1.5 text-indigo-400 hover:text-indigo-100 hover:bg-indigo-500/20 rounded-lg transition-all"
+                                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all"
                                 title="Edit Interaction"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => onDeleteInteraction(interaction.id, selectedInquiry.id)}
-                                className="p-1.5 text-rose-400 hover:text-rose-100 hover:bg-rose-500/20 rounded-lg transition-all"
+                                className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-lg transition-all"
                                 title="Delete Interaction"
                               >
                                 <Trash2 className="w-4 h-4" />

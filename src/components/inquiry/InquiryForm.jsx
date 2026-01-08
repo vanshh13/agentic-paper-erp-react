@@ -41,21 +41,21 @@ export default function InquiryForm({
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
-      <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
-        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 relative">
+      <div className="bg-background text-foreground rounded-xl shadow-card max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
+        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-background z-10 relative">
           <button
             onClick={() => setShowDialog(false)}
-            className="absolute top-4 right-4 text-[oklch(0.75_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
           >
             <X size={20} />
           </button>
           <h3 className="text-xl md:text-2xl font-bold">{title}</h3>
-          <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">{subtitle}</p>
+          <p className="text-muted-foreground text-xs md:text-sm mt-1">{subtitle}</p>
         </div>
         <div className="p-4 md:p-6 space-y-6">
           {/* Inquiry Section */}
           <div>
-            <h4 className="text-lg font-bold mb-3 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Inquiry Section</h4>
+            <h4 className="text-lg font-bold mb-3 text-foreground border-b border-[var(--border)] pb-2">Inquiry Section</h4>
             <div className="space-y-4">
               <div className="grid gap-3 md:gap-4 md:grid-cols-3">
                 <div>
@@ -65,7 +65,7 @@ export default function InquiryForm({
                   <select
                     value={formData.source}
                     onChange={(e) => handleChange('source', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Source</option>
                     <option value="WHATSAPP">WhatsApp</option>
@@ -84,7 +84,7 @@ export default function InquiryForm({
                     placeholder="e.g., WhatsApp Group Name"
                     value={formData.sourceReference || ''}
                     onChange={(e) => handleChange('sourceReference', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 
@@ -95,7 +95,7 @@ export default function InquiryForm({
                     placeholder="SO-2025-001"
                     value={formData.linkedOrderId}
                     onChange={(e) => handleChange('linkedOrderId', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -105,7 +105,7 @@ export default function InquiryForm({
                   <select
                     value={formData.status}
                     onChange={(e) => handleChange('status', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="">Select Status</option>
                     {/* <option value="NEW">New</option> */}
@@ -123,7 +123,7 @@ export default function InquiryForm({
  
           {/* Customer Details Section - SAME AS BEFORE */}
           <div>
-            <h4 className="text-lg font-bold mb-3 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Customer Details</h4>
+            <h4 className="text-lg font-bold mb-3 text-foreground border-b border-[var(--border)] pb-2">Customer Details</h4>
             <div className="space-y-4">
               <div className="grid gap-3 md:gap-4 md:grid-cols-2">
                 <div>
@@ -134,9 +134,9 @@ export default function InquiryForm({
                     value={formData.customerId}
                     onChange={(e) => handleChange('customerId', e.target.value)}
                     readOnly
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <p className="text-xs text-[oklch(0.65_0_0)] mt-1">Will be assigned for new customers</p>
+                  <p className="text-xs text-muted-foreground mt-1">Will be assigned for new customers</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Customer Name</label>
@@ -145,7 +145,7 @@ export default function InquiryForm({
                     placeholder="Customer name"
                     value={formData.customerName}
                     onChange={(e) => handleChange('customerName', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function InquiryForm({
                     placeholder="Contact person name"
                     value={formData.customerPOC}
                     onChange={(e) => handleChange('customerPOC', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -167,7 +167,7 @@ export default function InquiryForm({
                     placeholder="+91 98765 43210"
                     value={formData.customerPhone}
                     onChange={(e) => handleChange('customerPhone', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function InquiryForm({
                     placeholder="+91 98765 43210"
                     value={formData.customerWhatsapp}
                     onChange={(e) => handleChange('customerWhatsapp', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -189,7 +189,7 @@ export default function InquiryForm({
                     placeholder="email@example.com"
                     value={formData.customerEmail}
                     onChange={(e) => handleChange('customerEmail', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
               </div>
@@ -201,7 +201,7 @@ export default function InquiryForm({
                     value={formData.customerAddress}
                     onChange={(e) => handleChange('customerAddress', e.target.value)}
                     rows={2}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -209,7 +209,7 @@ export default function InquiryForm({
                   <select
                     value={formData.preferredContactMethod}
                     onChange={(e) => handleChange('preferredContactMethod', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="whatsapp">WhatsApp</option>
                     <option value="email">Email</option>
@@ -222,7 +222,7 @@ export default function InquiryForm({
 
           {/* Product & Order Details */}
           <div>
-            <h4 className="text-lg font-bold mb-3 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Product & Order Details</h4>
+            <h4 className="text-lg font-bold mb-3 text-foreground border-b border-[var(--border)] pb-2">Product & Order Details</h4>
             <div className="space-y-4">
               <div className="grid gap-3 md:gap-4 md:grid-cols-2">
                 <div>
@@ -232,7 +232,7 @@ export default function InquiryForm({
                     placeholder="Product name or category"
                     value={formData.productRequested}
                     onChange={(e) => handleChange('productRequested', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -242,10 +242,10 @@ export default function InquiryForm({
                     placeholder="0.00"
                     value={formData.expectedPrice}
                     onChange={(e) => handleChange('expectedPrice', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                     step="0.01"
                   />
-                  <p className="text-xs text-[oklch(0.65_0_0)] mt-1">According to price list</p>
+                  <p className="text-xs text-muted-foreground mt-1">According to price list</p>
                 </div>
               </div>
               <div className="grid gap-3 md:gap-4 md:grid-cols-2">
@@ -256,7 +256,7 @@ export default function InquiryForm({
                     placeholder="0"
                     value={formData.quantity}
                     onChange={(e) => handleChange('quantity', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -265,7 +265,7 @@ export default function InquiryForm({
                   <select
                       value={formData.uom || ''}
                       onChange={(e) => handleChange('uom', e.target.value)}
-                      className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                      className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                     >
                       <option value="" disabled>
                         Select unit
@@ -285,7 +285,7 @@ export default function InquiryForm({
                   type="date"
                   value={formData.expectedDeliveryDate}
                   onChange={(e) => handleChange('expectedDeliveryDate', e.target.value)}
-                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -295,7 +295,7 @@ export default function InquiryForm({
                   value={formData.specialInstructions}
                   onChange={(e) => handleChange('specialInstructions', e.target.value)}
                   rows={2}
-                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -306,7 +306,7 @@ export default function InquiryForm({
                   value={formData.transcript || formData.rawMessage || ''}
                   onChange={(e) => handleChange('transcript', e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                  className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -314,7 +314,7 @@ export default function InquiryForm({
 
           {/* Assignment & SLA */}
           <div>
-            <h4 className="text-lg font-bold mb-3 text-[oklch(0.90_0_0)] border-b border-[var(--border)] pb-2">Assignment & SLA</h4>
+            <h4 className="text-lg font-bold mb-3 text-foreground border-b border-[var(--border)] pb-2">Assignment & SLA</h4>
             <div className="space-y-4">
               <div className="grid gap-3 md:gap-4 md:grid-cols-2">
                 <div>
@@ -325,7 +325,7 @@ export default function InquiryForm({
                     placeholder="Sales person name or ID"
                     value={formData.assignedSalesPerson}
                     onChange={(e) => handleChange('assignedSalesPerson', e.target.value)}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   />
                 </div>
                 <div>
@@ -333,7 +333,7 @@ export default function InquiryForm({
                   <select
                     value={formData.isWithinWorkingHours?.toString() || 'true'}
                     onChange={(e) => handleChange('isWithinWorkingHours', e.target.value === 'true')}
-                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+                    className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
                   >
                     <option value="true">Yes</option>
                     <option value="false">No</option>
@@ -347,7 +347,7 @@ export default function InquiryForm({
           type="datetime-local"
           value={formatForDateTimeLocal(formData.interactionDueTime)}
           onChange={(e) => handleChange('interactionDueTime', e.target.value)}
-          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>
       <div>
@@ -355,7 +355,7 @@ export default function InquiryForm({
         <select
           value={formData.slaStatus || 'PENDING'}
           onChange={(e) => handleChange('slaStatus', e.target.value)}
-          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-[oklch(0.50_0.18_280)]"
+          className="w-full px-3 py-2 input-surface focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="PENDING">Pending</option>
           <option value="ON_TRACK">On Track</option>
@@ -369,14 +369,14 @@ export default function InquiryForm({
           <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
             <button
               onClick={() => setShowDialog(false)}
-              className="px-4 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+              className="px-4 py-2 border border-[var(--border)] rounded-lg text-foreground hover:bg-secondary transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={onSubmit}
               disabled={loading}
-              className="px-4 py-2 gradient-primary text-[oklch(0.98_0_0)] rounded-lg font-semibold shadow-glow hover:opacity-90 transition-colors disabled:opacity-50"
+              className="px-4 py-2 gradient-primary text-white rounded-lg font-semibold shadow-glow hover:opacity-90 transition-colors disabled:opacity-50"
             >
               {submitButtonText}
             </button>

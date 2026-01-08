@@ -11,7 +11,6 @@ const adminRoutes = [
     isProtected: true,
     title: 'Rules',
     isSidebar: true,
-    category: 'admin',
     isLayout: true,
   },  
   {
@@ -20,7 +19,6 @@ const adminRoutes = [
     isProtected: true,
     title: 'Approvals',
     isSidebar: true,
-    category: 'admin',
     isLayout: true,
   },
   {
@@ -29,7 +27,6 @@ const adminRoutes = [
     isProtected: true,
     title: 'Users',
     isSidebar: true,
-    category: 'admin',
     isLayout: true,
   },
   {
@@ -38,7 +35,6 @@ const adminRoutes = [
     isProtected: true,
     title: 'UserDetails',
     isSidebar: true,
-    category: 'admin',
     isLayout: true,
   },
   {
@@ -47,7 +43,6 @@ const adminRoutes = [
     isProtected: true,
     title: 'Settings',
     isSidebar: true,
-    category: 'admin',
     isLayout: true,
   },
 ];

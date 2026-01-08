@@ -11,9 +11,11 @@ import {
   Filler,
 } from 'chart.js'
 import { useState, useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import TimeRangeSelector from './TimeRangeSelector'
 import ProductSelector from './ProductSelector'
 import { generatePriceHistoryData, mockProducts } from '../../data/mockChartData'
+import { createChartOptions } from '../../lib/chartTheme'
 
 // Register Chart.js components
 ChartJS.register(
@@ -30,6 +32,7 @@ ChartJS.register(
 export default function PriceHistoryChart() {
   const [selectedRange, setSelectedRange] = useState(6)
   const [selectedProduct, setSelectedProduct] = useState('1')
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
 
   // Store raw data for tooltip access
   const rawData = useMemo(() => {
@@ -61,7 +64,7 @@ export default function PriceHistoryChart() {
     }
   }, [rawData])
 
-  const options = useMemo(() => ({
+  const baseOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -69,7 +72,6 @@ export default function PriceHistoryChart() {
         display: true,
         position: 'top',
         labels: {
-          color: 'rgb(220, 220, 220)',
           font: {
             size: 12,
           },
@@ -77,11 +79,6 @@ export default function PriceHistoryChart() {
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(50, 50, 50, 0.95)',
-        titleColor: 'rgb(245, 245, 245)',
-        bodyColor: 'rgb(220, 220, 220)',
-        borderColor: 'rgba(100, 100, 100, 0.3)',
-        borderWidth: 1,
         padding: 12,
         displayColors: true,
         callbacks: {
@@ -103,17 +100,14 @@ export default function PriceHistoryChart() {
         title: {
           display: true,
           text: 'Weeks',
-          color: 'rgb(220, 220, 220)',
           font: {
             size: 11,
           },
         },
         grid: {
-          color: 'rgba(100, 100, 100, 0.2)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(180, 180, 180, 0.8)',
           font: {
             size: 10,
           },
@@ -123,11 +117,9 @@ export default function PriceHistoryChart() {
       },
       y: {
         grid: {
-          color: 'rgba(100, 100, 100, 0.2)',
           drawBorder: false,
         },
         ticks: {
-          color: 'rgba(180, 180, 180, 0.8)',
           font: {
             size: 11,
           },
@@ -138,16 +130,21 @@ export default function PriceHistoryChart() {
         beginAtZero: false,
       },
     },
-  }), [rawData])
+  }
+
+  const options = useMemo(
+    () => createChartOptions(isDarkMode, baseOptions),
+    [isDarkMode]
+  )
 
   return (
     <div className="card-surface shadow-card p-5 md:p-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h3 className="text-lg md:text-xl font-semibold text-[oklch(0.96_0_0)] mb-1">
+          <h3 className="text-lg md:text-xl font-semibold text-foreground mb-1">
             Price History
           </h3>
-          <p className="text-xs md:text-sm text-[oklch(0.70_0_0)]">
+          <p className="text-xs md:text-sm text-muted-foreground">
             Product price trend over time
           </p>
         </div>

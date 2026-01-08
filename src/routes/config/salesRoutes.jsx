@@ -10,7 +10,6 @@ const salesRoutes = [
     isProtected: true,
     title: 'Customers',
     isSidebar: true,
-    category: 'sales',
     isLayout: true,
   },
   {
@@ -19,7 +18,6 @@ const salesRoutes = [
     isProtected: true,
     title: 'Sales Orders',
     isSidebar: true,
-    category: 'sales',
     isLayout: true,
   },
   {
@@ -28,7 +26,6 @@ const salesRoutes = [
     isProtected: true,
     title: 'Quotations',
     isSidebar: true,
-    category: 'sales',
     isLayout: true,
   },
   {
@@ -37,7 +34,6 @@ const salesRoutes = [
     isProtected: true,
     title: 'Inquiry',
     isSidebar: true,
-    category: 'sales',
     isLayout: true,
   },
 ];

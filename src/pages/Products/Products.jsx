@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useSelector } from 'react-redux'
 import { Package, Plus, Search } from 'lucide-react'
 
 const DEMO_PRODUCTS = [
@@ -17,12 +18,13 @@ const DEMO_PRODUCTS = [
 ]
 
 const STATS = [
-  { label: 'Total Products', value: '36', sublabel: '31 active', color: 'text-indigo-400', bgColor: 'bg-indigo-500/20' },
+  { label: 'Total Products', value: '36', sublabel: '31 active', color: 'text-violet-600', bgColor: 'bg-indigo-500/20' },
   { label: 'Low Stock Alert', value: '2', sublabel: 'Items below minimum level', color: 'text-orange-400', bgColor: 'bg-orange-500/20' },
   { label: 'Inventory Value', value: '₹4,29,01,438', sublabel: 'Total stock value', color: 'text-indigo-300', bgColor: 'bg-indigo-500/20' },
 ]
 
 export default function Products() {
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All Categories')
 
@@ -43,7 +45,7 @@ export default function Products() {
   }
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 text-foreground w-full px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -52,8 +54,8 @@ export default function Products() {
               <Package className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Product Catalog</h1>
-              <p className="text-[oklch(0.70_0_0)] text-sm md:text-base mt-1">Manage inventory and product specifications</p>
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Product Catalog</h1>
+              <p className="text-muted-foreground text-sm md:text-base mt-1">Manage inventory and product specifications</p>
             </div>
           </div>
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
@@ -61,7 +63,7 @@ export default function Products() {
             Add Product
           </button>
         </div>
-        <div className="flex items-center gap-2 text-xs text-[oklch(0.65_0_0)]">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
             Showing data from all companies
@@ -75,38 +77,38 @@ export default function Products() {
           <div key={stat.label} className={`card-surface p-5 md:p-6 rounded-xl border border-[var(--border)] ${stat.bgColor}`}>
             <div className="flex items-start justify-between mb-3">
               <div>
-                <p className="text-xs md:text-sm text-[oklch(0.70_0_0)] mb-1">{stat.label}</p>
+                <p className="text-xs md:text-sm text-muted-foreground mb-1">{stat.label}</p>
                 <p className={`text-2xl md:text-3xl font-bold ${stat.color}`}>{stat.value}</p>
               </div>
             </div>
-            <p className="text-xs md:text-sm text-[oklch(0.65_0_0)]">{stat.sublabel}</p>
+            <p className="text-xs md:text-sm text-muted-foreground">{stat.sublabel}</p>
           </div>
         ))}
       </div>
 
       {/* Search Products */}
       <div className="card-surface rounded-xl border border-[var(--border)] p-4 md:p-6">
-        <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)] mb-4 flex items-center gap-2">
+        <h3 className="text-base md:text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
           <Search className="w-5 h-5 text-indigo-400" />
           Search Products
         </h3>
-        <p className="text-[oklch(0.70_0_0)] text-sm mb-4">Find products by name or category</p>
+        <p className="text-muted-foreground text-sm mb-4">Find products by name or category</p>
         <div className="flex flex-wrap gap-3 items-center">
           <div className="flex-1 min-w-[220px]">
-            <div className="flex items-center gap-2 bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.85_0_0)]">
-              <Search className="w-4 h-4 text-[oklch(0.65_0_0)]" />
+            <div className="flex items-center gap-2 bg-input border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-foreground">
+              <Search className="w-4 h-4 text-muted-foreground" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search products..."
-                className="bg-transparent focus:outline-none w-full placeholder:text-[oklch(0.65_0_0)]"
+                className="bg-transparent focus:outline-none w-full placeholder:text-muted-foreground"
               />
             </div>
           </div>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="min-w-[140px] bg-[oklch(0.30_0_0)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[oklch(0.90_0_0)] focus:outline-none"
+            className="min-w-[140px] bg-input border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none"
           >
             {categories.map((cat) => (
               <option key={cat}>{cat}</option>
@@ -119,34 +121,34 @@ export default function Products() {
       <div className="card-surface rounded-xl border border-[var(--border)] overflow-hidden">
         {/* Header */}
         <div className="px-4 md:px-6 py-4 border-b border-[var(--border)]">
-          <h3 className="text-base md:text-lg font-semibold text-[oklch(0.95_0_0)]">Products ({filteredProducts.length})</h3>
+          <h3 className="text-base md:text-lg font-semibold text-foreground">Products ({filteredProducts.length})</h3>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--border)] bg-[oklch(0.28_0_0)]">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Product Name</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Brand</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">GSM</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Min Level</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Price</th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-[oklch(0.75_0_0)] uppercase tracking-wider">Status</th>
+              <tr className="border-b border-[var(--border)] bg-secondary">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Product Name</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Brand</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">GSM</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Min Level</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Price</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody>
               {filteredProducts.map((product) => (
-                <tr key={product.id} className="border-b border-[var(--border)] hover:bg-[oklch(0.32_0_0)] transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.95_0_0)]">{product.name}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{product.category}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{product.brand}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.90_0_0)]">{product.gsm}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{product.stock}</td>
-                  <td className="px-6 py-4 text-sm text-[oklch(0.85_0_0)]">{product.minLevel}</td>
-                  <td className="px-6 py-4 text-sm font-medium text-[oklch(0.90_0_0)]">{product.price}</td>
+                <tr key={product.id} className="border-b border-[var(--border)] hover:bg-accent transition-colors">
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{product.name}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{product.category}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{product.brand}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{product.gsm}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{product.stock}</td>
+                  <td className="px-6 py-4 text-sm text-foreground">{product.minLevel}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-foreground">{product.price}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(product.status)}`}>
                       {product.status}
@@ -159,7 +161,7 @@ export default function Products() {
         </div>
 
         {filteredProducts.length === 0 && (
-          <div className="py-12 text-center text-[oklch(0.65_0_0)] text-sm">No products found</div>
+          <div className="py-12 text-center text-muted-foreground text-sm">No products found</div>
         )}
       </div>
     </div>
