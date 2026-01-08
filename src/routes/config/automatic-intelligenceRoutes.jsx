@@ -7,7 +7,6 @@ const chatScreenRoutes = [
       isProtected: true,
       title: 'Chat',
       isSidebar: true,
-      category: 'chat',
       isLayout: true,
     }
   ];

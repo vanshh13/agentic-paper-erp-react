@@ -8,7 +8,6 @@ const logisticsRoutes = [
     isProtected: true,
     title: 'Transporters',
     isSidebar: true,
-    category: 'logistics',
     isLayout: true,
   },
   {
@@ -17,7 +16,6 @@ const logisticsRoutes = [
     isProtected: true,
     title: 'Dispatch',
     isSidebar: true,
-    category: 'logistics',
     isLayout: true,
   },
 ];

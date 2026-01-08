@@ -18,25 +18,25 @@ export default function OrderWorkflowStatus() {
       <div className="space-y-6">
         {/* Header with Title and Summary */}
         <div>
-          <h3 className="text-lg font-semibold text-[oklch(0.95_0_0)] mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-indigo-400" />
             Order Workflow Status
           </h3>
-          <p className="text-xs text-[oklch(0.65_0_0)] mb-4">Track orders across different stages</p>
+          <p className="text-xs text-muted-foreground mb-4">Track orders across different stages</p>
           
           {/* Summary Cards */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             <div className="bg-[var(--background)] p-3 rounded-lg border border-[var(--border)]">
-              <p className="text-xs text-[oklch(0.65_0_0)] mb-1">Total Orders</p>
-              <p className="text-2xl font-bold text-[oklch(0.95_0_0)]">{totalOrders}</p>
+              <p className="text-xs text-muted-foreground mb-1">Total Orders</p>
+              <p className="text-2xl font-bold text-foreground">{totalOrders}</p>
             </div>
             <div className="bg-[var(--background)] p-3 rounded-lg border border-[var(--border)]">
-              <p className="text-xs text-[oklch(0.65_0_0)] mb-1">Completed</p>
-              <p className="text-2xl font-bold text-emerald-400">{completedOrders}</p>
+              <p className="text-xs text-muted-foreground mb-1">Completed</p>
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{completedOrders}</p>
             </div>
             <div className="bg-[var(--background)] p-3 rounded-lg border border-[var(--border)]">
-              <p className="text-xs text-[oklch(0.65_0_0)] mb-1">Pending</p>
-              <p className="text-2xl font-bold text-amber-400">{pendingOrders}</p>
+              <p className="text-xs text-muted-foreground mb-1">Pending</p>
+              <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{pendingOrders}</p>
             </div>
           </div>
         </div>
@@ -54,11 +54,11 @@ export default function OrderWorkflowStatus() {
                       <Icon className={`w-4 h-4 ${status.color}`} />
                     </div>
                     <div>
-                      <p className="text-sm text-[oklch(0.85_0_0)]">{status.name}</p>
-                      <p className="text-xs text-[oklch(0.65_0_0)]">{status.count} orders</p>
+                      <p className="text-sm text-foreground">{status.name}</p>
+                      <p className="text-xs text-muted-foreground">{status.count} orders</p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold text-[oklch(0.75_0_0)]">{percentage.toFixed(0)}%</span>
+                  <span className="text-sm font-semibold text-foreground">{percentage.toFixed(0)}%</span>
                 </div>
                 <div className="w-full bg-[var(--background)] rounded-full h-2.5 overflow-hidden border border-[var(--border)]">
                   <div

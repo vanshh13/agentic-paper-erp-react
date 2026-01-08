@@ -27,18 +27,18 @@ export const inquiryColumns = [
       
       return (
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[oklch(0.28_0_0)] text-[oklch(0.98_0_0)] flex items-center justify-center text-xs font-bold flex-shrink-0">
+          <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center text-xs font-bold flex-shrink-0">
             {initials}
           </div>
           <div className="min-w-0">
-            <div className="font-medium text-xs md:text-sm text-[oklch(0.95_0_0)] truncate">
+            <div className="font-medium text-xs md:text-sm text-foreground truncate">
               {value || 'Unknown'}
             </div>
-            <div className="text-xs text-[oklch(0.70_0_0)] truncate">
+            <div className="text-xs text-muted-foreground truncate">
               {row.customerPhone || row.customerEmail || '-'}
             </div>
             {row.productRequested && (
-              <div className="text-xs text-[oklch(0.60_0_0)] truncate mt-0.5">
+              <div className="text-xs text-muted-foreground truncate mt-0.5">
                 {row.productRequested}
               </div>
             )}
@@ -64,7 +64,7 @@ export const inquiryColumns = [
       const source = sourceConfig[value?.toLowerCase()] || sourceConfig.whatsapp
       
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[oklch(0.26_0_0)] text-[oklch(0.90_0_0)] text-xs font-medium whitespace-nowrap">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-foreground text-xs font-medium whitespace-nowrap">
           {source.label}
         </span>
       )
@@ -85,14 +85,14 @@ export const inquiryColumns = [
     ],
     render: (value) => {
       const statusConfig = {
-        NEW: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-        OPEN: { label: 'Open', color: 'bg-emerald-500/15 text-emerald-200' },
-        PARSED: { label: 'Parsed', color: 'bg-indigo-500/15 text-indigo-200' },
-        PI_SENT: { label: 'PI Sent', color: 'bg-cyan-500/15 text-cyan-200' },
-        FOLLOW_UP: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
-        CONVERTED: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
-        REJECTED: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
-        CANCELLED: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
+        NEW: { label: 'New', color: 'bg-emerald-500/15 text-foreground' },
+        OPEN: { label: 'Open', color: 'bg-emerald-500/15 text-foreground' },
+        PARSED: { label: 'Parsed', color: 'bg-indigo-500/15 text-foreground' },
+        PI_SENT: { label: 'PI Sent', color: 'bg-cyan-500/15 text-foreground' },
+        FOLLOW_UP: { label: 'Follow Up', color: 'bg-amber-500/20 text-foreground' },
+        CONVERTED: { label: 'Converted', color: 'bg-emerald-500/20 text-foreground' },
+        REJECTED: { label: 'Rejected', color: 'bg-rose-500/20 text-foreground' },
+        CANCELLED: { label: 'Cancelled', color: 'bg-rose-500/20 text-foreground' },
       }
       const status = statusConfig[value?.toUpperCase()] || statusConfig.NEW
       
@@ -117,10 +117,10 @@ export const inquiryColumns = [
     ],
     render: (value) => {
       const slaConfig = {
-        PENDING: { label: 'Pending', color: 'bg-gray-500/15 text-gray-200' },
-        ON_TRACK: { label: 'On Track', color: 'bg-emerald-500/15 text-emerald-200' },
-        AT_RISK: { label: 'At Risk', color: 'bg-amber-500/20 text-amber-200' },
-        BREACHED: { label: 'Breached', color: 'bg-rose-500/20 text-rose-100' },
+        PENDING: { label: 'Pending', color: 'bg-gray-500/15 text-foreground' },
+        ON_TRACK: { label: 'On Track', color: 'bg-emerald-500/15 text-foreground' },
+        AT_RISK: { label: 'At Risk', color: 'bg-amber-500/20 text-foreground' },
+        BREACHED: { label: 'Breached', color: 'bg-rose-500/20 text-foreground' },
       }
       const sla = slaConfig[value?.toUpperCase()] || slaConfig.PENDING
       
@@ -138,7 +138,7 @@ export const inquiryColumns = [
     filterType: 'text', 
     filterable: true,
     render: (value) => (
-      <span className="text-xs md:text-sm text-[oklch(0.78_0_0)] truncate block">
+      <span className="text-xs md:text-sm text-muted-foreground truncate block">
         {value || '-'}
       </span>
     )
@@ -200,7 +200,7 @@ export const inquiryColumns = [
     }
     
     return (
-      <div className="text-xs md:text-sm text-[oklch(0.78_0_0)] whitespace-nowrap">
+      <div className="text-xs md:text-sm text-muted-foreground whitespace-nowrap">
         {getDisplayDate()}
       </div>
     )

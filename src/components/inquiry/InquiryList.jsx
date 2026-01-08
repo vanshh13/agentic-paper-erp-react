@@ -7,14 +7,14 @@ import { useMemo } from 'react'
 
 // Status configs (keep these inside component if needed for mobile view)
 const statusConfig = {
-  NEW: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-  OPEN: { label: 'Open', color: 'bg-emerald-500/15 text-emerald-200' },
-  PARSED: { label: 'Parsed', color: 'bg-indigo-500/15 text-indigo-200' },
-  PI_SENT: { label: 'PI Sent', color: 'bg-cyan-500/15 text-cyan-200' },
-  FOLLOW_UP: { label: 'Follow Up', color: 'bg-amber-500/20 text-amber-200' },
-  CONVERTED: { label: 'Converted', color: 'bg-emerald-500/20 text-emerald-100' },
-  REJECTED: { label: 'Rejected', color: 'bg-rose-500/20 text-rose-100' },
-  CANCELLED: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
+  NEW: { label: 'New', color: 'bg-emerald-500/20 text-foreground' },
+  OPEN: { label: 'Open', color: 'bg-emerald-500/10 text-foreground' },
+  PARSED: { label: 'Parsed', color: 'bg-indigo-500/20 text-foreground' },
+  PI_SENT: { label: 'PI Sent', color: 'bg-cyan-500/20 text-foreground' },
+  FOLLOW_UP: { label: 'Follow Up', color: 'bg-amber-500/20 text-foreground' },
+  CONVERTED: { label: 'Converted', color: 'bg-emerald-500/20 text-foreground' },
+  REJECTED: { label: 'Rejected', color: 'bg-rose-500/20 text-foreground' },
+  CANCELLED: { label: 'Cancelled', color: 'bg-rose-500/20 text-foreground' },
 }
 
 const sourceConfig = {
@@ -26,10 +26,10 @@ const sourceConfig = {
 }
 
 const slaConfig = {
-  PENDING: { label: 'Pending', color: 'bg-gray-500/15 text-gray-200' },
-  ON_TRACK: { label: 'On Track', color: 'bg-emerald-500/15 text-emerald-200' },
-  AT_RISK: { label: 'At Risk', color: 'bg-amber-500/20 text-amber-200' },
-  BREACHED: { label: 'Breached', color: 'bg-rose-500/20 text-rose-100' },
+  PENDING: { label: 'Pending', color: 'bg-gray-500/20 text-foreground' },
+  ON_TRACK: { label: 'On Track', color: 'bg-emerald-500/20 text-foreground' },
+  AT_RISK: { label: 'At Risk', color: 'bg-amber-500/20 text-foreground' },
+  BREACHED: { label: 'Breached', color: 'bg-rose-500/20 text-foreground' },
 }
 
 export default function InquiryList({
@@ -162,7 +162,7 @@ export default function InquiryList({
                       placeholder="Search inquiry..."
                       value={searchInquiry}
                       onChange={(e) => setSearchInquiry(e.target.value)}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     />
                   )
                 } else if (columnKey === 'customerName') {
@@ -172,7 +172,7 @@ export default function InquiryList({
                       placeholder="Search customer..."
                       value={searchCustomer}
                       onChange={(e) => setSearchCustomer(e.target.value)}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     />
                   )
                 } else if (columnKey === 'assignedSalesPerson') {
@@ -182,7 +182,7 @@ export default function InquiryList({
                       placeholder="Search salesperson..."
                       value={searchSalesPerson}
                       onChange={(e) => setSearchSalesPerson(e.target.value)}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     />
                   )
                 }
@@ -194,7 +194,7 @@ export default function InquiryList({
                     <select
                       value={filters.source}
                       onChange={(e) => setFilters({ ...filters, source: e.target.value })}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     >
                       <option value="">All Sources</option>
                       <option value="whatsapp">WhatsApp</option>
@@ -209,7 +209,7 @@ export default function InquiryList({
                     <select
                       value={filters.status}
                       onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     >
                       <option value="">All Status</option>
                       <option value="NEW">New</option>
@@ -227,7 +227,7 @@ export default function InquiryList({
                     <select
                       value={filters.sla}
                       onChange={(e) => setFilters({ ...filters, sla: e.target.value })}
-                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="w-full px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                     >
                       <option value="">All SLA</option>
                       <option value="PENDING">Pending</option>
@@ -246,7 +246,7 @@ export default function InquiryList({
                       type="date"
                       value={filters.dateFrom}
                       onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-                      className="flex-1 px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="flex-1 px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                       placeholder="From"
                       title="From date"
                     />
@@ -254,7 +254,7 @@ export default function InquiryList({
                       type="date"
                       value={filters.dateTo}
                       onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
-                      className="flex-1 px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-[oklch(0.50_0.18_280)] rounded"
+                      className="flex-1 px-2 py-1 text-xs input-surface focus:outline-none focus:ring-1 focus:ring-primary rounded"
                       placeholder="To"
                       title="To date"
                     />
@@ -291,27 +291,27 @@ export default function InquiryList({
     return (
       <div
         key={inq.id}
-        className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 space-y-3 hover:bg-[oklch(0.22_0_0)] transition-colors"
+        className="bg-background border border-[var(--border)] rounded-lg p-4 space-y-3 hover:bg-card transition-colors"
       >
         {/* Header Row */}
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1 min-w-0">
-            <div className="font-mono text-sm font-bold text-[oklch(0.92_0_0)] truncate">
+            <div className="font-mono text-sm font-bold text-foreground truncate">
               {inq.inquiryNumber || inq.inquiry_code || '-'}
             </div>
             <div className="flex items-center gap-2 mt-2">
-              <div className="w-8 h-8 rounded-full bg-[oklch(0.28_0_0)] text-[oklch(0.98_0_0)] flex items-center justify-center text-xs font-bold flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-secondary text-foreground flex items-center justify-center text-xs font-bold flex-shrink-0">
                 {initials}
               </div>
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-sm text-[oklch(0.95_0_0)] truncate">
+                <div className="font-medium text-sm text-muted-foreground truncate">
                   {inq.customerName || inq.customer_name || 'Unknown'}
                 </div>
-                <div className="text-xs text-[oklch(0.70_0_0)] truncate">
+                <div className="text-xs text-muted-foreground truncate">
                   {inq.customerPhone || inq.customerEmail || '-'}
                 </div>
                 {inq.productRequested && (
-                  <div className="text-xs text-[oklch(0.60_0_0)] truncate mt-0.5">
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
                     {inq.productRequested}
                   </div>
                 )}
@@ -321,7 +321,7 @@ export default function InquiryList({
           <button
             onClick={() => onViewDetails(inq)}
             disabled={loadingDetail}
-            className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-2 rounded-lg transition-colors flex-shrink-0"
+            className="text-foreground hover:text-foreground hover:bg-secondary p-2 rounded-lg transition-colors flex-shrink-0"
             title="View details"
           >
             <Eye className="w-5 h-5" />
@@ -330,7 +330,7 @@ export default function InquiryList({
 
         {/* Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[oklch(0.26_0_0)] text-[oklch(0.90_0_0)] text-xs font-medium">
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-foreground text-xs font-medium">
             {source.label}
           </span>
           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${status.color}`}>
@@ -344,22 +344,22 @@ export default function InquiryList({
         {/* Details Grid */}
         <div className="grid grid-cols-2 gap-3 text-sm pt-2 border-t border-[var(--border)]">
           <div>
-            <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Assigned To</div>
-            <div className="text-[oklch(0.88_0_0)] truncate">
+            <div className="text-xs text-muted-foreground mb-0.5">Assigned To</div>
+            <div className="text-foreground truncate">
               {inq.assignedSalesPerson || inq.assigned_user_name || '-'}
             </div>
           </div>
           <div>
-            <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Date</div>
-            <div className="text-[oklch(0.88_0_0)]">
+            <div className="text-xs text-muted-foreground mb-0.5">Date</div>
+            <div className="text-foreground">
               {displayDate}
             </div>
           </div>
           {/* Show expected price if available */}
           {inq.expectedPrice && (
             <div className="col-span-2">
-              <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Expected Price</div>
-              <div className="text-[oklch(0.88_0_0)]">
+              <div className="text-xs text-muted-foreground mb-0.5">Expected Price</div>
+              <div className="text-foreground">
                 ₹{parseFloat(inq.expectedPrice).toLocaleString('en-IN')}
               </div>
             </div>
@@ -370,19 +370,19 @@ export default function InquiryList({
   }
 
   return (
-    <div className="text-[oklch(0.95_0_0)] w-full h-screen overflow-hidden flex flex-col px-3 sm:px-4 lg:px-8">
+    <div className="text-foreground w-full h-screen overflow-hidden flex flex-col px-3 sm:px-4 lg:px-8">
       {/* Header */}
       <div className="pt-2 pb-3 sm:pb-4 flex-shrink-0">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <div className="min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold text-[oklch(0.98_0_0)]">Inquiry List</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-foreground">Inquiry List</h1>
             </div>
           </div>
           {isAnyFilterApplied && isAnyFilterApplied() && (
             <button
               onClick={clearAllFilters}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-[oklch(0.28_0_0)] bg-[oklch(0.22_0_0)] hover:bg-[oklch(0.24_0_0)] text-[oklch(0.92_0_0)] text-sm transition-all"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card hover:bg-accent text-foreground text-sm transition-all"
               title="Clear all filters"
             >
               <X className="w-4 h-4" />
@@ -393,7 +393,7 @@ export default function InquiryList({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 md:gap-2 border-b border-[oklch(0.28_0_0)] overflow-x-auto custom-scrollbar pb-px mb-4 flex-shrink-0">
+      <div className="flex gap-1 md:gap-2 border-b border-border overflow-x-auto custom-scrollbar pb-px mb-4 flex-shrink-0">
         {[
           { id: 'all', label: `All (${counts.all || 0})` },
           { id: 'pending', label: `Pending (${counts.pending || 0})` },
@@ -406,8 +406,8 @@ export default function InquiryList({
             onClick={() => setActiveTab(tab.id)}
             className={`px-3 md:px-4 py-2 font-medium transition-colors whitespace-nowrap text-xs md:text-sm ${
               activeTab === tab.id
-                ? 'text-[oklch(0.98_0_0)] border-b-2 border-[oklch(0.50_0.18_280)]'
-                : 'text-[oklch(0.70_0_0)] hover:text-[oklch(0.92_0_0)]'
+                ? 'text-foreground border-b-2 border-primary'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {tab.label}
@@ -429,7 +429,7 @@ export default function InquiryList({
             <button
               onClick={() => onViewDetails(row)}
               disabled={loadingDetail}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 rounded-lg text-xs font-semibold hover:bg-indigo-500/20 transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-input text-foreground border border-[var(--border)] rounded-lg text-xs font-semibold hover:bg-accent transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Eye className="w-4 h-4" aria-hidden="true" />
               <span>View</span>
@@ -441,11 +441,11 @@ export default function InquiryList({
       {/* Mobile Card View */}
       <div className="flex-1 min-h-0 flex flex-col overflow-y-auto sm:hidden px-2">
         {loading ? (
-          <div className="flex items-center justify-center h-full text-[oklch(0.70_0_0)]">
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             Loading inquiries...
           </div>
         ) : filteredInquiries.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-[oklch(0.65_0_0)]">
+          <div className="flex items-center justify-center h-full text-muted-foreground">
             No inquiries found
           </div>
         ) : (

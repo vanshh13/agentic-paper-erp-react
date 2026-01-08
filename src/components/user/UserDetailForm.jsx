@@ -26,18 +26,18 @@ const formatDateTime = (value) => {
 }
 
 const statusConfig = {
-  active: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-100', dotColor: 'bg-emerald-500' },
-  'on leave': { label: 'On Leave', color: 'bg-amber-500/20 text-amber-200', dotColor: 'bg-amber-500' },
-  probation: { label: 'Probation', color: 'bg-indigo-500/15 text-indigo-200', dotColor: 'bg-indigo-500' },
-  inactive: { label: 'Inactive', color: 'bg-rose-500/20 text-rose-100', dotColor: 'bg-rose-500' },
+  active: { label: 'Active', color: 'bg-emerald-500/20 text-black dark:text-emerald-400', dotColor: 'bg-emerald-500' },
+  'on leave': { label: 'On Leave', color: 'bg-amber-500/20 text-black dark:text-amber-400', dotColor: 'bg-amber-500' },
+  probation: { label: 'Probation', color: 'bg-indigo-500/20 text-black dark:text-indigo-400', dotColor: 'bg-indigo-500' },
+  inactive: { label: 'Inactive', color: 'bg-rose-500/20 text-black dark:text-rose-400', dotColor: 'bg-rose-500' },
 }
 
 const InfoField = ({ label, value }) => (
   <div>
-    <label className="text-xs font-semibold text-[oklch(0.65_0_0)] uppercase tracking-wider mb-1 block">
+    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1 block">
       {label}
     </label>
-    <p className="text-sm text-[oklch(0.95_0_0)] break-words">{value || '--'}</p>
+    <p className="text-sm text-foreground break-words">{value || '--'}</p>
   </div>
 )
 
@@ -128,16 +128,16 @@ export default function UserDetailForm() {
 
   if (loading && !user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[oklch(0.18_0_0)] to-[oklch(0.16_0_0)]">
-        <div className="text-[oklch(0.95_0_0)]">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br bg-background">
+        <div className="text-foreground">Loading...</div>
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[oklch(0.18_0_0)] to-[oklch(0.16_0_0)]">
-        <div className="text-[oklch(0.95_0_0)]">User not found</div>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br bg-background">
+        <div className="text-foreground">User not found</div>
       </div>
     )
   }
@@ -145,7 +145,7 @@ export default function UserDetailForm() {
   const statusKey = user.employment_status?.toLowerCase()
   const statusDisplay = statusConfig[statusKey] || {
     label: user.employment_status,
-    color: 'bg-[oklch(0.30_0_0)] text-[oklch(0.90_0_0)]',
+    color: 'bg-secondary text-foreground',
     dotColor: 'bg-gray-500'
   }
 
@@ -426,7 +426,7 @@ export default function UserDetailForm() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[oklch(0.18_0_0)] to-[oklch(0.16_0_0)] text-[oklch(0.95_0_0)]" style={{ height: 'auto', minHeight: '100vh', overflow: 'auto' }}>
+    <div className="flex flex-col min-h-screen bg-gradient-to-br bg-background text-foreground" style={{ height: 'auto', minHeight: '100vh', overflow: 'auto' }}>
       {/* Toast Messages */}
       <Toast 
         type="error" 
@@ -446,22 +446,22 @@ export default function UserDetailForm() {
       {/* Delete Confirmation Dialog */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[oklch(0.22_0_0)] border border-[oklch(0.28_0_0)] rounded-lg p-6 max-w-sm w-full">
-            <h3 className="text-lg font-bold text-white mb-4">Delete User</h3>
-            <p className="text-[oklch(0.75_0_0)] mb-6">
-              Are you sure you want to delete <span className="font-semibold text-white">{user.full_name}</span>? This action cannot be undone.
+          <div className="bg-card border border-border rounded-lg p-6 max-w-sm w-full">
+            <h3 className="text-lg font-bold text-foreground mb-4">Delete User</h3>
+            <p className="text-muted-foreground mb-6">
+              Are you sure you want to delete <span className="font-semibold text-foreground">{user.full_name}</span>? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-foreground rounded-lg font-semibold transition-all disabled:opacity-50"
               >
                 Delete
               </button>
               <button
                 onClick={() => setDeleteConfirm(false)}
-                className="flex-1 px-4 py-2 bg-[oklch(0.30_0_0)] hover:bg-[oklch(0.32_0_0)] text-[oklch(0.95_0_0)] rounded-lg font-semibold transition-all"
+                className="flex-1 px-4 py-2 bg-secondary hover:bg-accent text-foreground rounded-lg font-semibold transition-all"
               >
                 Cancel
               </button>
@@ -471,7 +471,7 @@ export default function UserDetailForm() {
       )}
 
       {/* Header with Tabs */}
-      <div className="bg-gradient-to-r from-[oklch(0.22_0_0)] to-[oklch(0.20_0_0)] border-b border-[oklch(0.28_0_0)] sticky top-0 z-40">
+      <div className="bg-gradient-to-r bg-card border-b border-border sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           {/* Back Button */}
           <button
@@ -485,12 +485,12 @@ export default function UserDetailForm() {
           {/* Header Content */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-3">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+              <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-foreground font-bold text-lg flex-shrink-0">
                 {initials}
               </div>
               <div className="min-w-0 flex-1">
-                <h1 className="text-lg sm:text-xl font-bold text-white mb-1">{user.full_name}</h1>
-                <p className="text-[oklch(0.70_0_0)] text-xs sm:text-sm mb-1 truncate">
+                <h1 className="text-lg sm:text-xl font-bold text-foreground mb-1">{user.full_name}</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-1 truncate">
                   {user.employee_code} • {user.designation_name || 'Employee'} {user.department_name && `• ${user.department_name}`}
                 </p>
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${statusDisplay.color}`}>
@@ -507,7 +507,7 @@ export default function UserDetailForm() {
                   <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-all disabled:opacity-50 text-sm"
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-all text-sm"
                   >
                     <Save className="w-4 h-4" />
                     <span className="hidden sm:inline">Save</span>
@@ -542,15 +542,15 @@ export default function UserDetailForm() {
           </div>
 
           {/* Tabs */}
-          <div className="flex items-center gap-2 sm:gap-4 -mb-4 pb-3 border-t border-[oklch(0.28_0_0)] pt-3 overflow-x-auto scrollbar-hide">
+          <div className="flex items-center gap-2 sm:gap-4 -mb-4 pb-3 border-t border-border pt-3 overflow-x-auto scrollbar-hide">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-2 px-2 sm:px-3 font-semibold text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'text-white border-indigo-500'
-                    : 'text-[oklch(0.70_0_0)] border-transparent hover:text-[oklch(0.85_0_0)]'
+                    ? 'text-foreground border-primary'
+                    : 'text-muted-foreground border-transparent hover:text-foreground'
                 }`}
               >
                 {tab.label}
@@ -562,10 +562,11 @@ export default function UserDetailForm() {
 
       {/* Content */}
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6">
-        <div className="bg-gradient-to-br from-[oklch(0.22_0_0)] to-[oklch(0.20_0_0)] rounded-lg sm:rounded-xl border border-[oklch(0.28_0_0)] p-4 sm:p-6">
+        <div className="bg-gradient-to-br bg-card rounded-lg sm:rounded-xl border border-border p-4 sm:p-6">
           {renderTabContent()}
         </div>
       </div>
     </div>
   )
 }
+

@@ -9,6 +9,9 @@
   --card-foreground: oklch(0.95 0 0);
   --popover: oklch(0.30 0 0);
   --popover-foreground: oklch(0.95 0 0);
+  /* Table header surface */
+  --table-header: oklch(0.38 0 0);
+  --table-header-foreground: oklch(0.92 0 0);
   --primary: oklch(0.50 0.18 280);
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.35 0 0);
@@ -44,6 +47,9 @@
   --card-foreground: oklch(0.15 0 0);
   --popover: oklch(0.98 0 0);
   --popover-foreground: oklch(0.15 0 0);
+  /* Table header surface */
+  --table-header: oklch(0.94 0 0);
+  --table-header-foreground: oklch(0.22 0 0);
   --primary: oklch(0.60 0.16 270);
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.92 0 0);
@@ -54,9 +60,17 @@
   --accent-foreground: oklch(0.20 0 0);
   --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.88 0 0 / 0.8);
-  --input: oklch(0.88 0 0 / 0.8);
+  --border: oklch(0.45 0 0 / 0.85);
+  --input: oklch(0.45 0 0 / 0.25);
   --ring: oklch(0.60 0.16 270);
+  --sidebar: oklch(0.98 0 0);
+  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-primary: oklch(0.60 0.16 270);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.94 0 0);
+  --sidebar-accent-foreground: oklch(0.15 0 0);
+  --sidebar-border: oklch(0.88 0 0 / 0.3);
+  --sidebar-ring: oklch(0.60 0.16 270);
 }
 
 @layer base {
@@ -70,6 +84,11 @@
 
   *, *::before, *::after {
     box-sizing: border-box;
+  }
+
+  /* Single global transition for all theme color changes - ensures synchronized updates */
+  * {
+    transition: background-color 0s ease, color 0s ease, border-color 0s ease, fill 0s ease, stroke 0s ease !important;
   }
 
   body {
@@ -122,6 +141,12 @@
     border-radius: var(--radius);
   }
 
+  /* Distinct table header surface aligned with theme tokens */
+  .table-header-surface {
+    background: var(--secondary);
+    color: var(--secondary-foreground);
+  }
+
   .gradient-sidebar {
     background: linear-gradient(180deg, oklch(0.20 0 0), oklch(0.22 0 0));
   }
@@ -137,7 +162,10 @@
                 0 2px 4px -1px oklch(0 0 0 / 0.1);
   }
 
-  .shadow-card-hover { transition: all 0.3s ease; }
+  /* Keep hover motion; theme colors change instantly */
+  .shadow-card-hover { 
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
 
   .shadow-card-hover:hover {
     box-shadow: 0 10px 15px -3px oklch(0.50 0.18 280 / 0.2),
@@ -176,7 +204,7 @@
   .custom-scrollbar::-webkit-scrollbar-thumb { background: oklch(0.35 0 0); border-radius: 3px; }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: oklch(0.45 0 0); }
 
-  /* Row animations (butter smooth) */
+  /* Row animations (butter smooth) - only animate opacity and transform, NOT colors */
   .row-animate {
     animation: rowFadeIn 520ms ease-in-out;
     will-change: opacity, transform;
@@ -187,7 +215,7 @@
     will-change: opacity, transform;
   }
 
-  /* Sorting uses transitions (smooth, no bounce) */
+  /* Sorting uses transitions (smooth, no bounce) - colors stay instant */
   .row-animate-sort {
     transition: opacity 380ms ease-in-out,
                 transform 380ms ease-in-out;
@@ -280,4 +308,43 @@
       transform: translateY(1.5px);
     }
   }
+
+  /* Theme-aware text color utilities */
+  .text-foreground { color: var(--foreground); }
+  .text-muted-foreground { color: var(--muted-foreground); }
+  .text-card-foreground { color: var(--card-foreground); }
+  .text-popover-foreground { color: var(--popover-foreground); }
+  .text-primary-foreground { color: var(--primary-foreground); }
+  .text-secondary-foreground { color: var(--secondary-foreground); }
+  .text-accent-foreground { color: var(--accent-foreground); }
+  .text-destructive-foreground { color: var(--destructive-foreground); }
+  .text-sidebar-foreground { color: var(--sidebar-foreground); }
+  .text-sidebar-accent { color: var(--sidebar-accent); }
+
+  /* Theme-aware background color utilities */
+  .bg-background { background-color: var(--background); }
+  .bg-foreground { background-color: var(--foreground); }
+  .bg-card { background-color: var(--card); }
+  .bg-popover { background-color: var(--popover); }
+  .bg-primary { background-color: var(--primary); }
+  .bg-secondary { background-color: var(--secondary); }
+  .bg-muted { background-color: var(--muted); }
+  .bg-accent { background-color: var(--accent); }
+  .bg-destructive { background-color: var(--destructive); }
+  .bg-input { background-color: var(--input); }
+  .bg-sidebar { background-color: var(--sidebar); }
+  .bg-sidebar-accent { background-color: var(--sidebar-accent); }
+
+  /* Theme-aware border color utilities */
+  .border-border { border-color: var(--border); }
+  .border-input { border-color: var(--input); }
+  .border-ring { border-color: var(--ring); }
+  .border-primary { border-color: var(--primary); }
+  .border-sidebar { border-color: var(--sidebar-border); }
+
+  /* Theme-aware hover utilities - transition only transform, not colors */
+  .hover\:bg-accent:hover { background-color: var(--accent); }
+  .hover\:bg-muted:hover { background-color: var(--muted); }
+  .hover\:bg-sidebar-accent:hover { background-color: var(--sidebar-accent); }
+  .hover\:text-foreground:hover { color: var(--foreground); }
 }

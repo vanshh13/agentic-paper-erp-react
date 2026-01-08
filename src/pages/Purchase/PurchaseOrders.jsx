@@ -8,18 +8,18 @@ import PurchaseOrderView from './PurchaseOrderView'
 import { purchaseOrderApi } from '../../services/api/purchase/purchase-order-api'
 
 const typeConfig = {
-  jk_company: { label: 'JK Company', color: 'bg-indigo-500/15 text-indigo-200' },
-  others: { label: 'Others', color: 'bg-emerald-500/15 text-emerald-200' },
-  imports: { label: 'Imports', color: 'bg-purple-500/15 text-purple-200' },
+  jk_company: { label: 'JK Company', color: 'bg-indigo-500/20 text-black dark:text-indigo-400' },
+  others: { label: 'Others', color: 'bg-emerald-500/20 text-black dark:text-emerald-400' },
+  imports: { label: 'Imports', color: 'bg-purple-500/20 text-black dark:text-purple-400' },
 }
 
 const statusConfig = {
-  new: { label: 'New', color: 'bg-emerald-500/15 text-emerald-200' },
-  pending: { label: 'Pending', color: 'bg-amber-500/20 text-amber-200' },
-  approved: { label: 'Approved', color: 'bg-cyan-500/15 text-cyan-200' },
-  in_transit: { label: 'In Transit', color: 'bg-blue-500/15 text-blue-200' },
-  completed: { label: 'Completed', color: 'bg-emerald-500/20 text-emerald-100' },
-  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-rose-100' },
+  new: { label: 'New', color: 'bg-emerald-500/20 text-black dark:text-emerald-400' },
+  pending: { label: 'Pending', color: 'bg-amber-500/20 text-black dark:text-amber-400' },
+  approved: { label: 'Approved', color: 'bg-cyan-500/20 text-black dark:text-cyan-400' },
+  in_transit: { label: 'In Transit', color: 'bg-blue-500/20 text-black dark:text-blue-400' },
+  completed: { label: 'Completed', color: 'bg-emerald-500/20 text-black dark:text-emerald-400' },
+  cancelled: { label: 'Cancelled', color: 'bg-rose-500/20 text-black dark:text-rose-400' },
 }
 
 const baseFormData = {
@@ -301,17 +301,17 @@ export default function PurchaseOrders() {
   })
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full">
+    <div className="space-y-6 pb-10 text-foreground w-full">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg gradient-primary shadow-glow text-[oklch(0.98_0_0)]">
+            <div className="p-2 rounded-lg gradient-primary shadow-glow text-foreground">
               <FileText className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[oklch(0.98_0_0)]">Purchase Orders</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Purchase Orders</h2>
           </div>
-          <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">
+          <p className="text-muted-foreground text-sm md:text-base">
             Multi-channel procurement management
           </p>
         </div>
@@ -322,7 +322,7 @@ export default function PurchaseOrders() {
               setEditingPO(null)
               setShowJKDialog(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm">
+            className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-foreground hover:bg-accent transition-colors text-sm">
             <FileText className="w-4 h-4" />
             JK Company PO
           </button>
@@ -332,7 +332,7 @@ export default function PurchaseOrders() {
               setEditingPO(null)
               setShowDialog(true)
             }}
-            className="flex items-center gap-2 gradient-primary text-[oklch(0.98_0_0)] px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap">
+            className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap">
             <Plus className="w-4 h-4" />
             Create PO
           </button>
@@ -342,25 +342,25 @@ export default function PurchaseOrders() {
       {/* Stats Cards */}
       <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-3">
         <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">JK Company Orders</div>
+          <div className="text-xs md:text-sm font-medium text-muted-foreground mb-1">JK Company Orders</div>
           <div className="text-xl md:text-2xl font-bold text-sky-300">{counts.jk_company}</div>
         </div>
         <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Others Orders</div>
+          <div className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Others Orders</div>
           <div className="text-xl md:text-2xl font-bold text-emerald-300">{counts.others}</div>
         </div>
         <div className="card-surface shadow-card-hover p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-[oklch(0.70_0_0)] mb-1">Imports Orders</div>
+          <div className="text-xs md:text-sm font-medium text-muted-foreground mb-1">Imports Orders</div>
           <div className="text-xl md:text-2xl font-bold text-purple-300">{counts.imports}</div>
         </div>
       </div>
 
       {/* Search & Filter */}
       <div className="card-surface shadow-card p-4 md:p-6">
-        <h3 className="text-lg font-bold text-[oklch(0.96_0_0)] mb-4">Search & Filter</h3>
+        <h3 className="text-lg font-bold text-foreground mb-4">Search & Filter</h3>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[oklch(0.60_0_0)]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search by PO number..."
@@ -398,7 +398,7 @@ export default function PurchaseOrders() {
       {/* Purchase Orders List */}
       <div className="card-surface shadow-card overflow-hidden">
         <div className="p-4 md:p-6 border-b border-[var(--border)]">
-          <h3 className="text-lg md:text-xl font-bold text-[oklch(0.96_0_0)]">
+          <h3 className="text-lg md:text-xl font-bold text-foreground">
             Purchase Orders ({filteredPOs.length})
           </h3>
         </div>
@@ -406,29 +406,29 @@ export default function PurchaseOrders() {
         {/* Desktop Table View - Hidden on Mobile */}
         <div className="hidden md:block overflow-x-auto custom-scrollbar max-h-[600px]">
           <table className="w-full min-w-full">
-            <thead className="bg-[oklch(0.20_0_0)] border-b border-[var(--border)] sticky top-0 z-10">
+            <thead className="bg-card border-b border-[var(--border)] sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">PO Number</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Vendor</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Delivery</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Items</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Amount</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Delivery Date</th>
-                <th className="px-4 py-3 text-center text-xs font-semibold text-[oklch(0.85_0_0)] uppercase whitespace-nowrap">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">PO Number</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Type</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Vendor</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Delivery</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Items</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Amount</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Delivery Date</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
               {loadingList ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-6 text-center text-[oklch(0.70_0_0)]">
+                  <td colSpan={9} className="px-6 py-6 text-center text-muted-foreground">
                     Loading purchase orders...
                   </td>
                 </tr>
               ) : filteredPOs.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-6 py-12 text-center text-[oklch(0.70_0_0)]">
+                  <td colSpan={9} className="px-6 py-12 text-center text-muted-foreground">
                     No purchase orders found
                   </td>
                 </tr>
@@ -438,9 +438,9 @@ export default function PurchaseOrders() {
                   const status = statusConfig[po.status] || statusConfig.pending
 
                   return (
-                    <tr key={po.id} className="hover:bg-[oklch(0.24_0_0)] transition-colors">
+                    <tr key={po.id} className="hover:bg-accent transition-colors">
                       <td className="px-4 py-4">
-                        <div className="font-mono text-sm font-semibold text-[oklch(0.90_0_0)]">{po.poNumber}</div>
+                        <div className="font-mono text-sm font-semibold text-foreground">{po.poNumber}</div>
                       </td>
                       <td className="px-4 py-4">
                         <span className={`inline-flex px-2 py-1 rounded-md text-xs font-medium ${type.color}`}>
@@ -453,21 +453,21 @@ export default function PurchaseOrders() {
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.88_0_0)]">{po.vendor}</span>
+                        <span className="text-sm text-foreground">{po.vendor}</span>
                       </td>
                       <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.78_0_0)]">{po.delivery}</span>
+                        <span className="text-sm text-foreground">{po.delivery}</span>
                       </td>
                       <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.88_0_0)]">{po.items}</span>
+                        <span className="text-sm text-foreground">{po.items}</span>
                       </td>
                       <td className="px-4 py-4 text-right">
-                        <span className="text-sm font-medium text-[oklch(0.90_0_0)]">
+                        <span className="text-sm font-medium text-foreground">
                           {po.amount > 0 ? `₹${po.amount.toLocaleString('en-IN')}` : '-'}
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <span className="text-sm text-[oklch(0.78_0_0)]">
+                        <span className="text-sm text-foreground">
                           {po.deliveryDate !== '-' ? new Date(po.deliveryDate).toLocaleDateString('en-IN') : '-'}
                         </span>
                       </td>
@@ -478,7 +478,7 @@ export default function PurchaseOrders() {
                               setSelectedOrder(po)
                               setShowViewDialog(true)
                             }}
-                            className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-1.5 rounded-lg transition-colors"
+                            className="text-foreground hover:text-foreground hover:bg-accent p-1.5 rounded-lg transition-colors"
                             title="View details"
                           >
                             <Eye className="w-4 h-4" />

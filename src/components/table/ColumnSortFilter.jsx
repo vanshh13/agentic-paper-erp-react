@@ -26,18 +26,18 @@ export default function ColumnSortFilter({
     <button
       type="button"
       onClick={handleSortClick}
-      className="flex items-center gap-1 px-2 py-1 rounded hover:bg-[oklch(0.32_0_0)] transition-colors w-full text-left"
+      className="flex items-center gap-1 px-2 py-1 rounded hover:bg-secondary transition-colors w-full text-left"
       title="Sort by this column"
     >
       <span className="truncate">{column.label}</span>
       {isSorted && sortOrder === 'asc' && (
-        <ChevronUp className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+        <ChevronUp className="w-3.5 h-3.5 text-primary flex-shrink-0" />
       )}
       {isSorted && sortOrder === 'desc' && (
-        <ChevronDown className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+        <ChevronDown className="w-3.5 h-3.5 text-primary flex-shrink-0" />
       )}
       {!isSorted && (
-        <ChevronsUpDown className="w-3.5 h-3.5 text-[oklch(0.60_0_0)] flex-shrink-0" />
+        <ChevronsUpDown className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
       )}
     </button>
   )

@@ -66,7 +66,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <div className="space-y-6 pb-10 text-[oklch(0.95_0_0)] w-full px-4 sm:px-6 lg:px-8">
+    <div className="space-y-6 pb-10 w-full px-4 sm:px-6 lg:px-8 text-foreground">
       {/* Header */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3 justify-between">
@@ -75,9 +75,8 @@ export default function Dashboard() {
               <LayoutDashboard className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[oklch(0.98_0_0)]">Dashboard</h1>
-                <p className="text-[oklch(0.70_0_0)] text-sm md:text-base">Company-wide overview and quick actions</p>
-
+              <h1 className="text-3xl md:text-4xl font-bold text-foreground">Dashboard</h1>
+              <p className="text-sm md:text-base text-muted-foreground">Company-wide overview and quick actions</p>
             </div>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
@@ -88,7 +87,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 text-[oklch(0.65_0_0)]">
+        <div className="flex flex-wrap items-center gap-3 text-muted-foreground">
           <span className="inline-flex items-center gap-1 text-xs md:text-sm">
             <span className="w-2 h-2 bg-indigo-400 rounded-sm"></span>
             Showing data from all companies
@@ -100,9 +99,9 @@ export default function Dashboard() {
       <div className="space-y-3">
         <div className="flex items-center gap-2">
           <Plus className="w-4 h-4 text-indigo-400" />
-          <h2 className="text-lg md:text-xl font-semibold text-[oklch(0.96_0_0)]">Quick Actions</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-foreground">Quick Actions</h2>
         </div>
-        <p className="text-[oklch(0.70_0_0)] text-xs md:text-sm">Frequently used actions</p>
+        <p className="text-xs md:text-sm text-muted-foreground">Frequently used actions</p>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
           {quickActions.map((action) => {
@@ -117,7 +116,7 @@ export default function Dashboard() {
                   <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl ${action.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
                     <Icon className="w-6 h-6 md:w-7 md:h-7" />
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-[oklch(0.90_0_0)] group-hover:text-[oklch(0.98_0_0)] transition-colors">
+                  <span className="text-xs md:text-sm font-medium text-foreground group-hover:opacity-90 transition-colors">
                     {action.label}
                   </span>
                 </div>
@@ -143,12 +142,12 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-1 mb-4">
-                <p className="text-xs md:text-sm text-[oklch(0.70_0_0)]">{stat.title}</p>
+                <p className="text-xs md:text-sm text-muted-foreground">{stat.title}</p>
                 <p className={`text-3xl md:text-4xl font-bold ${stat.color}`}>{stat.value}</p>
-                <p className="text-xs text-[oklch(0.65_0_0)]">{stat.subtitle}</p>
+                <p className="text-xs text-muted-foreground">{stat.subtitle}</p>
               </div>
 
-              <button className="flex items-center gap-1 text-xs text-[oklch(0.75_0_0)] hover:text-[oklch(0.95_0_0)] transition-colors group-hover:gap-2">
+              <button className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors group-hover:gap-2">
                 <span>{stat.link}</span>
                 <ArrowRight className="w-3 h-3" />
               </button>

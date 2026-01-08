@@ -9,7 +9,6 @@ const purchaseRoutes = [
     isProtected: true,
     title: 'Purchase Orders',
     isSidebar: true,
-    category: 'purchase',
     isLayout: true,
   },
   {
@@ -18,7 +17,6 @@ const purchaseRoutes = [
     isProtected: true,
     title: 'Vendors',
     isSidebar: true,
-    category: 'purchase',
     isLayout: true,
   },
   {
@@ -27,7 +25,6 @@ const purchaseRoutes = [
     isProtected: true,
     title: 'GRN',
     isSidebar: true,
-    category: 'purchase',
     isLayout: true,
     },
 ];

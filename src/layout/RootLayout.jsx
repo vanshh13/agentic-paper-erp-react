@@ -1,13 +1,64 @@
 import { useEffect, useRef } from 'react'
 import Sidebar from './Sidebar'
-import { Outlet, useLocation, Link } from 'react-router-dom'
-import { Bell, Menu, ChevronRight, Home } from 'lucide-react'
+import { Bell, Menu, ChevronRight, Home, Sun, Moon } from 'lucide-react'
+import { useLocation, Link, matchPath } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import { toggleTheme } from '../store/slices/theme-slice'
 import { useSidebar } from '../contexts/SidebarContext'
+import routes from '../routes/config/routes'
+import { selectBreadcrumbs, setPathname } from '../store/slices/breadcrumbs-slice'
 
 export default function RootLayout({ children }) {
   const { isOpen, setIsOpen } = useSidebar()
   const location = useLocation()
   const mainRef = useRef(null)
+  const dispatch = useDispatch()
+
+  const activeRoute = routes.find((route) => {
+    if (!route?.path || route.path === '*') return false
+    return Boolean(matchPath({ path: route.path, end: true }, location.pathname))
+  })
+
+  const shouldShowSidebar = activeRoute?.isSidebar !== false
+  const effectiveIsOpen = shouldShowSidebar && isOpen
+
+  // Get theme from Redux - apply globally in RootLayout only
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
+  const currentTheme = useSelector((state) =>
+    isDarkMode ? state.theme.darkTheme : state.theme.lightTheme
+  )
+
+  // Apply theme to document root
+  useEffect(() => {
+    const root = document.documentElement
+    
+    // Apply the dark class when in dark mode, remove it when in light mode
+    if (isDarkMode) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+    
+    Object.entries(currentTheme).forEach(([key, value]) => {
+      // Convert camelCase to kebab-case and set CSS variable
+      const cssVarName = `--${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`
+      root.style.setProperty(cssVarName, value)
+    })
+  }, [currentTheme, isDarkMode])
+
+  // Keep sidebar closed on routes that don't want it
+  useEffect(() => {
+    if (!shouldShowSidebar && isOpen) {
+      setIsOpen(false)
+    }
+  }, [shouldShowSidebar, isOpen, setIsOpen])
+
+  // Breadcrumbs (computed in slice)
+  const breadcrumbs = useSelector(selectBreadcrumbs)
+
+  useEffect(() => {
+    dispatch(setPathname(location.pathname))
+  }, [dispatch, location.pathname])
 
   // Reset scroll position when route changes
   useEffect(() => {
@@ -16,64 +67,107 @@ export default function RootLayout({ children }) {
     }
   }, [location.pathname])
 
-  // Generate breadcrumb from location pathname
-  const getBreadcrumbs = () => {
-    const paths = location.pathname.split('/').filter(Boolean)
-    const breadcrumbs = [{ label: 'Home', path: '/dashboard' }]
-    
-    if (paths.length === 0) {
-      return breadcrumbs
-    }
-
-    let currentPath = ''
-    paths.forEach((path, index) => {
-      currentPath += `/${path}`
-      const label = path
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
-      breadcrumbs.push({ label, path: currentPath })
-    })
-
-    return breadcrumbs
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    dispatch(toggleTheme())
   }
 
-  const breadcrumbs = getBreadcrumbs()
+  // Force chart/layout recalculation when sidebar opens/closes
+  useEffect(() => {
+    window.dispatchEvent(new Event('resize'))
+  }, [effectiveIsOpen])
 
   return (
-    <div className="flex h-screen bg-[oklch(0.18_0_0)] overflow-hidden">
+    <div 
+      className="flex h-screen overflow-hidden transition-colors duration-300"
+      style={{ backgroundColor: currentTheme.background }}
+    >
       {/* Sidebar */}
-      <Sidebar />
+      {shouldShowSidebar && <Sidebar />}
 
       {/* Main Content Area */}
       <div className={`flex-1 flex flex-col transition-all duration-300 overflow-hidden ${
-        isOpen ? 'lg:ml-[19.5rem]' : 'lg:ml-0'
+        effectiveIsOpen ? 'md:ml-[19.5rem]' : 'md:ml-0'
       }`}>
         {/* Top Bar */}
-        <header className="bg-[oklch(0.22_0_0)] border-b border-[oklch(0.25_0_0)] flex-shrink-0 z-20 h-20">
+        <header 
+          className="border-b flex-shrink-0 z-20 h-20 transition-colors duration-300"
+          style={{ 
+            backgroundColor: currentTheme.card,
+            borderColor: currentTheme.border
+          }}
+        >
           <div className="h-full px-4 md:px-6 flex justify-between items-center">
             <div className="flex items-center gap-2">
-              {!isOpen && (
+              {shouldShowSidebar && !effectiveIsOpen && (
                 <button 
                   onClick={() => setIsOpen(true)}
-                  className="p-2 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors"
+                  className="p-2 rounded-lg hover:opacity-80 transition-all"
+                  style={{ color: currentTheme.foreground }}
                   aria-label="Open sidebar"
                   title="Open sidebar"
                 >
                   <Menu className="w-5 h-5" />
                 </button>
               )}
-              <h1 className="text-base md:text-lg font-semibold text-[oklch(0.90_0_0)] truncate">
+              <h1 
+                className="text-base md:text-lg font-semibold truncate transition-colors duration-300"
+                style={{ color: currentTheme.foreground }}
+              >
                 {document.title || 'Dashboard'}
               </h1>
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">
-              <button className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors text-sm">
+              <button 
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg hover:opacity-80 transition-all text-sm"
+                style={{ color: currentTheme.foreground }}
+              >
                 <span className="text-indigo-400">📋</span>
                 All Companies
               </button>
-              <button className="relative p-2 rounded-lg text-[oklch(0.80_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors">
+              
+              {/* Theme Toggle Switch */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleThemeToggle}
+                  className="relative inline-flex items-center h-8 w-16 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  style={{ 
+                    backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(234, 179, 8, 0.2)',
+                    borderColor: currentTheme.border 
+                  }}
+                  aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                  title={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
+                >
+                  {/* Moon Icon (Left) */}
+                  <Moon 
+                    className={`absolute left-2 w-4 h-4 transition-all duration-300 ${
+                      isDarkMode ? 'text-indigo-400 opacity-100' : 'text-gray-400 opacity-50'
+                    }`}
+                  />
+                  
+                  {/* Sun Icon (Right) */}
+                  <Sun 
+                    className={`absolute right-2 w-4 h-4 transition-all duration-300 ${
+                      !isDarkMode ? 'text-yellow-500 opacity-100' : 'text-gray-400 opacity-50'
+                    }`}
+                  />
+                  
+                  {/* Toggle Circle */}
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300 ${
+                      isDarkMode ? 'translate-x-1' : 'translate-x-9'
+                    }`}
+                    style={{
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)'
+                    }}
+                  />
+                </button>
+              </div>
+              <button 
+                className="relative p-2 rounded-lg hover:opacity-80 transition-all"
+                style={{ color: currentTheme.foreground }}
+              >
                 <Bell className="w-4 h-4 md:w-5 md:h-5" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full"></span>
               </button>
@@ -82,27 +176,41 @@ export default function RootLayout({ children }) {
         </header>
 
         {/* Breadcrumb */}
-        <div className="bg-[oklch(0.20_0_0)] border-b border-[oklch(0.25_0_0)] px-4 md:px-6 py-3 flex-shrink-0">
+        {location.pathname != '/chat' &&
+        <div 
+          className="border-b px-4 md:px-6 py-3 flex-shrink-0 transition-colors duration-300"
+          style={{ 
+            backgroundColor: currentTheme.card,
+            borderColor: currentTheme.border
+          }}
+        >
           <nav className="flex items-center gap-2 text-sm">
             {breadcrumbs.map((crumb, index) => (
               <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
                 {index === 0 ? (
                   <Link
                     to={crumb.path}
-                    className="flex items-center gap-1.5 text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                    className="flex items-center gap-1.5 hover:opacity-80 transition-all"
+                    style={{ color: currentTheme.primary }}
                   >
                     <Home size={16} />
                     <span>{crumb.label}</span>
                   </Link>
                 ) : (
                   <>
-                    <ChevronRight size={16} className="text-[oklch(0.50_0_0)]" />
+                    <ChevronRight size={16} style={{ color: currentTheme.muted }} />
                     {index === breadcrumbs.length - 1 ? (
-                      <span className="text-[oklch(0.90_0_0)] font-medium">{crumb.label}</span>
+                      <span 
+                        className="font-medium transition-colors duration-300"
+                        style={{ color: currentTheme.foreground }}
+                      >
+                        {crumb.label}
+                      </span>
                     ) : (
                       <Link
                         to={crumb.path}
-                        className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.90_0_0)] transition-colors"
+                        className="hover:opacity-80 transition-all"
+                        style={{ color: currentTheme.primary }}
                       >
                         {crumb.label}
                       </Link>
@@ -113,11 +221,12 @@ export default function RootLayout({ children }) {
             ))}
           </nav>
         </div>
-
+        }
         {/* Page Content */}
         <main 
           ref={mainRef}
-          className="flex-1 overflow-y-auto custom-scrollbar bg-[oklch(0.18_0_0)] p-4 md:p-6"
+          className="flex-1 overflow-y-auto custom-scrollbar transition-colors duration-300 p-4 md:p-6"
+          style={{ backgroundColor: currentTheme.background }}
         >
           {children}
         </main>

@@ -10,7 +10,6 @@ const inventoryRoutes = [
     title: 'Products',
     icon: 'box',
     isSidebar: true,
-    category: 'inventory',
     isLayout: true,
   },
   {
@@ -19,7 +18,6 @@ const inventoryRoutes = [
     isProtected: true,
     title: 'Stock',
     isSidebar: true,
-    category: 'inventory',
     isLayout: true,
   },
   {
@@ -28,7 +26,6 @@ const inventoryRoutes = [
     isProtected: true,
     title: 'Price Lists',
     isSidebar: true,
-    category: 'inventory',
     isLayout: true,
   },
 ];

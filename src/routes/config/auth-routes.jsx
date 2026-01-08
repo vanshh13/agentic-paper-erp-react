@@ -8,7 +8,6 @@ const authRoutes = [
     isProtected: false,
     title: 'Login',
     isSidebar: false,
-    category: 'auth',
     isLayout: false,
   },
   {
@@ -17,7 +16,6 @@ const authRoutes = [
     isProtected: false,
     title: 'Register',
     isSidebar: true,
-    category: 'auth',
     isLayout: false,
   },
 ];

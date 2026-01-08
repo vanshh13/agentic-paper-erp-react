@@ -92,7 +92,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
       const testRegex = new RegExp(`^${escapedQuery}$`, 'gi')
       if (testRegex.test(part)) {
         return (
-          <mark key={index} className="bg-yellow-500/30 text-yellow-200 font-medium px-0.5 rounded">
+          <mark key={index} className="bg-yellow-500/30 text-yellow-900 dark:text-yellow-200 font-medium px-0.5 rounded">
             {part}
           </mark>
         )
@@ -139,7 +139,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
             {/* Section Header */}
             <button
               onClick={() => toggleSection(section.id)}
-              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-[oklch(0.60_0_0)] uppercase tracking-wider hover:text-[oklch(0.75_0_0)] transition-colors"
+              className="w-full flex items-center justify-between px-3 py-2 text-xs font-semibold text-sidebar-foreground uppercase tracking-wider transition-colors"
             >
               <span>{section.label}</span>
               <ChevronRight
@@ -162,7 +162,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm relative group ${
                         active
                           ? 'bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-900/40'
-                          : 'text-[oklch(0.75_0_0)] hover:bg-[oklch(0.20_0_0)] hover:text-[oklch(0.92_0_0)]'
+                          : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                       }`}
                     >
                       <IconComponent size={18} className="flex-shrink-0 min-w-[18px]" />
@@ -172,7 +172,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
                           className={`flex-shrink-0 px-1.5 py-0.5 rounded text-xs font-semibold whitespace-nowrap ${
                             active
                               ? 'bg-white/20 text-white'
-                              : 'bg-[oklch(0.25_0_0)] text-[oklch(0.85_0_0)]'
+                              : 'bg-sidebar-accent text-sidebar-accent-foreground'
                           }`}
                         >
                           {item.badge}
@@ -188,7 +188,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
 
         {filteredSections.length === 0 && (
           <div className="flex items-center justify-center py-8">
-            <p className="text-sm text-[oklch(0.60_0_0)]">No results found</p>
+            <p className="text-sm text-sidebar-foreground">No results found</p>
           </div>
         )}
       </nav>

@@ -1,4 +1,5 @@
 import { X, ChevronDown } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
 export default function PurchaseOrderForm({
   formData,
@@ -13,6 +14,8 @@ export default function PurchaseOrderForm({
   title,
 }) {
   if (!showDialog) return null
+
+  const isDarkMode = useSelector((state) => state.theme.isDarkMode)
 
   const isEdit = mode === 'edit'
   const formTitle = title || (isEdit ? 'Update Purchase Order' : 'Create Purchase Order')
@@ -60,17 +63,19 @@ export default function PurchaseOrderForm({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50">
-      <div className="bg-[oklch(0.20_0_0)] text-[oklch(0.95_0_0)] rounded-xl shadow-card max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-[var(--border)] custom-scrollbar">
+    <div
+      className={`fixed inset-0 ${isDarkMode ? 'bg-black/70' : 'bg-black/50'} backdrop-blur-sm flex items-center justify-center p-3 md:p-4 z-50`}
+    >
+      <div className="bg-card text-card-foreground rounded-xl shadow-card max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-border custom-scrollbar">
         {/* Header */}
-        <div className="p-4 md:p-6 border-b border-[var(--border)] sticky top-0 bg-[oklch(0.20_0_0)] z-10 flex justify-between items-start">
+        <div className="p-4 md:p-6 border-b border-border sticky top-0 bg-card z-10 flex justify-between items-start">
           <div>
             <h3 className="text-xl md:text-2xl font-bold">{formTitle}</h3>
-            <p className="text-[oklch(0.75_0_0)] text-xs md:text-sm mt-1">Complete all mandatory fields marked with <span className="text-rose-300">*</span></p>
+            <p className="text-muted-foreground text-xs md:text-sm mt-1">Complete all mandatory fields marked with <span className="text-rose-300">*</span></p>
           </div>
           <button
             onClick={() => setShowDialog(false)}
-            className="text-[oklch(0.70_0_0)] hover:text-[oklch(0.95_0_0)] transition-colors"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -83,7 +88,7 @@ export default function PurchaseOrderForm({
               <span className="bg-sky-300 text-[oklch(0.20_0_0)] rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
               Vendor Type Selection
             </h4>
-            <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4">
+            <div className="bg-background border border-border rounded-lg p-4">
               <label className="block text-sm font-medium mb-2">
                 Vendor Type <span className="text-rose-300">*</span>
               </label>
@@ -98,7 +103,7 @@ export default function PurchaseOrderForm({
                     className={`p-3 rounded-lg border-2 font-medium transition-all text-center ${
                       vendorType === option.value
                         ? 'border-sky-400 bg-sky-400/10 text-sky-300'
-                        : 'border-[var(--border)] bg-[oklch(0.20_0_0)] text-[oklch(0.80_0_0)] hover:border-sky-400/50'
+                        : 'border-border bg-card text-muted-foreground hover:border-sky-400/50'
                     }`}
                   >
                     {option.label}
@@ -115,7 +120,7 @@ export default function PurchaseOrderForm({
               Common Purchase Details
             </h4>
             
-            <div className="space-y-4 bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4">
+            <div className="space-y-4 bg-background border border-border rounded-lg p-4">
               {/* Row 1: PO Number & Document Date */}
               <div className="grid gap-3 md:grid-cols-2">
                 <div>
@@ -125,7 +130,7 @@ export default function PurchaseOrderForm({
                     placeholder="Auto-generated"
                     value={formData.poNumber || 'PO-2025-001'}
                     disabled
-                    className="w-full px-3 py-2 input-surface bg-[oklch(0.16_0_0)] cursor-not-allowed opacity-70"
+                    className="w-full px-3 py-2 input-surface cursor-not-allowed opacity-70"
                   />
                 </div>
                 <div>
@@ -140,8 +145,8 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Buyer Details */}
-              <div className="border-t border-[var(--border)] pt-4">
-                <h5 className="font-semibold text-[oklch(0.85_0_0)] mb-3">Buyer Details</h5>
+              <div className="border-t border-border pt-4">
+                <h5 className="font-semibold text-foreground mb-3">Buyer Details</h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium mb-2">Buyer Name <span className="text-rose-300">*</span></label>
@@ -199,8 +204,8 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Supplier Details */}
-              <div className="border-t border-[var(--border)] pt-4">
-                <h5 className="font-semibold text-[oklch(0.85_0_0)] mb-3">Supplier Details</h5>
+              <div className="border-t border-border pt-4">
+                <h5 className="font-semibold text-foreground mb-3">Supplier Details</h5>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium mb-2">Supplier Name <span className="text-rose-300">*</span></label>
@@ -275,8 +280,8 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Addresses */}
-              <div className="border-t border-[var(--border)] pt-4">
-                <h5 className="font-semibold text-[oklch(0.85_0_0)] mb-3">Delivery Addresses</h5>
+              <div className="border-t border-border pt-4">
+                <h5 className="font-semibold text-foreground mb-3">Delivery Addresses</h5>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
                     <label className="block text-sm font-medium mb-2">Bill To Address <span className="text-rose-300">*</span></label>
@@ -403,12 +408,12 @@ export default function PurchaseOrderForm({
               <span className="bg-indigo-300 text-[oklch(0.20_0_0)] rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">3</span>
               Item Details
             </h4>
-            <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 space-y-4">
+            <div className="bg-background border border-border rounded-lg p-4 space-y-4">
               {formData.lineItems && formData.lineItems.length > 0 ? (
                 formData.lineItems.map((item, index) => (
-                  <div key={index} className="bg-[oklch(0.20_0_0)] p-4 rounded-lg border border-[var(--border)] space-y-3">
+                  <div key={index} className="bg-card p-4 rounded-lg border border-border space-y-3">
                     <div className="flex justify-between items-center mb-2">
-                      <h5 className="font-semibold text-[oklch(0.85_0_0)]">Item {index + 1}</h5>
+                      <h5 className="font-semibold text-foreground">Item {index + 1}</h5>
                       <button
                         onClick={() => handleRemoveLineItem(index)}
                         className="text-sm text-rose-300 hover:text-rose-200"
@@ -622,7 +627,7 @@ export default function PurchaseOrderForm({
                           type="text"
                           value={calculateNetWeight(item.sheets, item.reamWeight) + ' kg'}
                           disabled
-                          className="w-full px-3 py-2 input-surface bg-[oklch(0.16_0_0)] text-sm opacity-70 cursor-not-allowed"
+                          className="w-full px-3 py-2 input-surface text-sm opacity-70 cursor-not-allowed"
                         />
                       </div>
                       <div>
@@ -651,13 +656,13 @@ export default function PurchaseOrderForm({
                   </div>
                 ))
               ) : (
-                <div className="text-center py-8 text-[oklch(0.65_0_0)]">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>No items added yet</p>
                 </div>
               )}
               <button
                 onClick={handleAddLineItem}
-                className="w-full py-2 border border-dashed border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors font-medium"
+                className="w-full py-2 border border-dashed border-border rounded-lg text-foreground hover:bg-accent transition-colors font-medium"
               >
                 + Add Item
               </button>
@@ -673,7 +678,7 @@ export default function PurchaseOrderForm({
               </h4>
 
               {/* Shipment Information */}
-              <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 mb-4 space-y-4">
+              <div className="bg-background border border-border rounded-lg p-4 mb-4 space-y-4">
                 <h5 className="font-semibold text-cyan-300 mb-3">Shipment & Logistics</h5>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
@@ -872,7 +877,7 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Import Compliance & Customs */}
-              <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 mb-4 space-y-4">
+              <div className="bg-background border border-border rounded-lg p-4 mb-4 space-y-4">
                 <h5 className="font-semibold text-cyan-300 mb-3">Import Compliance & Customs</h5>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
@@ -958,7 +963,7 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Insurance Details */}
-              <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 mb-4 space-y-4">
+              <div className="bg-background border border-border rounded-lg p-4 mb-4 space-y-4">
                 <h5 className="font-semibold text-cyan-300 mb-3">Insurance Details</h5>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
@@ -1006,7 +1011,7 @@ export default function PurchaseOrderForm({
               </div>
 
               {/* Landing & Clearing Charges */}
-              <div className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 space-y-4">
+              <div className="bg-background border border-border rounded-lg p-4 space-y-4">
                 <h5 className="font-semibold text-cyan-300 mb-3">Landing & Clearing Charges</h5>
                 <div className="grid gap-3 md:grid-cols-3">
                   <div>
@@ -1089,10 +1094,10 @@ export default function PurchaseOrderForm({
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <button
               onClick={() => setShowDialog(false)}
-              className="px-6 py-2 border border-[var(--border)] rounded-lg text-[oklch(0.90_0_0)] hover:bg-[oklch(0.24_0_0)] transition-colors font-medium"
+              className="px-6 py-2 border border-border rounded-lg text-foreground hover:bg-accent transition-colors font-medium"
             >
               Cancel
             </button>

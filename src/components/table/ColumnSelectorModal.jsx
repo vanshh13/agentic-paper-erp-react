@@ -29,13 +29,13 @@ export default function ColumnSelectorModal({ open, columns, selectedKeys, onApp
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md rounded-xl border border-[var(--border)] bg-[oklch(0.18_0_0)] shadow-2xl">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
-          <h3 className="text-sm font-semibold text-[oklch(0.95_0_0)]">Select Columns</h3>
+      <div className="w-full max-w-md rounded-xl card-surface shadow-2xl">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+          <h3 className="text-sm font-semibold text-foreground">Select Columns</h3>
           <button
             type="button"
             onClick={onClose}
-            className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.90_0_0)] px-2 py-1 rounded hover:bg-[oklch(0.22_0_0)]"
+            className="text-muted-foreground hover:text-foreground px-2 py-1 rounded hover:bg-secondary"
           >
             Cancel
           </button>
@@ -46,13 +46,13 @@ export default function ColumnSelectorModal({ open, columns, selectedKeys, onApp
             {columns.map((col) => (
               <label
                 key={col.key}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[oklch(0.22_0_0)] cursor-pointer text-sm text-[oklch(0.92_0_0)]"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-secondary cursor-pointer text-sm text-foreground"
               >
                 <input
                   type="checkbox"
                   checked={localSelection.includes(col.key)}
                   onChange={() => toggle(col.key)}
-                  className="w-4 h-4 rounded border-[var(--border)] bg-[oklch(0.26_0_0)] checked:bg-indigo-600 focus:ring-2 focus:ring-indigo-500"
+                  className="w-4 h-4 rounded border-border bg-input checked:bg-primary focus:ring-2 focus:ring-primary"
                 />
                 <span className="truncate">{col.label}</span>
               </label>
@@ -60,18 +60,18 @@ export default function ColumnSelectorModal({ open, columns, selectedKeys, onApp
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-[var(--border)] bg-[oklch(0.20_0_0)]">
+        <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-border bg-card">
           <button
             type="button"
             onClick={onClose}
-            className="px-3 py-1.5 rounded-lg border border-[var(--border)] text-[oklch(0.85_0_0)] hover:bg-[oklch(0.24_0_0)] text-xs font-medium"
+            className="px-3 py-1.5 rounded-lg border border-border text-foreground hover:bg-accent text-xs font-medium"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleApply}
-            className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 text-xs font-semibold"
+            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground hover:opacity-90 text-xs font-semibold"
           >
             Apply
           </button>
