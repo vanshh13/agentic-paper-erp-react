@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Plus, Trash2, Save, X, ChevronDown, ChevronUp, Edit2 } from 'lucide-react';
 import Toast from '../ui/toast';
+import { useSelector } from 'react-redux';
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice';
 
 /**
  * DynamicForm Component
@@ -48,6 +50,8 @@ const DynamicForm = ({
   const isViewMode = config.mode === 'view';
   const isEditMode = config.mode === 'edit';
   const isCreateMode = config.mode === 'create';
+  const isDarkMode = useSelector(selectThemeMode);
+  const currentTheme = useSelector(selectCurrentTheme);
 
   // Initialize form data with default values from config or empty
   const [formData, setFormData] = useState(() => {
@@ -243,46 +247,46 @@ const DynamicForm = ({
   // Render field value in view mode
   const renderViewValue = (field, value) => {
     if (value === null || value === undefined || value === '') {
-      return <span className="text-gray-500 italic">Not specified</span>;
+      return <span className="text-muted-foreground italic">Not specified</span>;
     }
 
     switch (field.type) {
       case 'select':
         const selectedOption = field.options?.find(opt => opt.value === value);
-        return <span className="text-gray-200">{selectedOption?.label || value}</span>;
+        return <span className="text-foreground">{selectedOption?.label || value}</span>;
 
       case 'radio':
         const selectedRadio = field.options?.find(opt => opt.value === value);
-        return <span className="text-gray-200">{selectedRadio?.label || value}</span>;
+        return <span className="text-foreground">{selectedRadio?.label || value}</span>;
 
       case 'checkbox':
         return (
           <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${
-            value ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'
+            value ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-secondary/20 text-secondary-foreground border border-border'
           }`}>
             {value ? 'Yes' : 'No'}
           </span>
         );
 
       case 'number':
-        return <span className="text-gray-200">{value}</span>;
+        return <span className="text-foreground">{value}</span>;
 
       case 'textarea':
-        return <p className="text-gray-200 whitespace-pre-wrap">{value}</p>;
+        return <p className="text-foreground whitespace-pre-wrap">{value}</p>;
 
       case 'date':
       case 'datetime-local':
       case 'time':
-        return <span className="text-gray-200">{value}</span>;
+        return <span className="text-foreground">{value}</span>;
 
       case 'custom':
         if (field.renderView) {
           return field.renderView(value, formData);
         }
-        return <span className="text-gray-200">{String(value)}</span>;
+        return <span className="text-foreground">{String(value)}</span>;
 
       default:
-        return <span className="text-gray-200">{value}</span>;
+        return <span className="text-foreground">{value}</span>;
     }
   };
 
@@ -304,7 +308,7 @@ const DynamicForm = ({
       );
     }
 
-    const baseInputClass = `w-full px-3 py-2.5 bg-[#0f0f0f] border ${showError ? 'border-red-500' : 'border-[#2d2d2d]'} rounded-md text-gray-300 text-sm focus:outline-none focus:border-indigo-500 transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} ${isReadOnly ? 'bg-[#1a1a1a]' : ''}`;
+    const baseInputClass = `w-full px-3 py-2.5 bg-input border ${showError ? 'border-destructive' : 'border-border'} rounded-md text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`;
 
     const fieldProps = {
       name: field.name,
@@ -364,9 +368,9 @@ const DynamicForm = ({
               checked={!!value}
               onChange={(e) => handleFieldChange(field.name, e.target.checked)}
               disabled={isDisabled}
-              className="w-4 h-4 rounded border-[#2d2d2d] bg-[#0f0f0f] text-indigo-600 focus:ring-2 focus:ring-indigo-500"
+              className="w-4 h-4 rounded border-border bg-input text-foreground focus:ring-2 focus:ring-primary"
             />
-            <label htmlFor={field.name} className="text-sm text-gray-300">
+            <label htmlFor={field.name} className="text-sm text-foreground">
               {field.label}
             </label>
           </div>
@@ -376,7 +380,7 @@ const DynamicForm = ({
         return (
           <div className="space-y-2">
             {field.options?.map((option, idx) => (
-              <label key={idx} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-[#1a1a1a] rounded transition-colors">
+              <label key={idx} className="flex items-center gap-2 cursor-pointer p-2 hover:bg-card rounded transition-colors">
                 <input
                   type="radio"
                   name={field.name}
@@ -384,9 +388,9 @@ const DynamicForm = ({
                   checked={value === option.value}
                   onChange={(e) => handleFieldChange(field.name, e.target.value)}
                   disabled={isDisabled}
-                  className="w-4 h-4 border-[#2d2d2d] bg-[#0f0f0f] text-indigo-600 focus:ring-2 focus:ring-indigo-500"
+                  className="w-4 h-4 border-border bg-input text-foreground focus:ring-2 focus:ring-primary"
                 />
-                <span className="text-sm text-gray-300">{option.label}</span>
+                <span className="text-sm text-foreground">{option.label}</span>
               </label>
             ))}
           </div>
@@ -407,10 +411,10 @@ const DynamicForm = ({
               disabled={isDisabled}
               accept={field.accept}
               multiple={field.multiple}
-              className="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"
+              className="w-full text-sm text-foreground file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:opacity-90 cursor-pointer"
             />
             {field.multiple && (
-              <p className="text-xs text-gray-500">Multiple files can be selected</p>
+              <p className="text-xs text-muted-foreground">Multiple files can be selected</p>
             )}
           </div>
         );
@@ -423,7 +427,7 @@ const DynamicForm = ({
               {...fieldProps}
               className="w-10 h-10 cursor-pointer"
             />
-            <span className="text-sm text-gray-300">{value}</span>
+            <span className="text-sm text-foreground">{value}</span>
           </div>
         );
 
@@ -438,7 +442,7 @@ const DynamicForm = ({
               step={field.step || 1}
               className="w-full h-2 bg-[#2d2d2d] rounded-lg appearance-none cursor-pointer"
             />
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-xs text-muted-foreground">
               <span>{field.min || 0}</span>
               <span className="font-medium">{value}</span>
               <span>{field.max || 100}</span>
@@ -464,9 +468,9 @@ const DynamicForm = ({
     return (
       <div className="space-y-3 sm:space-y-4">
         {arrayData.map((item, index) => (
-          <div key={index} className="bg-[#161616] p-3 sm:p-4 rounded-lg border border-[#2d2d2d] space-y-3 sm:space-y-4">
+          <div key={index} className="bg-card p-3 sm:p-4 rounded-lg border border-border space-y-3 sm:space-y-4">
             <div className="flex justify-between items-center">
-              <h4 className="text-sm font-medium text-gray-300">
+              <h4 className="text-sm font-medium text-foreground">
                 {section.itemLabel || 'Item'} {index + 1}
               </h4>
               {!isViewMode && (
@@ -474,7 +478,7 @@ const DynamicForm = ({
                   type="button"
                   onClick={() => handleRemoveArrayItem(section.arrayField, index)}
                   disabled={loading}
-                  className="text-red-400 hover:text-red-300 transition-colors p-1 disabled:opacity-50"
+                  className="text-destructive hover:opacity-80 transition-colors p-1 disabled:opacity-50"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -484,9 +488,9 @@ const DynamicForm = ({
               {section.fields?.map((field, fieldIndex) => (
                 <div key={fieldIndex}>
                   {field.label && (
-                    <label className="block text-xs font-medium mb-1 text-gray-400">
+                    <label className="block text-xs font-medium mb-1 text-muted-foreground">
                       {field.label}
-                      {field.required && !isViewMode && <span className="text-red-400 ml-1">*</span>}
+                      {field.required && !isViewMode && <span className="text-destructive ml-1">*</span>}
                     </label>
                   )}
                   {renderField({
@@ -504,7 +508,7 @@ const DynamicForm = ({
             type="button"
             onClick={() => handleAddArrayItem(section.arrayField, section.defaultItem || {})}
             disabled={loading}
-            className="w-full py-2.5 border border-dashed border-[#2d2d2d] rounded-lg text-gray-300 hover:bg-[#202020] transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-2.5 border border-dashed border-border rounded-lg text-foreground hover:bg-card transition-colors text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             {section.addButtonLabel || 'Add Item'}
@@ -523,26 +527,26 @@ const DynamicForm = ({
     if (!showSection) return null;
 
     return (
-      <div key={sectionId} className="bg-[#1a1a1a] rounded-lg border border-[#2d2d2d] overflow-hidden">
+      <div key={sectionId} className="bg-card rounded-lg border border-border overflow-hidden">
         {(section.title || section.description) && (
           <div 
-            className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-[#2d2d2d] bg-[#161616] cursor-pointer hover:bg-[#1f1f1f] transition-colors"
+            className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-border bg-card cursor-pointer hover:opacity-90 transition-colors"
             onClick={() => toggleSection(sectionId)}
           >
             <div className="flex justify-between items-center">
               <div>
                 {section.title && (
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-200">
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">
                     {section.title}
                   </h3>
                 )}
                 {section.description && (
-                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     {section.description}
                   </p>
                 )}
               </div>
-              <div className="text-gray-400">
+              <div className="text-muted-foreground">
                 {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
               </div>
             </div>
@@ -568,20 +572,20 @@ const DynamicForm = ({
                       className={field.fullWidth ? 'col-span-1 md:col-span-2 xl:col-span-3' : ''}
                     >
                       {field.type !== 'checkbox' && field.label && (
-                        <label className="block text-sm font-medium mb-2 text-gray-400">
+                        <label className="block text-sm font-medium mb-2 text-muted-foreground">
                           {field.label}
-                          {field.required && !isViewMode && <span className="text-red-400 ml-1">*</span>}
+                          {field.required && !isViewMode && <span className="text-destructive ml-1">*</span>}
                         </label>
                       )}
                       
                       {renderField(field)}
                       
                       {errors[field.name] && touched[field.name] && !isViewMode && (
-                        <p className="text-red-400 text-xs mt-1">{errors[field.name]}</p>
+                        <p className="text-destructive text-xs mt-1">{errors[field.name]}</p>
                       )}
                       
                       {field.helperText && !errors[field.name] && !isViewMode && (
-                        <p className="text-gray-500 text-xs mt-1">{field.helperText}</p>
+                        <p className="text-muted-foreground text-xs mt-1">{field.helperText}</p>
                       )}
                     </div>
                   );
@@ -595,26 +599,26 @@ const DynamicForm = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Fixed Header */}
-      <div className="bg-[#1a1a1a] border-b border-[#2d2d2d] z-40">
+      <div className="border-b border-border bg-card z-40">
         <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3 sm:gap-4">
               {showBackButton && (
                 <button
                   onClick={handleCancelClick}
-                  className="p-2 hover:bg-[#252525] rounded-lg transition-colors text-gray-400 hover:text-gray-200"
+                  className="p-2 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
                 >
                   <ArrowLeft className="w-5 h-5" />
                 </button>
               )}
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-100">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                   {config.title || 'Form'}
                 </h1>
                 {config.subtitle && (
-                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                  <p className="text-xs sm:text-sm mt-0.5 text-muted-foreground">
                     {config.subtitle}
                   </p>
                 )}
@@ -642,7 +646,7 @@ const DynamicForm = ({
             <button
               type="button"
               onClick={handleCancelClick}
-              className="px-5 py-3 bg-[#1a1a1a] border border-[#2d2d2d] rounded-lg text-gray-300 hover:bg-[#252525] hover:border-indigo-500 transition-all shadow-lg font-medium flex items-center gap-2"
+              className="px-5 py-3 rounded-lg transition-all shadow-lg font-medium flex items-center gap-2 bg-card border border-border text-foreground hover:bg-accent"
               title="Back"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -652,7 +656,7 @@ const DynamicForm = ({
               <button
                 type="button"
                 onClick={handleEditClick}
-                className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg flex items-center gap-2"
+                className="px-5 py-3 rounded-lg font-semibold transition-all shadow-lg flex items-center gap-2 bg-primary text-primary-foreground hover:opacity-90"
                 title="Edit"
               >
                 <Edit2 className="w-5 h-5" />
@@ -666,7 +670,7 @@ const DynamicForm = ({
               type="button"
               onClick={handleCancelClick}
               disabled={isLoading}
-              className="px-5 py-3 bg-[#1a1a1a] border border-[#2d2d2d] rounded-lg text-gray-300 hover:bg-[#252525] hover:border-indigo-500 transition-all shadow-lg font-medium disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-3 rounded-lg transition-all shadow-lg font-medium disabled:opacity-50 flex items-center gap-2 bg-card border border-border text-foreground hover:bg-accent"
               title="Cancel"
             >
               <X className="w-5 h-5" />
@@ -676,7 +680,7 @@ const DynamicForm = ({
               type="button"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50"
+              className="px-5 py-3 rounded-lg font-semibold transition-all shadow-lg flex items-center gap-2 disabled:opacity-50 bg-primary text-primary-foreground hover:opacity-90"
               title="Save"
             >
               <Save className="w-5 h-5" />

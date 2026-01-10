@@ -24,7 +24,7 @@ const mainRoutes = [
     element: Profile,
     isProtected: true,
     title: 'Profile',
-    isSidebar: false,
+    isSidebar: true,
     isLayout: true,
   },
 ];

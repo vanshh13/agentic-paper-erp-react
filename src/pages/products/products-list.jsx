@@ -6,9 +6,13 @@ import { productApi } from '../../services/api/product/product-api';
 import DynamicTable from '../../components/table/dynamic-table';
 import ConfirmationModal from '../../components/ui/confirmation-modal';
 import productColumns from './product-columns';
+import { useSelector } from 'react-redux';
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice';
 
 export default function ProductsList() {
   const navigate = useNavigate();
+  const isDarkMode = useSelector(selectThemeMode);
+  const currentTheme = useSelector(selectCurrentTheme);
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +69,10 @@ export default function ProductsList() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-300 p-6">
+    <div
+      className="min-h-screen p-6 bg-background text-foreground"
+      style={{ backgroundColor: currentTheme.background, color: currentTheme.foreground }}
+    >
       {/* Toast */}
       {toast.show && (
         <div className="fixed top-4 right-4 z-50">
@@ -82,14 +89,15 @@ export default function ProductsList() {
             <Package className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-100">Product Catalog</h1>
-            <p className="text-gray-500 text-sm">Manage inventory</p>
+            <h1 className="text-3xl font-bold" style={{ color: currentTheme.foreground }}>Product Catalog</h1>
+            <p className="text-sm" style={{ color: currentTheme.mutedForeground }}>Manage inventory</p>
           </div>
         </div>
 
         <button
           onClick={handleAddProduct}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-white"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors"
+          style={{ backgroundColor: currentTheme.primary, color: currentTheme.primaryForeground }}
         >
           <Plus className="w-4 h-4" />
           Add Product
@@ -106,21 +114,24 @@ export default function ProductsList() {
           <div className="flex gap-3">
             <button
               onClick={() => handleViewProduct(row)}
-              className="text-[oklch(0.75_0_0)] hover:text-[oklch(0.95_0_0)] transition-colors cursor-pointer"  
+              className="transition-opacity cursor-pointer hover:opacity-80"
+              style={{ color: currentTheme.mutedForeground }}
               title="View"
             >
               <Eye size={25} />
             </button>
             <button
               onClick={() => handleEditProduct(row)}
-              className="text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="transition-opacity hover:opacity-80"
+              style={{ color: currentTheme.primary }}
               title="Edit"
             >
               <Edit2 size={25} />
             </button>
             <button
               onClick={() => handleDeleteProduct(row.id)}
-              className="text-red-400 hover:text-red-300 transition-colors"
+              className="transition-opacity hover:opacity-80"
+              style={{ color: currentTheme.destructive }}
               title="Delete"
             >
               <Trash2 size={25} />
