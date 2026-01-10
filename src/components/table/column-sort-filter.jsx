@@ -1,4 +1,6 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice'
 
 export default function ColumnSortFilter({ 
   column, 
@@ -7,6 +9,8 @@ export default function ColumnSortFilter({
   onSort, 
   onFilter 
 }) {
+  const isDarkMode = useSelector(selectThemeMode)
+  const theme = useSelector(selectCurrentTheme)
   const isSorted = sortKey === column.key
 
   const handleSortClick = () => {

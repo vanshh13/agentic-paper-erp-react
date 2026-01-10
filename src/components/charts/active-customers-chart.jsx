@@ -13,6 +13,8 @@ import {
 import { useState, useMemo } from 'react'
 import TimeRangeSelector from './time-range-selector'
 import { generateActiveCustomersData } from '../../data/mock-chart-data'
+import { useSelector } from 'react-redux'
+import { createChartOptions } from '../../lib/chart-theme'
 
 // Register Chart.js components
 ChartJS.register(

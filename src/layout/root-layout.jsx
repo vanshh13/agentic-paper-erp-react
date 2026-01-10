@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
-import Sidebar from './Sidebar'
+import Sidebar from './sidebar'
 import { Bell, Menu, ChevronRight, Home, Sun, Moon } from 'lucide-react'
 import { useLocation, Link, matchPath } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleTheme } from '../store/slices/theme-slice'
-import { useSidebar } from '../contexts/SidebarContext'
+import { useSidebar } from '../contexts/sidebar-context'
 import routes from '../routes/config/routes'
 import { selectBreadcrumbs, setPathname } from '../store/slices/breadcrumbs-slice'
 
@@ -31,6 +31,8 @@ export default function RootLayout({ children }) {
   // Apply theme to document root
   useEffect(() => {
     const root = document.documentElement
+
+    root.classList.toggle('dark', isDarkMode)
     
     // Apply the dark class when in dark mode, remove it when in light mode
     if (isDarkMode) {

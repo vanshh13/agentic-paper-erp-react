@@ -1,390 +1,271 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, Paperclip, X, Copy, Check, Loader2 } from 'lucide-react'
-import InteractiveAIAvatar from './components/InteractiveAIAvatar-main'
+import {
+  Send,
+  Paperclip,
+  X,
+  FileIcon,
+  FileText,
+  Table
+} from 'lucide-react'
+import InteractiveAIAvatarLogo from '../../components/interactive-ai-avatar'
+import { useSelector } from 'react-redux'
+import Typewriter from 'typewriter-effect';
 
-// Placeholder for ChatInput - replace with your actual component
-const ChatInput = ({ onSend, isProcessingMessage, onStop }) => {
+// 1. Fixed the symbol helper to be more robust
+const getFileSymbol = (file) => {
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  if (name.endsWith('.xlsx') || name.endsWith('.xls') || type.includes('spreadsheet')) return <Table className="w-4 h-4 text-green-500" />;
+  if (name.endsWith('.docx') || name.endsWith('.doc') || type.includes('word')) return <FileText className="w-4 h-4 text-blue-500" />;
+  if (type.includes('pdf')) return <FileIcon className="w-4 h-4 text-red-500" />;
+  return <FileIcon className="w-4 h-4 text-muted-foreground" />;
+}
+
+const ChatInput = ({ onSend, isProcessingMessage }) => {
   const [message, setMessage] = useState('')
-  
+  const [selectedFiles, setSelectedFiles] = useState([])
+  const textareaRef = useRef(null)
+  const fileInputRef = useRef(null)
+
+  // Auto-expand logic
+  useEffect(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = '40px'
+      const scrollHeight = textarea.scrollHeight
+      const maxHeight = 160
+      textarea.style.height = `${Math.min(scrollHeight, maxHeight)}px`
+      textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden'
+    }
+  }, [message])
+
+  const handleSubmission = () => {
+    if (message.trim() || selectedFiles.length > 0) {
+      onSend(message, selectedFiles.map(f => f.file))
+      setMessage('')
+      // Cleanup Object URLs to prevent memory leaks
+      selectedFiles.forEach(f => { if (f.preview) URL.revokeObjectURL(f.preview) });
+      setSelectedFiles([])
+    }
+  }
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files).map(file => ({
+      file,
+      id: Math.random().toString(36).substr(2, 9),
+      preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+    }));
+    setSelectedFiles(prev => [...prev, ...files]);
+    e.target.value = null; // Reset input
+  }
+
   return (
-    <div className="flex gap-2 items-center">
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyPress={(e) => e.key === 'Enter' && !isProcessingMessage && onSend(message)}
-        placeholder="Type your message..."
-        className="flex-1 input-surface px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        disabled={isProcessingMessage}
-      />
-      {isProcessingMessage ? (
-        <button
-          onClick={onStop}
-          className="px-4 py-3 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Stop
-        </button>
-      ) : (
-        <button
-          onClick={() => onSend(message)}
-          disabled={!message.trim()}
-          className="px-4 py-3 bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-        >
-          <Send className="w-5 h-5" />
-        </button>
+    <div className="flex flex-col gap-2 w-full">
+      {selectedFiles.length > 0 && (
+        <div className="flex flex-wrap gap-2 px-1 max-h-32 overflow-y-auto">
+          {selectedFiles.map((item) => (
+            <div key={item.id} className="flex items-center gap-2 p-1.5 bg-accent/40 rounded-xl border border-border/50 animate-in fade-in zoom-in duration-200">
+              {item.preview ? <img src={item.preview} className="w-6 h-6 rounded object-cover" alt="" /> : getFileSymbol(item.file)}
+              <span className="text-[10px] font-medium max-w-[60px] truncate">{item.file.name}</span>
+              <button
+                onClick={() => setSelectedFiles(prev => prev.filter(f => f.id !== item.id))}
+                className="hover:text-destructive transition-colors"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
       )}
+
+      <div className="relative flex items-end gap-2 p-1.5 bg-card rounded-[26px] border border-border shadow-sm focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+        <div className="flex items-center pb-1 pl-1">
+          <input type="file" ref={fileInputRef} hidden multiple onChange={handleFileChange} />
+          <button onClick={() => fileInputRef.current?.click()} className="p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-accent">
+            <Paperclip className="w-5 h-5" />
+          </button>
+        </div>
+
+        <textarea
+          ref={textareaRef}
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), !isProcessingMessage && handleSubmission())}
+          placeholder="Message AI Assistant..."
+          className="flex-1 min-h-[40px] max-h-[160px] py-2.5 bg-transparent resize-none focus:outline-none text-[15px] leading-normal"
+        />
+
+        <div className="pb-1 pr-1">
+          <button
+            onClick={handleSubmission}
+            disabled={(!message.trim() && selectedFiles.length === 0) || isProcessingMessage}
+            className="flex items-center justify-center w-8 h-8 bg-primary text-primary-foreground rounded-full disabled:opacity-20 transition-all"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
 
-// Chat Messages Component
-const ChatMessagesComp = ({ chatMessages, showSkeletonOfAi }) => {
-  const messagesEndRef = useRef(null)
-  const [copiedIndex, setCopiedIndex] = useState(null)
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [chatMessages, showSkeletonOfAi])
-
-  const handleCopy = (message, index) => {
-    navigator.clipboard.writeText(message)
-    setCopiedIndex(index)
-    setTimeout(() => setCopiedIndex(null), 2000)
-  }
-
-  // Function to render file previews
-  const renderFilePreview = (file) => {
-    const openFileInNewTab = (file) => {
-      const fileURL = URL.createObjectURL(file)
-      window.open(fileURL, '_blank')
-    }
-
-    const downloadFile = (file) => {
-      const fileURL = URL.createObjectURL(file)
-      const a = document.createElement('a')
-      a.href = fileURL
-      a.download = file.name
-      if (document.body) {
-        document.body.appendChild(a)
-        a.click()
-        if (document.body.contains(a)) {
-          document.body.removeChild(a)
-        }
-      }
-      URL.revokeObjectURL(fileURL)
-    }
-
-    if (file.type.startsWith('image/')) {
-      return (
-        <div className="mt-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <img 
-            src={URL.createObjectURL(file)} 
-            alt={file.name}
-            className="max-w-[280px] max-h-[280px] rounded-xl object-cover cursor-pointer shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-[1.02]"
-            onClick={() => openFileInNewTab(file)}
-          />
-          <div className="mt-2 flex gap-2">
-            <button
-              className="px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded-lg hover:opacity-90 transition-all duration-200 font-medium"
-              onClick={(e) => {
-                e.stopPropagation()
-                openFileInNewTab(file)
-              }}
-            >
-              Open Full Size
-            </button>
-            <button
-              className="px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-lg hover:bg-accent transition-all duration-200 font-medium"
-              onClick={(e) => {
-                e.stopPropagation()
-                downloadFile(file)
-              }}
-            >
-              Download
-            </button>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">{file.name}</p>
-        </div>
-      )
-    } else {
-      // Determine file type icon
-      let fileIcon = (
-        <svg className="w-10 h-10 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      )
-
-      if (file.type.includes('pdf')) {
-        fileIcon = (
-          <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        )
-      } else if (file.type.includes('excel') || file.type.includes('spreadsheet') || file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-        fileIcon = (
-          <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        )
-      } else if (file.type.includes('word') || file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
-        fileIcon = (
-          <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        )
-      }
-
-      return (
-        <div className="mt-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="p-3 card-surface cursor-pointer hover:bg-accent transition-all duration-200 group">
-            <div 
-              className="flex items-center gap-3"
-              onClick={() => openFileInNewTab(file)}
-            >
-              <div className="flex-shrink-0 transform group-hover:scale-110 transition-transform duration-200">
-                {fileIcon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{file.name}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{(file.size / 1024).toFixed(1)} KB</p>
-              </div>
-            </div>
-            <div className="mt-3 flex gap-2">
-              <button
-                className="flex-1 px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded-lg hover:opacity-90 transition-all duration-200 font-medium"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  openFileInNewTab(file)
-                }}
-              >
-                Open
-              </button>
-              <button
-                className="flex-1 px-3 py-1.5 bg-secondary text-secondary-foreground text-xs rounded-lg hover:bg-accent transition-all duration-200 font-medium"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  downloadFile(file)
-                }}
-              >
-                Download
-              </button>
-            </div>
-          </div>
-        </div>
-      )
-    }
-  }
-
-  if (!chatMessages?.length && !showSkeletonOfAi) return null
+const ChatMessagesComp = ({ chatMessages }) => {
+  const messagesEndRef = useRef(null);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [chatMessages]);
 
   return (
-    <div className="flex flex-col space-y-6 p-6">
-      {chatMessages.map(({ role, message, files }, index) => {
-        return (
-          <div
-            key={index}
-            className={`flex ${role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-3 duration-500`}
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <div
-              className={`flex items-start max-w-[85%] gap-3 ${
-                role === 'user' ? 'flex-row-reverse' : 'flex-row'
-              }`}
-            >
-              {/* Avatar */}
-              {role === 'assistant' && (
-                <div className="w-10 h-10 flex-shrink-0 rounded-full overflow-hidden shadow-card">
-                  <InteractiveAIAvatar />
+    <div className="flex flex-col space-y-8 py-8 w-full">
+      {chatMessages.map(({ role, message, files }, index) => (
+        <div key={index} className={`flex w-full ${role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+          <div className={`flex items-start max-w-[85%] md:max-w-[75%] gap-3 ${role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+            {role === 'assistant' && (
+              <div className="w-8 h-8 flex-shrink-0 rounded-full overflow-hidden border border-border shadow-sm">
+                <InteractiveAIAvatarLogo />
+              </div>
+            )}
+            <div className={`flex flex-col gap-2 ${role === 'user' ? 'items-end' : 'items-start'}`}>
+              <div className={`px-4 py-2.5 rounded-2xl text-[15px] shadow-sm ${role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-none' : 'bg-muted/50 border border-border/50 rounded-tl-none'}`}>
+                <div className="whitespace-pre-line">{message}</div>
+              </div>
+
+              {/* Render Attached Files */}
+              {files?.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {files.map((file, i) => (
+                    <div key={i} className="flex items-center gap-2 p-2 bg-accent/20 rounded-lg border border-border/40 text-[12px]">
+                      {getFileSymbol(file)}
+                      <span>{file.name}</span>
+                    </div>
+                  ))}
                 </div>
               )}
-
-              {/* Message Content */}
-              <div className="flex flex-col gap-2">
-                <div
-                  className={`group relative px-5 py-3.5 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 ${
-                    role === 'user'
-                      ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                      : 'card-surface rounded-tl-sm'
-                  }`}
-                >
-                  <div className="text-[15px] leading-relaxed">
-                    <div style={{ whiteSpace: 'pre-line' }}>{message}</div>
-                    
-                    {/* File previews */}
-                    {files && files.length > 0 && (
-                      <div className="mt-2 space-y-2">
-                        {files.map((file, fileIndex) => (
-                          <div key={fileIndex}>
-                            {renderFilePreview(file)}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Copy button for AI messages */}
-                  {role === 'assistant' && (
-                    <button
-                      className="absolute -bottom-8 right-0 p-2 rounded-lg hover:bg-accent transition-all duration-200 opacity-0 group-hover:opacity-100"
-                      onClick={() => handleCopy(message, index)}
-                      title="Copy message"
-                    >
-                      {copiedIndex === index ? (
-                        <Check className="w-4 h-4 text-green-500" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </button>
-                  )}
-                </div>
-
-                {/* Timestamp */}
-                <div className={`text-xs text-muted-foreground px-2 ${role === 'user' ? 'text-right' : 'text-left'}`}>
-                  {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      })}
-      
-      {/* AI Thinking Skeleton */}
-      {showSkeletonOfAi && (
-        <div className="flex justify-start animate-in fade-in slide-in-from-bottom-3 duration-500">
-          <div className="flex items-start gap-3 max-w-[85%]">
-            {/* Avatar skeleton */}
-            <div className="w-10 h-10 flex-shrink-0 rounded-full bg-secondary animate-pulse shadow-card" />
-
-            {/* Message content */}
-            <div className="flex flex-col gap-2">
-              <div className="px-5 py-4 card-surface rounded-2xl rounded-tl-sm shadow-card min-w-[300px]">
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <div className="w-32 h-3.5 bg-muted rounded-full animate-pulse" />
-                    <div className="w-20 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
-                  </div>
-                  <div className="w-48 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '300ms' }} />
-                  <div className="flex gap-2">
-                    <div className="w-28 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '450ms' }} />
-                    <div className="w-24 h-3.5 bg-muted rounded-full animate-pulse" style={{ animationDelay: '600ms' }} />
-                  </div>
-                </div>
-
-                {/* Typing indicator */}
-                <div className="flex gap-1.5 mt-4">
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
             </div>
           </div>
         </div>
-      )}
-      
+      ))}
       <div ref={messagesEndRef} />
     </div>
-  )
+  );
 }
-
-
-// Main Chat Screen UI Component
 export default function ChatScreenUI() {
-  const [isDarkMode] = useState(true)
   const [chatMessages, setChatMessages] = useState([])
   const [showSkeletonOfAi, setShowSkeletonOfAi] = useState(false)
   const [isProcessingMessage, setIsProcessingMessage] = useState(false)
+  const isDark = useSelector((state) => state.theme.isDarkMode)
+  const user = useSelector((state => state.auth.user))
 
-  const getGreetingText = () => {
-    const hours = new Date().getHours()
-    if (hours >= 0 && hours < 12) return 'Good Morning'
-    if (hours >= 12 && hours < 17) return 'Good Afternoon'
-    return 'Good Evening'
-  }
-
-  useEffect(() => {
-    const greeting = getGreetingText()
-    setChatMessages([
-      {
-        role: 'assistant',
-        message: `${greeting}! I'm your AI Assistant. How can I help you today?`
-      }
-    ])
-  }, [])
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
 
   const handleSendMessage = (message, files = []) => {
-    if (!message.trim() && files.length === 0) return
-
-    setChatMessages(prev => [
-      ...prev,
-      {
-        role: 'user',
-        message: message || (files.length > 0 ? `${files.length} file(s) uploaded` : ''),
-        files: files.length > 0 ? files : undefined
-      }
-    ])
-
-    setShowSkeletonOfAi(true)
-    setIsProcessingMessage(true)
-
+    setChatMessages(prev => [...prev, { role: 'user', message, files }]);
+    setShowSkeletonOfAi(true);
+    setIsProcessingMessage(true);
     setTimeout(() => {
-      setChatMessages(prev => [
-        ...prev,
-        {
-          role: 'assistant',
-          message: 'This is a sample AI response. Replace this with your actual API integration.'
-        }
-      ])
-      setShowSkeletonOfAi(false)
-      setIsProcessingMessage(false)
-    }, 2000)
-  }
+      setChatMessages(prev => [...prev, { role: 'assistant', message: 'I have received your message and am processing it.' }]);
+      setShowSkeletonOfAi(false);
+      setIsProcessingMessage(false);
+    }, 1500);
+  };
 
-  const handleStopRequest = () => {
-    setShowSkeletonOfAi(false)
-    setIsProcessingMessage(false)
-  }
+  const isInitialState = chatMessages.length === 0;
+
   return (
-    <div
-      className="relative h-screen bg-background text-foreground overflow-hidden flex flex-col"
-      data-theme={isDarkMode ? 'dark' : 'light'}
-    >
-      {/* FIXED HEADER 
-          - Removed 'p-5' to eliminate top/side margins
-          - Added 'h-16' for a consistent fixed height
-          - Added 'px-5' for side padding only
-      */}
-      <header className="flex-shrink-0 h-16 border-b border-border bg-card/80 backdrop-blur-md z-20 flex items-center shadow-sm">
-        <div className="w-full px-5 flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full overflow-hidden ring-1 ring-primary/20">
-              <InteractiveAIAvatar />
-            </div>
-            <h1 className="text-md font-bold text-foreground">AI Assistant</h1>
-          </div>
-        </div>
-      </header>
+    <div className="flex flex-col w-full h-full bg-background text-foreground overflow-hidden font-sans relative">
+      <main className="flex-1 overflow-y-auto custom-scrollbar w-full scroll-smooth">
+        <div className="flex flex-col min-h-full w-full">
+          {chatMessages.length === 0 ? (
+            <div className="flex-1 flex flex-col p-6 text-center">
+              {/* Parent container with reduced padding */}
+              <div className="flex-1 flex flex-col p-2 text-center items-center">
+                <>
+                  {/*Adjusted py for height and px for width */}
+                  <div className="relative py-8 px-32 md:px-64 mx-auto w-fit group overflow-hidden bg-card rounded-[1.5rem] border border-border shadow-card animate-in fade-in zoom-in duration-500 animate-border-glow">
 
-      {/* SCROLLABLE CONTENT 
-          - flex-1 ensures it takes up all space between header and footer
-      */}
-      <main className="flex-1 overflow-y-auto bg-background custom-scrollbar">
-        <ChatMessagesComp 
-          chatMessages={chatMessages}
-          showSkeletonOfAi={showSkeletonOfAi}
-        />
+                    {/* Animated Glowing Border */}
+                    <div className="absolute inset-0 rounded-[1.5rem] p-[2px]">
+                      <div className="w-full h-full rounded-[1.5rem] bg-card relative overflow-hidden">
+                        {/* Top border animation */}
+                        <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-transparent via-primary/60 to-transparent animate-[border-flow-top_3s_linear_infinite]" />
+                        {/* Right border animation */}
+                        <div className="absolute top-0 right-0 w-[2px] h-full bg-gradient-to-b from-transparent via-primary/60 to-transparent animate-[border-flow-right_3s_linear_infinite_0.75s]" />
+                        {/* Bottom border animation */}
+                        <div className="absolute bottom-0 right-0 w-full h-[2px] bg-gradient-to-l from-transparent via-primary/60 to-transparent animate-[border-flow-bottom_3s_linear_infinite_1.5s]" />
+                        {/* Left border animation */}
+                        <div className="absolute bottom-0 left-0 w-[2px] h-full bg-gradient-to-t from-transparent via-primary/60 to-transparent animate-[border-flow-left_3s_linear_infinite_2.25s]" />
+                      </div>
+                    </div>
+
+                    {/* Static Horizontal Accent Line */}
+                    <div className="absolute top-1/2 left-0 w-full h-[1px] -translate-y-1/2 bg-gradient-to-r from-transparent via-primary/40 to-transparent transition-opacity duration-700 group-hover:via-primary/60" />
+                    {/* Header Label with margin-bottom simulation */}
+                    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20">
+                      <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_var(--primary)]" />
+                        <span className="text-[9px] font-mono tracking-[0.2em] text-primary uppercase">Hey I'm Chat bot</span>
+                      </div>
+                      {/* This creates the visual "margin" under the label before the avatar starts */}
+                      <div className="h-2" />
+                    </div>
+
+                    {/* Avatar - Wrapped in a container with mt to respect the top label */}
+                    <div className="relative z-10 flex items-center justify-center mt-4">
+                      <div className="relative w-24 h-24 md:w-32 md:h-32">
+                        <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl animate-pulse" />
+                        <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-card via-muted to-card shadow-2xl border border-border/50 flex items-center justify-center transition-all duration-700 group-hover:scale-105 group-hover:border-primary/50">
+                          <InteractiveAIAvatarLogo size="100%" />
+                          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-muted/10 to-transparent pointer-events-none" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Typewriter Text - Zero gap with the frame */}
+                  <div className="mt-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 fill-mode-both">
+                    <div className="text-muted-foreground max-w-lg mx-auto text-xl md:text-2xl font-semibold leading-snug tracking-tight">
+                      <Typewriter
+                        key={`${getGreeting()}-${user.username}`}
+                        options={{
+                          strings: [`${getGreeting()} ${user.username}, how can I help?`],
+                          autoStart: true,
+                          delay: 40,
+                          cursor: "",
+                          deleteSpeed: 999999,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <ChatMessagesComp
+                chatMessages={chatMessages}
+                showSkeletonOfAi={showSkeletonOfAi}
+              />
+            </div>
+          )}
+        </div>
       </main>
 
-      {/* FIXED FOOTER */}
-<footer className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl p-5 z-20">
-<div className="bg-card/80 backdrop-blur-md rounded-2xl border border-border shadow-lg p-2">
-  <ChatInput
-    onSend={handleSendMessage}
-    isProcessingMessage={isProcessingMessage}
-    onStop={handleStopRequest}
-  />
-</div>
-</footer>
+      {/* Input Footer */}
+      <footer className="flex-shrink-0 w-full bg-background/95 backdrop-blur-sm p-4 pt-2">
+        <div className="max-w-4xl mx-auto w-full">
+          <ChatInput
+            onSend={handleSendMessage}
+            isProcessingMessage={isProcessingMessage}
+            onStop={() => setIsProcessingMessage(false)}
+          />
+          <p className="text-[11px] text-center text-muted-foreground mt-3 opacity-70">
+            AI can make mistakes. Verify important info.
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

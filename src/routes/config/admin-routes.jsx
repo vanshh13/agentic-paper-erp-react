@@ -1,8 +1,8 @@
-import Rules from '../../pages/Rules/Rules';
-import Approvals from '../../pages/Approvals/Approvals';
-import UserList from '../../pages/UserList/UserList';
-import Settings from '../../pages/Settings/Settings';
-import UserDetailForm from '../../components/user/UserDetailForm';
+import Rules from '../../pages/rules/rules';
+import Approvals from '../../pages/approvals/approvals';
+import UserList from '../../pages/user-list/user-list';
+import UserDetailForm from '../../components/user/user-detail-form';
+import Settings from '../../pages/settings/settings';
 
 const adminRoutes = [
   {

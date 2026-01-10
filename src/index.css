@@ -1,3 +1,9 @@
+/* 
+  NOTE:
+  Colors here are DEFAULTS only.
+  After app mount, Redux injects all theme variables inline.
+*/
+
 @import "tailwindcss";
 
 :root {
@@ -347,4 +353,53 @@
   .hover\:bg-muted:hover { background-color: var(--muted); }
   .hover\:bg-sidebar-accent:hover { background-color: var(--sidebar-accent); }
   .hover\:text-foreground:hover { color: var(--foreground); }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Update your CSS file */
+.animate-border-glow {
+  position: relative;
+  z-index: 0;
+  /* Remove overflow-hidden from here so glow can spread */
+}
+
+.animate-border-glow::before {
+  content: "";
+  position: absolute;
+  /* This controls how "wide" the glow goes outside the border */
+  inset: -2px; 
+  z-index: -1;
+  background: linear-gradient(
+    45deg, 
+    transparent 20%, 
+    var(--primary) 50%, 
+    transparent 80%
+  );
+  background-size: 400% 400%;
+  border-radius: calc(1.5rem + 2px);
+  animation: border-glow-rotate 4s linear infinite;
+  /* This adds the "spread" effect */
+  filter: blur(15px); 
+  opacity: 0.6;
+}
+
+/* Optional: Keep the sharp border line too */
+.animate-border-glow::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: linear-gradient(45deg, transparent, var(--primary), transparent);
+  background-size: 400% 400%;
+  border-radius: calc(1.5rem + 1px);
+  animation: border-glow-rotate 4s linear infinite;
+}
+
+@keyframes border-glow-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

@@ -2,12 +2,12 @@ import React, { useEffect, Suspense } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
-
-import { store } from './store'
+import NotificationWrapper from './components/notifiction/notifiction'
+import { store, persistor } from './store'
 import routes  from './routes/config/routes'
 import ProtectedRoute from './routes/protected-route'
 import RootLayout from './layout/root-layout'
-import { SidebarProvider } from './contexts/side-bar-context'
+import { SidebarProvider } from './contexts/sidebar-context'
 
 const LoadingSpinner = () => (
   <div className="flex h-screen w-screen items-center justify-center">

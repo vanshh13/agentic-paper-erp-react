@@ -2,11 +2,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, Search, Settings, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useSidebar } from '../contexts/SidebarContext'
+import { useSidebar } from '../contexts/sidebar-context'
 import { logoutUser } from '../services/api/auth'
-import NavItems from './NavItems'
-import InteractiveAIAvatar from '../components/InteractiveAIAvatar'
-import { logoutSuccess } from '../store/slices/userSlice'
+import NavItems from './nav-items'
+import InteractiveAIAvatar from '../pages/automatic-intelligence/components/interactive-ai-avatar-main'
+import { logoutSuccess } from '../store/slices/user-slice'
 
 export default function Sidebar() {
   const { isOpen, setIsOpen } = useSidebar()
@@ -92,7 +92,7 @@ export default function Sidebar() {
 
         {/* AI Avatar */}
         <div 
-          className="flex-shrink-0 border-b border-sidebar pt-4 pb-3 cursor-pointer transition-colors duration-300"
+          className="flex-shrink-0 border-b border-sidebar pt-4 cursor-pointer transition-colors duration-300"
           onClick={() => navigate('/chat')}
         >
           <InteractiveAIAvatar />
