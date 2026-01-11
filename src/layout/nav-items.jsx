@@ -19,23 +19,23 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
       label: 'Overview',
       items: [
         { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard', badge: null },
-        { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: '5' },
-        { label: 'Approvals', icon: CheckSquare, path: '/approvals', badge: '4' },
+        { label: 'Inquiries', icon: MessageSquare, path: '/inquiry', badge: null },
+        { label: 'Approvals', icon: CheckSquare, path: '/approvals', badge: null },
       ]
     },
     {
       id: 'purchases',
       label: 'Purchases',
       items: [
-        { label: 'Purchase Orders', icon: ShoppingCart, path: '/purchase-orders', badge: '3' },
-        { label: 'GRN', icon: ClipboardList, path: '/grn', badge: '2' },
+        { label: 'Purchase Orders', icon: ShoppingCart, path: '/purchase-orders', badge: null },
+        { label: 'GRN', icon: ClipboardList, path: '/grn', badge: null },
       ]
     },
     {
       id: 'sales',
       label: 'Sales',
       items: [
-        { label: 'Sales Orders', icon: IndianRupee, path: '/sales-orders', badge: '8' },
+        { label: 'Sales Orders', icon: IndianRupee, path: '/sales-orders', badge: null },
         { label: 'Quotations', icon: FileText, path: '/quotations', badge: null },
         { label: 'Dispatch', icon: Truck, path: '/dispatch', badge: null },
       ]
@@ -44,7 +44,7 @@ export default function NavItems({ onLinkClick, searchQuery = '' }) {
       id: 'inventory',
       label: 'Inventory',
       items: [
-        { label: 'Stock', icon: Package, path: '/stock', badge: '12' },
+        { label: 'Stock', icon: Package, path: '/stock', badge: null },
         { label: 'Products', icon: Package, path: '/productsList', badge: null },
         { label: 'Price Lists', icon: Tag, path: '/price-lists', badge: null },
       ]

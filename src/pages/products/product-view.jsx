@@ -4,10 +4,14 @@ import { useEffect, useState } from 'react';
 import { createProductFormConfig } from './product-form-config';
 import DynamicForm from '../../components/form/dynamic-form';
 import { productApi } from '../../services/api/product/product-api';
+import { useSelector } from 'react-redux';
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice';
 
 export default function ProductView() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const isDarkMode = useSelector(selectThemeMode);
+  const currentTheme = useSelector(selectCurrentTheme);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,16 +45,16 @@ export default function ProductView() {
   /* ===== LOADING STATE ===== */
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-gray-400">Loading product details...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading product details...</p>
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-gray-400">Product not found</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Product not found</p>
       </div>
     );
   }
@@ -73,7 +77,7 @@ export default function ProductView() {
   const formConfig = createProductFormConfig('view', viewData);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-300">
+    <div className="min-h-screen bg-background text-foreground">
       <DynamicForm
         config={formConfig}
         onCancel={handleBack}

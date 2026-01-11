@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
-import Sidebar from './Sidebar'
+import Sidebar from './sidebar'
 import { Bell, Menu, ChevronRight, Home, Sun, Moon } from 'lucide-react'
 import { useLocation, Link, matchPath } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { toggleTheme } from '../store/slices/theme-slice'
-import { useSidebar } from '../contexts/SidebarContext'
+import { useSidebar } from '../contexts/sidebar-context'
 import routes from '../routes/config/routes'
 import { selectBreadcrumbs, setPathname } from '../store/slices/breadcrumbs-slice'
 
@@ -31,6 +31,8 @@ export default function RootLayout({ children }) {
   // Apply theme to document root
   useEffect(() => {
     const root = document.documentElement
+
+    root.classList.toggle('dark', isDarkMode)
     
     // Apply the dark class when in dark mode, remove it when in light mode
     if (isDarkMode) {
@@ -177,36 +179,48 @@ export default function RootLayout({ children }) {
 
         {/* Breadcrumb */}
         {location.pathname != '/chat' &&
-        <div 
-          className="border-b px-4 md:px-6 py-3 flex-shrink-0 transition-colors duration-300"
-          style={{ 
-            backgroundColor: currentTheme.card,
-            borderColor: currentTheme.border
-          }}
-        >
-          <nav className="flex items-center gap-2 text-sm">
-            {breadcrumbs.map((crumb, index) => (
-              <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
-                {index === 0 ? (
-                  <Link
-                    to={crumb.path}
-                    className="flex items-center gap-1.5 hover:opacity-80 transition-all"
-                    style={{ color: currentTheme.primary }}
-                  >
-                    <Home size={16} />
-                    <span>{crumb.label}</span>
-                  </Link>
-                ) : (
-                  <>
-                    <ChevronRight size={16} style={{ color: currentTheme.muted }} />
-                    {index === breadcrumbs.length - 1 ? (
-                      <span 
-                        className="font-medium transition-colors duration-300"
+          <div
+            className="border-b px-4 md:px-6 py-3 flex-shrink-0 transition-colors duration-300"
+            style={{
+              backgroundColor: currentTheme.card,
+              borderColor: currentTheme.border
+            }}
+          >
+            <nav className="flex items-center gap-2 text-sm">
+              {breadcrumbs.map((crumb, index) => {
+                const isLast = index === breadcrumbs.length - 1
+
+                // Make Edit / View / numeric IDs text-only
+                const isEditViewOrId =
+                  ['edit', 'view'].includes(crumb.label.toLowerCase()) ||
+                  !isNaN(Number(crumb.label))
+
+                return (
+                  <div key={`${crumb.path}-${index}`} className="flex items-center gap-2">
+                    {index !== 0 && (
+                      <ChevronRight size={16} style={{ color: currentTheme.muted }} />
+                    )}
+
+                    {index === 0 ? (
+                      // Home (always clickable)
+                      <Link
+                        to={crumb.path}
+                        className="flex items-center gap-1.5 hover:opacity-80 transition-all"
+                        style={{ color: currentTheme.primary }}
+                      >
+                        <Home size={16} />
+                        <span>{crumb.label}</span>
+                      </Link>
+                    ) : isLast || isEditViewOrId ? (
+                      // Edit / View / ID → text only
+                      <span
+                        className="font-medium cursor-default transition-colors duration-300"
                         style={{ color: currentTheme.foreground }}
                       >
                         {crumb.label}
                       </span>
                     ) : (
+                      // Other breadcrumbs clickable
                       <Link
                         to={crumb.path}
                         className="hover:opacity-80 transition-all"
@@ -215,11 +229,10 @@ export default function RootLayout({ children }) {
                         {crumb.label}
                       </Link>
                     )}
-                  </>
-                )}
-              </div>
-            ))}
-          </nav>
+                  </div>
+                )
+              })}
+            </nav>
         </div>
         }
         {/* Page Content */}

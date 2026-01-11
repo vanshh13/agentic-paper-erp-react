@@ -1,12 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { persistStore, persistReducer } from 'redux-persist'
 import storageSession from 'redux-persist/lib/storage/session'
-// src/store/index.js
-import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './slices/user-slice';
-
-
-import authReducer from './slices/userSlice'
+import authReducer from './slices/user-slice'
 import themeReducer from './slices/theme-slice'
 import breadcrumbsReducer from './slices/breadcrumbs-slice'
 

@@ -3,10 +3,14 @@ import { useEffect, useState } from 'react';
 import { createProductFormConfig } from './product-form-config';
 import DynamicForm from '../../components/form/dynamic-form';
 import { productApi } from '../../services/api/product/product-api';
+import { useSelector } from 'react-redux';
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice';
 
 export default function ProductCreateEdit() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const isDarkMode = useSelector(selectThemeMode);
+  const currentTheme = useSelector(selectCurrentTheme);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,8 +70,8 @@ export default function ProductCreateEdit() {
   /* ===== STATES ===== */
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <p className="text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     );
   }
@@ -94,7 +98,7 @@ export default function ProductCreateEdit() {
   const formConfig = createProductFormConfig(formMode, initialData);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-300">
+    <div className="min-h-screen bg-background text-foreground">
       <DynamicForm
         config={formConfig}
         onSubmit={handleFormSubmit}

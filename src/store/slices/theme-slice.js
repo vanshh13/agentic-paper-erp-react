@@ -49,6 +49,13 @@ const defaultLightTheme = {
   chart3: 'oklch(0.45 0.20 280)',          // Purple
   chart4: 'oklch(0.60 0.14 270)',          // Blue
   chart5: 'oklch(0.40 0.18 285)',          // Deep purple
+
+  radius: '0.625rem',
+  tableHeader: 'oklch(0.94 0 0)',                // light
+  tableHeaderForeground: 'oklch(0.22 0 0)',
+  sidebarRing: 'oklch(0.60 0.16 270)',           // light
+  // border: 'oklch(0.45 0 0 / 0.85)',
+  input: 'oklch(0.75 0 0 / 0.25)',
 };
 
 // Default Dark Theme Colors
@@ -101,6 +108,13 @@ const defaultDarkTheme = {
   chart3: 'oklch(0.45 0.20 280)',          // Purple
   chart4: 'oklch(0.60 0.14 270)',          // Blue
   chart5: 'oklch(0.40 0.18 285)',          // Deep purple
+
+  tableHeader: 'oklch(0.38 0 0)',                // dark
+  tableHeaderForeground: 'oklch(0.92 0 0)',
+  sidebarRing: 'oklch(0.50 0.18 280)',           // dark
+  border: 'oklch(0.40 0 0 / 0.3)',
+  input: 'oklch(0.35 0 0)',
+
 };
 
 const initialState = {

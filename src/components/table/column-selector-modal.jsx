@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice'
 
 export default function ColumnSelectorModal({ open, columns, selectedKeys, onApply, onClose }) {
+  const isDarkMode = useSelector(selectThemeMode)
+  const theme = useSelector(selectCurrentTheme)
   const [localSelection, setLocalSelection] = useState(selectedKeys || [])
 
   useEffect(() => {

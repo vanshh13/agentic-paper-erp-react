@@ -1,4 +1,6 @@
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react'
+import { useSelector } from 'react-redux'
+import { selectThemeMode, selectCurrentTheme } from '../../store/slices/theme-slice'
 
 export default function TablePagination({
   currentPage = 1,

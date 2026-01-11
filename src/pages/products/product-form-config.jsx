@@ -76,7 +76,7 @@ const createProductFormConfig = (mode = 'create', initialData = {}) => {
             placeholder: 'e.g., 80',
             // Custom view rendering for GSM
             renderView: isViewMode 
-              ? (value) => <span className="text-gray-200">{value} g/m²</span>
+              ? (value) => <span className="text-foreground">{value} g/m²</span>
               : undefined,
           },
         ],
@@ -99,7 +99,7 @@ const createProductFormConfig = (mode = 'create', initialData = {}) => {
             // Custom view rendering for stock with unit
             renderView: isViewMode 
               ? (value, formData) => (
-                  <span className="text-gray-200">
+                  <span className="text-foreground">
                     {value} {formData.stockUnit || 'units'}
                   </span>
                 )
@@ -128,7 +128,7 @@ const createProductFormConfig = (mode = 'create', initialData = {}) => {
             // Custom view rendering for min level with unit
             renderView: isViewMode 
               ? (value, formData) => (
-                  <span className="text-gray-200">
+                  <span className="text-foreground">
                     {value} {formData.stockUnit || 'units'}
                   </span>
                 )
@@ -144,7 +144,7 @@ const createProductFormConfig = (mode = 'create', initialData = {}) => {
             // Custom view rendering for price
             renderView: isViewMode 
               ? (value) => (
-                  <span className="text-gray-200 font-medium">₹{value}</span>
+                  <span className="text-foreground font-medium">₹{value}</span>
                 )
               : undefined,
           },

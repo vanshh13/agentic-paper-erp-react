@@ -296,7 +296,7 @@ export default function PurchaseOrders() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg gradient-primary shadow-glow text-foreground">
+            <div className="p-2 rounded-lg bg-primary text-primary-foreground shadow-glow">
               <FileText className="w-6 h-6" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Purchase Orders</h2>
@@ -312,7 +312,7 @@ export default function PurchaseOrders() {
               setEditingPO(null)
               setShowJKDialog(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg text-foreground hover:bg-accent transition-colors text-sm">
+            className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-foreground hover:bg-accent transition-colors text-sm bg-card">
             <FileText className="w-4 h-4" />
             JK Company PO
           </button>
@@ -322,7 +322,7 @@ export default function PurchaseOrders() {
               setEditingPO(null)
               setShowDialog(true)
             }}
-            className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap">
+            className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-semibold shadow-glow hover:opacity-90 transition text-sm md:text-base whitespace-nowrap">
             <Plus className="w-4 h-4" />
             Create PO
           </button>
@@ -345,7 +345,7 @@ export default function PurchaseOrders() {
                   renderActions={(row) => (
                   <button
                     onClick={() => navigate(`/purchase-orders/${row.id}`)}
-                    className="p-2 rounded-lg hover:bg-[oklch(0.28_0_0)]"
+                    className="p-2 rounded-lg hover:bg-accent"
                     title="View"
                   >
                     <Eye className="w-4 h-4" />
@@ -357,11 +357,11 @@ export default function PurchaseOrders() {
         {/* Mobile Card View - Hidden on Desktop */}
         <div className="md:hidden max-h-[600px] overflow-y-auto custom-scrollbar">
           {loadingList ? (
-            <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
+            <div className="px-4 py-12 text-center text-muted-foreground">
               Loading purchase orders...
             </div>
           ) : filteredPOs.length === 0 ? (
-            <div className="px-4 py-12 text-center text-[oklch(0.70_0_0)]">
+            <div className="px-4 py-12 text-center text-muted-foreground">
               No purchase orders found
             </div>
           ) : (
@@ -373,12 +373,12 @@ export default function PurchaseOrders() {
                 return (
                   <div
                     key={po.id}
-                    className="bg-[oklch(0.18_0_0)] border border-[var(--border)] rounded-lg p-4 space-y-3 hover:bg-[oklch(0.22_0_0)] transition-colors"
+                    className="bg-card border border-border rounded-lg p-4 space-y-3 hover:bg-accent transition-colors"
                   >
                     {/* Header Row */}
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-mono text-sm font-bold text-[oklch(0.92_0_0)] truncate">
+                        <div className="font-mono text-sm font-bold text-foreground truncate">
                           {po.poNumber}
                         </div>
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -392,7 +392,7 @@ export default function PurchaseOrders() {
                       </div>
                       <button
                         onClick={() => navigate(`/purchase-orders/${po.id}`)}
-                        className="text-[oklch(0.90_0_0)] hover:text-[oklch(0.98_0_0)] hover:bg-[oklch(0.28_0_0)] p-2 rounded-lg transition-colors flex-shrink-0"
+                        className="text-foreground hover:text-primary hover:bg-accent p-2 rounded-lg transition-colors flex-shrink-0"
                         title="View details"
                       >
                         <Eye className="w-5 h-5" />
@@ -402,31 +402,31 @@ export default function PurchaseOrders() {
                     {/* Details Grid */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Vendor</div>
-                        <div className="text-[oklch(0.88_0_0)] truncate">{po.vendor}</div>
+                        <div className="text-xs text-muted-foreground mb-0.5">Vendor</div>
+                        <div className="text-foreground truncate">{po.vendor}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Items</div>
-                        <div className="text-[oklch(0.88_0_0)]">{po.items}</div>
+                        <div className="text-xs text-muted-foreground mb-0.5">Items</div>
+                        <div className="text-foreground">{po.items}</div>
                       </div>
                       <div>
-                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Amount</div>
-                        <div className="text-[oklch(0.90_0_0)] font-semibold">
+                        <div className="text-xs text-muted-foreground mb-0.5">Amount</div>
+                        <div className="text-foreground font-semibold">
                           {po.amount > 0 ? `₹${po.amount.toLocaleString('en-IN')}` : '-'}
                         </div>
                       </div>
                       <div>
-                        <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Delivery</div>
-                        <div className="text-[oklch(0.88_0_0)] truncate capitalize">
+                        <div className="text-xs text-muted-foreground mb-0.5">Delivery</div>
+                        <div className="text-foreground truncate capitalize">
                           {po.delivery}
                         </div>
                       </div>
                     </div>
 
                     {/* Delivery Date */}
-                    <div className="pt-2 border-t border-[var(--border)]">
-                      <div className="text-xs text-[oklch(0.65_0_0)] mb-0.5">Delivery Date</div>
-                      <div className="text-sm text-[oklch(0.78_0_0)]">
+                    <div className="pt-2 border-t border-border">
+                      <div className="text-xs text-muted-foreground mb-0.5">Delivery Date</div>
+                      <div className="text-sm text-foreground">
                         {po.deliveryDate !== '-' ? new Date(po.deliveryDate).toLocaleDateString('en-IN') : '-'}
                       </div>
                     </div>

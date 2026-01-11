@@ -88,7 +88,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
       e.preventDefault();
       setApiError('');
-      
+
       const newErrors = validate();
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors);
@@ -98,7 +98,16 @@ const Register = () => {
       setLoading(true);
 
       try {
-        const response = await registerUser(formData);
+        // Convert date format from DD/MM/YYYY to YYYY-MM-DD for API
+        const submitData = {
+          ...formData,
+          date_of_birth: formData.date_of_birth ? (() => {
+            const [day, month, year] = formData.date_of_birth.split('/');
+            return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          })() : ''
+        };
+
+        const response = await registerUser(submitData);
         
         if (response.success) {
           setSuccess(true);
@@ -114,20 +123,12 @@ const Register = () => {
             date_of_birth: '',
             mobile_number: '',
           });
-          Notification({
-            type: NOTIFICATION_TYPE_SUCCESS,
-            message: 'Registration successful! Please login.',
-          })
           // Navigate to login 
           navigate('/auth/login', { replace: true })
         }
       } catch (error) {
         const message = error.message || 'Registration failed. Please try again.'
         setApiError(message || 'Registration failed. Please try again.');
-        Notification({
-          type: NOTIFICATION_TYPE_ERROR,
-          message,
-        })
         setLoading(false);
       }
     };

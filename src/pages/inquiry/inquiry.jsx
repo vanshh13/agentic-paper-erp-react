@@ -15,11 +15,11 @@ import {
   deleteInquiryInteraction,
 } from '../../services/api/inquiry/inquiry-interaction-api';
 // Import components
-import InquiryForm from '../../components/inquiry/InquiryForm'
-import InquiryList from '../../components/inquiry/InquiryList'
-import InquiryView from '../../components/inquiry/InquiryView'
-import Toast from '../../components/ui/Toast'
-import ConfirmationModal from '../../components/ui/ConfirmationModal'
+import InquiryForm from '../../components/inquiry/inquiry-form'
+import InquiryList from '../../components/inquiry/inquiry-list'
+import InquiryView from '../../components/inquiry/inquiry-view'
+import Toast from '../../components/ui/toast'
+import ConfirmationModal from '../../components/ui/confirmation-modal'
 import Notification from '../../components/notifiction/notifiction'
 import { useSelector } from 'react-redux'
 
